@@ -1,0 +1,448 @@
+---
+title: Authentication & Environments
+description: Learn how to authenticate to Rebell APIs using RSA signatures and configure sandbox and production environments.
+---
+
+Rebell Payment APIs use asymmetric cryptography (RSA) to ensure secure server-to-server communication between your backend and the Rebell platform. Every API request must be signed with your private key, and every response must be validated according to the contract defined in this section.
+
+## API Environments
+
+Rebell provides two separate environments for integration and production use:
+
+<CardGroup cols={2}>
+  <Card title="Sandbox" icon="flask">
+    **Base URL:** `https://sandbox-api.rebellapp.com`
+
+    For integration, functional testing, and signature verification. Payments are simulated and do not settle.
+  </Card>
+
+  <Card title="Production" icon="shield-check">
+    **Base URL:** `https://api.rebellapp.com`
+
+    Live payment environment. Requires merchant onboarding and contract activation.
+  </Card>
+</CardGroup>
+
+### Environment Separation Rules
+
+<Warning>
+**Critical requirements:**
+
+- Sandbox and Production credentials are **not interchangeable**
+- Keys registered in sandbox do **not** carry over to production
+- Webhooks must be configured per environment
+- Testing and live order identifiers must remain separate
+</Warning>
+
+## Merchant Credentials
+
+Once you complete merchant onboarding (regulatory, KYB, and contractual steps), Rebell provisions a credential set that identifies and authenticates your business.
+
+### Credential Components
+
+<Tabs>
+  <Tab title="Client-Id">
+    **Unique merchant identifier**
+
+    A unique identifier for your merchant account, included in every API request header.
+
+    ```
+    Client-Id: 2022091495540562874792
+    ```
+  </Tab>
+
+  <Tab title="RSA Public Key">
+    **Public key registration**
+
+    You upload your RSA-2048 public key to Rebell. The platform stores it and associates it with your merchant identity for signature verification.
+
+    - Must be RSA-2048 format
+    - Uploaded through merchant portal
+    - Used to verify your request signatures
+  </Tab>
+
+  <Tab title="keyVersion">
+    **Key rotation support**
+
+    A version number assigned to each RSA key pair. Used to support key rotation without downtime.
+
+    ```
+    keyVersion: 1
+    ```
+
+    When you rotate keys, Rebell assigns a new keyVersion while accepting signatures from previous active versions.
+  </Tab>
+</Tabs>
+
+These credentials enable secure, authenticated API communication.
+
+## RSA Signing Model
+
+All API requests must be signed with your **RSA-2048 private key** using **SHA256**.
+
+### What Rebell Validates
+
+Rebell validates every request for:
+
+- ✅ **Signature integrity** - Cryptographic signature matches request content
+- ✅ **Timestamp freshness** - Request is within 5-minute tolerance window
+- ✅ **Merchant identity** - Client-Id matches registered merchant
+- ✅ **Payload consistency** - Request body hasn't been tampered with
+
+### Purpose of Signing
+
+<AccordionGroup>
+  <Accordion title="Merchant Authentication">
+    Ensures that the request originates from the legitimate merchant who owns the Client-Id and private key.
+  </Accordion>
+
+  <Accordion title="Request Integrity">
+    Prevents tampering with request content during transmission. Any modification invalidates the signature.
+  </Accordion>
+
+  <Accordion title="Replay Attack Prevention">
+    Timestamp validation prevents attackers from capturing and replaying old requests.
+  </Accordion>
+</AccordionGroup>
+
+## Required HTTP Headers
+
+Every server-to-server API call must include these headers:
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Client-Id` | Yes | Identifies the merchant |
+| `Request-Time` | Yes | ISO 8601 timestamp (UTC) |
+| `Signature` | Yes | RSA signature block |
+| `Content-Type` | Yes | Must be `application/json` |
+
+### Timestamp Requirement
+
+<Warning>
+The `Request-Time` value must not differ from Rebell server time by more than **±5 minutes**.
+
+Requests outside this tolerance window are rejected to prevent replay attacks.
+</Warning>
+
+**Example:**
+```
+Request-Time: 2024-01-10T12:22:30Z
+```
+
+## Signature Construction
+
+Follow these three steps to generate a valid signature:
+
+<Steps>
+  <Step title="Build the Signing String">
+    Concatenate the following components:
+
+    ```
+    <HTTP_METHOD> <HTTP_PATH>
+    <Client-Id>.<Request-Time>.<BODY>
+    ```
+
+    **Examples:**
+
+    ```
+    POST /v1/payments/retailPay
+    2022091495540562874792.2024-01-10T12:22:30Z.{"productCode":"51051000101000100040",...}
+    ```
+
+    ```
+    POST /v1/payments/createQrOrder
+    2022091495540562874792.2024-01-10T12:22:30Z.{"paymentAmount":{"currency":"EUR","value":1250},...}
+    ```
+  </Step>
+
+  <Step title="Sign with RSA-SHA256">
+    Use your private key to sign the string:
+
+    ```javascript
+    SHA256withRSA(signing_string)
+    ```
+
+    **Implementation examples:**
+
+    <CodeGroup>
+
+    ```javascript Node.js
+    const crypto = require('crypto');
+    const fs = require('fs');
+
+    function signRequest(method, path, clientId, requestTime, body) {
+      const signingString = `${method} ${path}\n${clientId}.${requestTime}.${JSON.stringify(body)}`;
+
+      const privateKey = fs.readFileSync('private_key.pem', 'utf8');
+      const sign = crypto.createSign('RSA-SHA256');
+      sign.update(signingString);
+
+      const signature = sign.sign(privateKey, 'base64url');
+      return signature;
+    }
+    ```
+
+    ```java Java
+    import java.security.*;
+    import java.util.Base64;
+
+    public String signRequest(String method, String path, String clientId,
+                               String requestTime, String body) throws Exception {
+        String signingString = method + " " + path + "\n" +
+                                clientId + "." + requestTime + "." + body;
+
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign(privateKey);
+        signature.update(signingString.getBytes("UTF-8"));
+
+        byte[] signedBytes = signature.sign();
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(signedBytes);
+    }
+    ```
+
+    ```python Python
+    from cryptography.hazmat.primitives import hashes, serialization
+    from cryptography.hazmat.primitives.asymmetric import padding
+    import base64
+
+    def sign_request(method, path, client_id, request_time, body):
+        signing_string = f"{method} {path}\n{client_id}.{request_time}.{body}"
+
+        with open("private_key.pem", "rb") as key_file:
+            private_key = serialization.load_pem_private_key(
+                key_file.read(), password=None
+            )
+
+        signature = private_key.sign(
+            signing_string.encode('utf-8'),
+            padding.PKCS1v15(),
+            hashes.SHA256()
+        )
+
+        return base64.urlsafe_b64encode(signature).decode('utf-8').rstrip('=')
+    ```
+
+    </CodeGroup>
+  </Step>
+
+  <Step title="Format the Signature Header">
+    Format the signature header as:
+
+    ```
+    Signature: algorithm=SHA256withRSA, keyVersion=<n>, signature=<base64url>
+    ```
+
+    **Example:**
+
+    ```
+    Signature: algorithm=SHA256withRSA, keyVersion=1, signature=MIIC...
+    ```
+
+    **Important notes:**
+    - Signature is base64url-encoded (not standard base64)
+    - Newlines must not be inserted in the signature payload
+    - Ensure all JSON fields are serialized consistently
+  </Step>
+</Steps>
+
+## Complete Example
+
+Here's a complete signed request:
+
+```http
+POST /v1/payments/retailPay
+Client-Id: 2022091495540562874792
+Request-Time: 2024-01-10T12:22:30Z
+Signature: algorithm=SHA256withRSA, keyVersion=1, signature=MIIC...
+Content-Type: application/json
+
+{
+  "productCode": "51051000101000100040",
+  "paymentRequestId": "pos-001",
+  "paymentAuthCode": "2810120202624...",
+  "paymentAmount": {
+    "currency": "EUR",
+    "value": 1250
+  },
+  "order": {
+    "orderDescription": "Coffee"
+  }
+}
+```
+
+### Validation Process
+
+This request will be validated for:
+
+<Checks>
+  - Proper signature (matches signing string)
+  - Timestamp validity (within ±5 minutes)
+  - Merchant identity (Client-Id exists and is active)
+  - Payload correctness (JSON matches signature)
+</Checks>
+
+## Key Rotation
+
+Merchants may rotate keys at any time without downtime.
+
+### Rotation Process
+
+<Steps>
+  <Step title="Generate New Key Pair">
+    Create a new RSA-2048 key pair while keeping the old one active.
+  </Step>
+
+  <Step title="Upload New Public Key">
+    Upload the new public key to Rebell. You'll receive a new `keyVersion` identifier.
+  </Step>
+
+  <Step title="Gradual Migration">
+    Gradually migrate traffic to use the new key while the old key remains active.
+  </Step>
+
+  <Step title="Deprecate Old Key">
+    Once all traffic has migrated, deprecate the old key through the merchant portal.
+  </Step>
+</Steps>
+
+### Rotation Rules
+
+<CardGroup cols={2}>
+  <Card title="New keyVersion" icon="key">
+    Every new public key uploaded to Rebell receives a new keyVersion identifier
+  </Card>
+
+  <Card title="Multi-Version Support" icon="layer-group">
+    Rebell accepts signatures generated with any active keyVersion
+  </Card>
+
+  <Card title="Gradual Migration" icon="arrows-rotate">
+    Migrate traffic gradually and deprecate old keys safely
+  </Card>
+
+  <Card title="Secure Storage" icon="vault">
+    Private keys must be stored in a secure KMS/HSM
+  </Card>
+</CardGroup>
+
+## Security Best Practices
+
+<Warning>
+**Critical Security Requirements:**
+
+- ✅ Store private keys in a Hardware Security Module (HSM) or cloud KMS
+- ✅ Never embed private keys in mobile apps or frontend code
+- ✅ Rotate private keys regularly (recommended every 6-12 months)
+- ✅ Validate webhook signatures using the same RSA mechanism
+- ✅ Log invalid signature attempts for auditing
+- ✅ Ensure system clocks are synchronized (NTP)
+</Warning>
+
+### Key Storage
+
+Your private key is the most critical security asset. Follow these guidelines:
+
+<AccordionGroup>
+  <Accordion title="Use HSM or Cloud KMS">
+    Store private keys in dedicated hardware security modules (HSM) or cloud-based key management systems (AWS KMS, Google Cloud KMS, Azure Key Vault).
+
+    **Never:**
+    - Store keys in application code
+    - Commit keys to version control
+    - Share keys via email or chat
+  </Accordion>
+
+  <Accordion title="Restrict Access">
+    Limit private key access to only the backend services that need to sign requests. Use role-based access control (RBAC) and audit all key access.
+  </Accordion>
+
+  <Accordion title="Regular Rotation">
+    Rotate keys every 6-12 months or immediately if:
+    - Key may have been compromised
+    - Team member with key access leaves
+    - Security audit recommends rotation
+  </Accordion>
+
+  <Accordion title="Environment Separation">
+    Use completely separate keys for sandbox and production environments. Never share keys between environments.
+  </Accordion>
+</AccordionGroup>
+
+### Clock Synchronization
+
+<Info>
+Ensure your servers use Network Time Protocol (NTP) to maintain accurate time synchronization. Clock drift can cause valid requests to be rejected due to timestamp validation failures.
+
+**Check your server time:**
+```bash
+date -u
+```
+
+**Sync with NTP:**
+```bash
+ntpdate -s time.nist.gov
+```
+</Info>
+
+## Troubleshooting
+
+Common signature validation errors and solutions:
+
+<AccordionGroup>
+  <Accordion title="Invalid Signature Error">
+    **Cause:** Signature doesn't match the signing string
+
+    **Solutions:**
+    - Verify signing string format (HTTP method, path, Client-Id, timestamp, body)
+    - Ensure JSON serialization is consistent (no extra whitespace)
+    - Check that you're using the correct private key
+    - Verify base64url encoding (not standard base64)
+  </Accordion>
+
+  <Accordion title="Timestamp Out of Range">
+    **Cause:** Request-Time differs from server time by more than 5 minutes
+
+    **Solutions:**
+    - Synchronize your server clock with NTP
+    - Check for timezone issues (must be UTC)
+    - Verify ISO 8601 format: `2024-01-10T12:22:30Z`
+  </Accordion>
+
+  <Accordion title="Invalid Client-Id">
+    **Cause:** Client-Id not recognized or inactive
+
+    **Solutions:**
+    - Verify you're using the correct Client-Id for the environment
+    - Check that merchant account is active
+    - Ensure you're not mixing sandbox and production credentials
+  </Accordion>
+
+  <Accordion title="Invalid keyVersion">
+    **Cause:** keyVersion doesn't match any active keys
+
+    **Solutions:**
+    - Verify keyVersion in signature header
+    - Check that key hasn't been deprecated
+    - Ensure public key was successfully uploaded
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication Deep Dive" icon="microscope" href="/payment-integration/authentication-deep-dive">
+    Advanced authentication topics and implementation details
+  </Card>
+
+  <Card title="Retail Pay" icon="barcode-read" href="/payment-integration/retail-pay">
+    Implement merchant-initiated QR scanning payments
+  </Card>
+
+  <Card title="Webhooks" icon="webhook" href="/payment-integration/webhooks">
+    Verify webhook signatures using the same RSA mechanism
+  </Card>
+
+  <Card title="Error Handling" icon="triangle-exclamation" href="/payment-integration/error-handling">
+    Handle authentication and signature errors correctly
+  </Card>
+</CardGroup>

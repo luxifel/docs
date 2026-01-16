@@ -1,0 +1,387 @@
+---
+title: Quick Integration Guide
+description: Step-by-step overview for fast, correct, and production-ready integration with Rebell Payments.
+---
+
+This guide provides a complete integration path for developers who want a production-ready implementation without navigating all sections in depth.
+
+## Prerequisites
+
+Before starting your integration, ensure you have:
+
+<CardGroup cols={2}>
+  <Card title="Merchant Onboarding" icon="user-check">
+    Complete KYB/AML verification and contractual approval
+  </Card>
+  <Card title="Sandbox Access" icon="flask">
+    Access to test environment for integration and testing
+  </Card>
+  <Card title="Credentials" icon="key">
+    Client-Id, RSA key pair (private key stored securely), and keyVersion
+  </Card>
+  <Card title="Technical Setup" icon="server">
+    HTTPS-enabled backend and ability to expose webhook endpoint
+  </Card>
+</CardGroup>
+
+## Choose Your Payment Flow
+
+Select the payment flow that best matches your use case:
+
+| Use Case | Recommended Flow | Description |
+|----------|------------------|-------------|
+| **In-store POS with scanner** | [Retail Pay](/payment-integration/retail-pay) | Merchant scans user's dynamic QR code |
+| **Printed or on-screen QR** | [QR Order Pay](/payment-integration/qr-order-pay) | User scans merchant's QR code |
+| **Mobile app checkout** | [Link Pay](/payment-integration/link-pay) | App-to-app payment redirection |
+| **Web checkout (desktop)** | [QR Order Pay](/payment-integration/qr-order-pay) or [Link Pay](/payment-integration/link-pay) | Based on user device |
+
+<Note>
+You may implement more than one flow using the same credentials.
+</Note>
+
+## Integration Overview
+
+All Rebell payment integrations follow the same seven core steps:
+
+<Steps>
+  <Step title="Implement Request Signing">
+    Set up RSA-SHA256 authentication for secure API communication
+  </Step>
+
+  <Step title="Create Payment">
+    Call the appropriate payment API based on your chosen flow
+  </Step>
+
+  <Step title="Handle Immediate Response">
+    Process SUCCESS, PROCESSING, or FAIL status from initial API call
+  </Step>
+
+  <Step title="Implement Webhook Endpoint">
+    Receive asynchronous payment notifications from Rebell
+  </Step>
+
+  <Step title="Handle Final Payment Result">
+    Update order status based on webhook notifications
+  </Step>
+
+  <Step title="Implement Inquiry API">
+    Use as fallback when webhooks are delayed or for active confirmation
+  </Step>
+
+  <Step title="Production Deployment">
+    Switch credentials and endpoints from sandbox to production
+  </Step>
+</Steps>
+
+## Step-by-Step Implementation
+
+### Step 1: Implement Authentication & Signing
+
+<AccordionGroup>
+  <Accordion title="Generate RSA-2048 Key Pair">
+    ```bash
+    # Generate private key
+    openssl genrsa -out private_key.pem 2048
+
+    # Extract public key
+    openssl rsa -in private_key.pem -pubout -out public_key.pem
+    ```
+  </Accordion>
+
+  <Accordion title="Upload Public Key to Rebell">
+    Upload your public key through the Rebell merchant portal to receive your keyVersion identifier.
+  </Accordion>
+
+  <Accordion title="Store Private Key Securely">
+    Store your private key in a Hardware Security Module (HSM) or cloud KMS. Never embed keys in mobile apps or frontend code.
+  </Accordion>
+
+  <Accordion title="Implement Signing Logic">
+    Sign every request with these components:
+    - HTTP method
+    - Request path
+    - Client-Id
+    - Request-Time (ISO 8601 UTC)
+    - Request body (JSON)
+
+    See [Authentication & Environments](/payment-integration/authentication-environments) for detailed implementation.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+Validate your signing implementation using sandbox APIs before proceeding with payment integration.
+</Warning>
+
+### Step 2: Create a Payment
+
+Choose the appropriate endpoint based on your payment flow:
+
+<CodeGroup>
+
+```bash Retail Pay
+POST /v1/payments/retailPay
+```
+
+```bash QR Order Pay
+POST /v1/payments/createQrOrder
+```
+
+```bash Link Pay
+POST /v1/payments/linkPayCreate
+```
+
+</CodeGroup>
+
+**Required for all flows:**
+
+- Generate a unique `paymentRequestId` (used for idempotency)
+- Store mapping between `paymentRequestId` and your internal order ID
+- Log requests and responses (excluding sensitive data)
+
+### Step 3: Handle Immediate Response
+
+Evaluate the `result` object returned by the API:
+
+<Tabs>
+  <Tab title="SUCCESS">
+    **Payment is final**
+
+    - Payment is authorized and complete
+    - You can immediately print receipt and deliver goods
+    - No need to wait for webhook (though you'll still receive one)
+  </Tab>
+
+  <Tab title="PROCESSING">
+    **Payment is pending**
+
+    - Payment requires additional processing
+    - Start polling with Inquiry API every 3-5 seconds
+    - Continue polling for up to 30 seconds or until webhook received
+    - Treat payment as PENDING until resolved
+  </Tab>
+
+  <Tab title="FAIL">
+    **Payment rejected**
+
+    - Transaction failed (insufficient balance, user rejection, expired code)
+    - Reject the transaction and request different payment method
+    - Do not retry with same payment details
+  </Tab>
+</Tabs>
+
+<Warning>
+Do not assume the initial API response is the final payment state. Always implement webhooks.
+</Warning>
+
+### Step 4: Implement Webhooks (Required)
+
+Webhooks are the **source of truth** for final payment results.
+
+**Implementation requirements:**
+
+- Expose an HTTPS POST endpoint
+- Verify RSA signature on every webhook
+- Make handler idempotent (handle duplicate notifications)
+- Update order state only once per payment
+- Return 200 OK to acknowledge receipt
+
+```javascript Example Webhook Handler
+app.post('/webhooks/rebell', async (req, res) => {
+  // 1. Verify signature
+  const isValid = verifyWebhookSignature(req.headers, req.body);
+  if (!isValid) {
+    return res.status(401).send('Invalid signature');
+  }
+
+  // 2. Extract payment info
+  const { paymentId, paymentRequestId, result } = req.body;
+
+  // 3. Update order (idempotent)
+  await updateOrderStatus(paymentRequestId, result.resultStatus);
+
+  // 4. Acknowledge receipt
+  res.status(200).send('OK');
+});
+```
+
+### Step 5: Use Inquiry API (Fallback)
+
+Use the Inquiry API only when:
+
+- Initial response is `PROCESSING`
+- Webhook is delayed
+- POS requires active confirmation
+
+**Polling rules:**
+
+- Poll every 3-5 seconds
+- Stop after receiving `SUCCESS` or `FAIL`
+- Do not exceed retry limits (max 30 seconds)
+
+```bash Inquiry API
+POST /v1/payments/inquiryPayment
+```
+
+### Step 6: Map Errors Correctly
+
+**Error handling checklist:**
+
+- Always check `resultStatus` first
+- Handle user errors appropriately (rejection, insufficient balance)
+- Do not retry business failures
+- Retry safely only on network or 5xx errors
+- Never reuse a `paymentRequestId`
+
+See [Error Handling & Result Codes](/payment-integration/error-handling) for complete error reference.
+
+## Minimal End-to-End Example
+
+Here's a complete QR Order Pay flow:
+
+<Steps>
+  <Step title="Create Order">
+    Merchant backend creates order in your system
+  </Step>
+
+  <Step title="Call API">
+    Call `POST /v1/payments/createQrOrder` with signed request
+  </Step>
+
+  <Step title="Display QR">
+    Render the returned QR code to user
+  </Step>
+
+  <Step title="User Pays">
+    User scans QR and confirms payment in Rebell SuperApp
+  </Step>
+
+  <Step title="Receive Webhook">
+    Rebell sends webhook notification with final result
+  </Step>
+
+  <Step title="Complete Order">
+    Merchant backend marks order as PAID and fulfills
+  </Step>
+</Steps>
+
+<Info>
+This same structure applies to all payment flows (Retail Pay, QR Order Pay, Link Pay).
+</Info>
+
+## Testing Checklist
+
+### Sandbox Testing
+
+Before requesting production access, verify:
+
+<AccordionGroup>
+  <Accordion title="Core Functionality">
+    - [ ] All APIs tested in sandbox
+    - [ ] Signing logic validated
+    - [ ] Webhooks received and signature verified
+    - [ ] Inquiry API logic tested
+    - [ ] Idempotency verified (duplicate requests handled correctly)
+  </Accordion>
+
+  <Accordion title="Error Scenarios">
+    Test these failure cases:
+    - [ ] User rejection
+    - [ ] Insufficient balance
+    - [ ] Expired QR code
+    - [ ] Invalid payment code
+    - [ ] Network timeout
+    - [ ] Signature validation failure
+  </Accordion>
+
+  <Accordion title="Edge Cases">
+    - [ ] PROCESSING status handling
+    - [ ] Delayed webhooks
+    - [ ] Duplicate webhook notifications
+    - [ ] Concurrent payment requests
+  </Accordion>
+</AccordionGroup>
+
+### Go-Live Checklist
+
+Before switching to production:
+
+<CardGroup cols={2}>
+  <Card title="Credentials" icon="key">
+    - [ ] Production credentials configured
+    - [ ] Production public key uploaded
+    - [ ] Sandbox keys removed from production config
+  </Card>
+
+  <Card title="Infrastructure" icon="server">
+    - [ ] Webhook endpoint switched to production URL
+    - [ ] HTTPS properly configured
+    - [ ] Load balancing tested
+  </Card>
+
+  <Card title="Monitoring" icon="chart-line">
+    - [ ] Logging enabled
+    - [ ] Alerting configured for:
+      - Webhook failures
+      - Signature errors
+      - High PROCESSING rate
+  </Card>
+
+  <Card title="Operations" icon="book">
+    - [ ] Internal runbook prepared
+    - [ ] Support team trained
+    - [ ] Rollback plan documented
+  </Card>
+</CardGroup>
+
+## Common Integration Mistakes
+
+Avoid these common pitfalls:
+
+<Warning>
+**Critical Mistakes:**
+
+- ❌ Treating API response as final payment result
+- ❌ Ignoring or not implementing webhooks
+- ❌ Reusing `paymentRequestId` for different transactions
+- ❌ Polling Inquiry API too frequently (< 3 seconds)
+- ❌ Exposing private keys to frontend code
+- ❌ Mixing sandbox and production credentials
+</Warning>
+
+<Tip>
+**Best Practices:**
+
+- ✅ Always wait for webhook confirmation
+- ✅ Implement proper signature verification
+- ✅ Use unique `paymentRequestId` per transaction
+- ✅ Store private keys in HSM/KMS
+- ✅ Test all error scenarios in sandbox
+- ✅ Monitor webhook delivery rates
+</Tip>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication & Environments" icon="shield" href="/payment-integration/authentication-environments">
+    Learn detailed RSA signing and environment configuration
+  </Card>
+
+  <Card title="Payment Flows" icon="credit-card" href="/payment-integration/retail-pay">
+    Explore specific payment methods (Retail Pay, QR Order Pay, Link Pay)
+  </Card>
+
+  <Card title="Webhooks" icon="webhook" href="/payment-integration/webhooks">
+    Implement webhook handling and signature verification
+  </Card>
+
+  <Card title="Error Handling" icon="triangle-exclamation" href="/payment-integration/error-handling">
+    Complete reference for error codes and recovery logic
+  </Card>
+</CardGroup>
+
+## Additional Resources
+
+- **Detailed API specs** → See individual payment flow sections
+- **Advanced authentication** → See [Authentication Deep Dive](/payment-integration/authentication-deep-dive)
+- **UI/UX guidance** → See Product Guides
+- **Mini App integrations** → See Mini App Development

@@ -1,0 +1,798 @@
+---
+title: Authentication Deep Dive
+description: Detailed guide to implementing RSA request signing, troubleshooting signature errors, and managing key rotation.
+---
+
+This guide provides an expanded explanation of how Rebell's authentication and signing model works, including implementation examples, common errors, and best practices.
+
+Use this section when implementing low-level cryptographic signing or when troubleshooting signature-related issues.
+
+<Info>
+For a higher-level overview of authentication and environments, see [Authentication & Environments](/payment-integration/authentication-environments).
+</Info>
+
+## Overview
+
+All Rebell server-to-server requests must be authenticated using an **asymmetric RSA signature**. The merchant signs the request using a private key; Rebell validates the signature using the merchant's registered public key.
+
+**Goals of RSA signing within Rebell:**
+
+- Guarantee request authenticity
+- Prevent tampering of payload and metadata
+- Ensure requests cannot be replayed outside a valid temporal window
+- Enforce a secure merchant identity model
+
+The signing process applies to all payment-related APIs and webhook verification.
+
+## Signing Workflow
+
+A signed Rebell API request follows this lifecycle:
+
+<Steps>
+  <Step title="Construct the Signing String">
+    Build the string that will be signed, including method, path, Client-Id, timestamp, and payload
+  </Step>
+
+  <Step title="Serialize the Request Body">
+    Convert the request body to a JSON string exactly as it will be sent
+  </Step>
+
+  <Step title="Sign with RSA">
+    Sign the string using `SHA256withRSA` algorithm
+  </Step>
+
+  <Step title="Base64URL Encode">
+    Encode the signature using Base64URL encoding
+  </Step>
+
+  <Step title="Add Signature Header">
+    Include the signature in the `Signature` header
+  </Step>
+
+  <Step title="Send Request">
+    Send the request over HTTPS
+  </Step>
+
+  <Step title="Rebell Validates">
+    Rebell verifies signature + timestamp + payload integrity
+  </Step>
+</Steps>
+
+<Warning>
+If any of these steps fail or produce inconsistent results, the request is rejected with `INVALID_SIGNATURE`.
+</Warning>
+
+## Building the Signing String
+
+The signing string is composed of two lines:
+
+```
+<HTTP_METHOD> <HTTP_PATH>
+<Client-Id>.<Request-Time>.<BODY>
+```
+
+### Example
+
+```
+POST /v1/payments/retailPay
+2022091495540562874792.2024-01-10T12:22:30Z.{"productCode":"51051000101000100040","paymentRequestId":"order-123"}
+```
+
+### Important Rules
+
+<Warning>
+**Critical Requirements:**
+
+- `HTTP_PATH` must **not** include hostname or query parameters
+- Body must be serialized **exactly** as sent (byte-for-byte)
+- Spaces, indentation, or field ordering inconsistencies **will break** signature validation
+- Empty body should be represented as an empty string (`""`)
+- Use UTF-8 encoding for all strings
+</Warning>
+
+### Signing String Construction Example
+
+<CodeGroup>
+
+```javascript Node.js
+function buildSigningString(method, path, clientId, requestTime, body) {
+  const bodyString = body ? JSON.stringify(body) : '';
+
+  const line1 = `${method} ${path}`;
+  const line2 = `${clientId}.${requestTime}.${bodyString}`;
+
+  return `${line1}\n${line2}`;
+}
+
+// Example usage
+const signingString = buildSigningString(
+  'POST',
+  '/v1/payments/retailPay',
+  '2022091495540562874792',
+  '2024-01-10T12:22:30Z',
+  {
+    productCode: '51051000101000100040',
+    paymentRequestId: 'order-123',
+    paymentAmount: { currency: 'EUR', value: 1250 }
+  }
+);
+```
+
+```python Python
+import json
+
+def build_signing_string(method, path, client_id, request_time, body):
+    body_string = json.dumps(body, separators=(',', ':')) if body else ''
+
+    line1 = f"{method} {path}"
+    line2 = f"{client_id}.{request_time}.{body_string}"
+
+    return f"{line1}\n{line2}"
+
+# Example usage
+signing_string = build_signing_string(
+    'POST',
+    '/v1/payments/retailPay',
+    '2022091495540562874792',
+    '2024-01-10T12:22:30Z',
+    {
+        'productCode': '51051000101000100040',
+        'paymentRequestId': 'order-123',
+        'paymentAmount': {'currency': 'EUR', 'value': 1250}
+    }
+)
+```
+
+```java Java
+public String buildSigningString(String method, String path, String clientId,
+                                  String requestTime, String bodyJson) {
+    String line1 = method + " " + path;
+    String line2 = clientId + "." + requestTime + "." + (bodyJson != null ? bodyJson : "");
+
+    return line1 + "\n" + line2;
+}
+```
+
+</CodeGroup>
+
+## Signature Generation
+
+Once you have the signing string, sign it using RSA-SHA256.
+
+<CodeGroup>
+
+```javascript Node.js
+const crypto = require('crypto');
+
+function signRequest(privateKeyPem, signingString) {
+  const signer = crypto.createSign('RSA-SHA256');
+  signer.update(signingString, 'utf8');
+  return signer.sign(privateKeyPem, 'base64url');
+}
+
+// Complete signing function
+function createSignature(privateKeyPem, method, path, clientId, body) {
+  const requestTime = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+  const signingString = buildSigningString(method, path, clientId, requestTime, body);
+  const signature = signRequest(privateKeyPem, signingString);
+
+  return {
+    requestTime,
+    signature,
+    header: `algorithm=SHA256withRSA, keyVersion=1, signature=${signature}`
+  };
+}
+```
+
+```python Python
+import base64
+from datetime import datetime, timezone
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+
+def sign_request(private_key_pem, signing_string):
+    private_key = serialization.load_pem_private_key(
+        private_key_pem.encode(),
+        password=None
+    )
+
+    signature = private_key.sign(
+        signing_string.encode('utf-8'),
+        padding.PKCS1v15(),
+        hashes.SHA256()
+    )
+
+    return base64.urlsafe_b64encode(signature).decode()
+
+def create_signature(private_key_pem, method, path, client_id, body):
+    request_time = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    signing_string = build_signing_string(method, path, client_id, request_time, body)
+    signature = sign_request(private_key_pem, signing_string)
+
+    return {
+        'request_time': request_time,
+        'signature': signature,
+        'header': f'algorithm=SHA256withRSA, keyVersion=1, signature={signature}'
+    }
+```
+
+```java Java
+import java.security.Signature;
+import java.security.PrivateKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
+public String signRequest(PrivateKey privateKey, String signingString) throws Exception {
+    Signature signature = Signature.getInstance("SHA256withRSA");
+    signature.initSign(privateKey);
+    signature.update(signingString.getBytes(StandardCharsets.UTF_8));
+
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(signature.sign());
+}
+```
+
+</CodeGroup>
+
+## Complete Request Example
+
+Here's a complete example of making a signed API request:
+
+<CodeGroup>
+
+```javascript Node.js
+const crypto = require('crypto');
+const https = require('https');
+
+class RebellClient {
+  constructor(clientId, privateKeyPem, keyVersion = 1) {
+    this.clientId = clientId;
+    this.privateKeyPem = privateKeyPem;
+    this.keyVersion = keyVersion;
+    this.baseUrl = 'https://open-eu.rebell.app'; // Production
+  }
+
+  buildSigningString(method, path, requestTime, body) {
+    const bodyString = body ? JSON.stringify(body) : '';
+    return `${method} ${path}\n${this.clientId}.${requestTime}.${bodyString}`;
+  }
+
+  sign(signingString) {
+    const signer = crypto.createSign('RSA-SHA256');
+    signer.update(signingString, 'utf8');
+    return signer.sign(this.privateKeyPem, 'base64url');
+  }
+
+  async request(method, path, body = null) {
+    const requestTime = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+    const signingString = this.buildSigningString(method, path, requestTime, body);
+    const signature = this.sign(signingString);
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'Client-Id': this.clientId,
+      'Request-Time': requestTime,
+      'Signature': `algorithm=SHA256withRSA, keyVersion=${this.keyVersion}, signature=${signature}`
+    };
+
+    const response = await fetch(`${this.baseUrl}${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined
+    });
+
+    return response.json();
+  }
+
+  // Payment methods
+  async retailPay(paymentData) {
+    return this.request('POST', '/v1/payments/retailPay', paymentData);
+  }
+
+  async createQrOrder(orderData) {
+    return this.request('POST', '/v1/payments/createQrOrder', orderData);
+  }
+
+  async linkPayCreate(paymentData) {
+    return this.request('POST', '/v1/payments/linkPayCreate', paymentData);
+  }
+
+  async inquiryPayment(paymentId, paymentRequestId) {
+    return this.request('POST', '/v1/payments/inquiryPayment', {
+      paymentId,
+      paymentRequestId
+    });
+  }
+}
+
+// Usage
+const client = new RebellClient(
+  'your-client-id',
+  fs.readFileSync('private-key.pem', 'utf8')
+);
+
+const result = await client.retailPay({
+  productCode: '51051000101000100040',
+  paymentRequestId: 'order-123',
+  paymentAuthCode: '281012020262467128',
+  paymentAmount: { currency: 'EUR', value: 1250 }
+});
+```
+
+```python Python
+import json
+import base64
+import requests
+from datetime import datetime, timezone
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+
+class RebellClient:
+    def __init__(self, client_id, private_key_pem, key_version=1):
+        self.client_id = client_id
+        self.private_key = serialization.load_pem_private_key(
+            private_key_pem.encode(),
+            password=None
+        )
+        self.key_version = key_version
+        self.base_url = 'https://open-eu.rebell.app'  # Production
+
+    def _build_signing_string(self, method, path, request_time, body):
+        body_string = json.dumps(body, separators=(',', ':')) if body else ''
+        return f"{method} {path}\n{self.client_id}.{request_time}.{body_string}"
+
+    def _sign(self, signing_string):
+        signature = self.private_key.sign(
+            signing_string.encode('utf-8'),
+            padding.PKCS1v15(),
+            hashes.SHA256()
+        )
+        return base64.urlsafe_b64encode(signature).decode().rstrip('=')
+
+    def request(self, method, path, body=None):
+        request_time = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+        signing_string = self._build_signing_string(method, path, request_time, body)
+        signature = self._sign(signing_string)
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Client-Id': self.client_id,
+            'Request-Time': request_time,
+            'Signature': f'algorithm=SHA256withRSA, keyVersion={self.key_version}, signature={signature}'
+        }
+
+        response = requests.request(
+            method,
+            f"{self.base_url}{path}",
+            headers=headers,
+            json=body
+        )
+
+        return response.json()
+
+    # Payment methods
+    def retail_pay(self, payment_data):
+        return self.request('POST', '/v1/payments/retailPay', payment_data)
+
+    def create_qr_order(self, order_data):
+        return self.request('POST', '/v1/payments/createQrOrder', order_data)
+
+    def link_pay_create(self, payment_data):
+        return self.request('POST', '/v1/payments/linkPayCreate', payment_data)
+
+    def inquiry_payment(self, payment_id, payment_request_id=None):
+        return self.request('POST', '/v1/payments/inquiryPayment', {
+            'paymentId': payment_id,
+            'paymentRequestId': payment_request_id
+        })
+
+
+# Usage
+with open('private-key.pem', 'r') as f:
+    private_key_pem = f.read()
+
+client = RebellClient('your-client-id', private_key_pem)
+
+result = client.retail_pay({
+    'productCode': '51051000101000100040',
+    'paymentRequestId': 'order-123',
+    'paymentAuthCode': '281012020262467128',
+    'paymentAmount': {'currency': 'EUR', 'value': 1250}
+})
+```
+
+</CodeGroup>
+
+## Timestamp Requirements
+
+The `Request-Time` header ensures replay protection.
+
+| Requirement | Details |
+|-------------|---------|
+| Format | ISO 8601 UTC timestamp (e.g., `2024-03-21T10:15:00Z`) |
+| Timezone | Must be UTC (indicated by `Z` suffix) |
+| Tolerance | Must not differ from Rebell server time by more than ±5 minutes |
+| Error | If drift exceeds this bound, Rebell returns `TIMESTAMP_INVALID` |
+
+<Info>
+**Best Practice:** Ensure your backend servers use NTP synchronization to keep accurate time.
+</Info>
+
+```javascript Timestamp Generation
+// Correct - UTC with Z suffix
+const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+// Result: "2024-03-21T10:15:00Z"
+
+// Also correct - full ISO format
+const timestamp2 = new Date().toISOString();
+// Result: "2024-03-21T10:15:00.000Z"
+```
+
+## Key Rotation Workflow
+
+Rebell supports key rotation through versioning (`keyVersion`).
+
+### Rotation Sequence
+
+<Steps>
+  <Step title="Generate New Keypair">
+    Merchant generates a new RSA keypair (minimum 2048-bit)
+  </Step>
+
+  <Step title="Upload Public Key">
+    Merchant uploads the new public key to Rebell dashboard
+  </Step>
+
+  <Step title="Receive New Version">
+    Rebell assigns a new `keyVersion` number
+  </Step>
+
+  <Step title="Update Signing Logic">
+    Merchant updates signing logic to use the new private key and `keyVersion`
+  </Step>
+
+  <Step title="Transition Period">
+    Both old and new signatures remain valid during transition
+  </Step>
+
+  <Step title="Deactivate Old Key">
+    Old key is eventually deactivated in Rebell dashboard
+  </Step>
+</Steps>
+
+<Info>
+**Recommendation:** Rotate keys at least annually or according to your internal security policies.
+</Info>
+
+### Key Rotation Example
+
+```javascript Key Rotation
+class RebellClient {
+  constructor(clientId, keys) {
+    this.clientId = clientId;
+    // Support multiple key versions during rotation
+    this.keys = keys; // { 1: privateKey1, 2: privateKey2 }
+    this.activeKeyVersion = Math.max(...Object.keys(keys).map(Number));
+  }
+
+  sign(signingString) {
+    const privateKey = this.keys[this.activeKeyVersion];
+    const signer = crypto.createSign('RSA-SHA256');
+    signer.update(signingString, 'utf8');
+    return {
+      signature: signer.sign(privateKey, 'base64url'),
+      keyVersion: this.activeKeyVersion
+    };
+  }
+}
+```
+
+## Webhook Signature Verification
+
+Rebell signs webhook payloads using the same RSA mechanism. Merchants must verify these signatures.
+
+### Verification Steps
+
+<Steps>
+  <Step title="Extract Signature">
+    Parse the `Signature` header to extract algorithm, keyVersion, and signature
+  </Step>
+
+  <Step title="Reconstruct Signing String">
+    Build the signing string from the request data
+  </Step>
+
+  <Step title="Validate Timestamp">
+    Ensure `Request-Time` is within acceptable window (e.g., 10 minutes)
+  </Step>
+
+  <Step title="Verify RSA Signature">
+    Verify using Rebell's public key for the specified keyVersion
+  </Step>
+
+  <Step title="Process Event">
+    Only process the webhook if verification succeeds
+  </Step>
+</Steps>
+
+### Verification Example
+
+<CodeGroup>
+
+```javascript Node.js
+const crypto = require('crypto');
+
+function verifyWebhookSignature(req, rebellPublicKeys) {
+  // 1. Parse signature header
+  const signatureHeader = req.headers['signature'];
+  const parts = {};
+  signatureHeader.split(', ').forEach(part => {
+    const [key, value] = part.split('=');
+    parts[key] = value;
+  });
+
+  const { algorithm, keyVersion, signature } = parts;
+
+  // 2. Get the correct public key
+  const publicKey = rebellPublicKeys[keyVersion];
+  if (!publicKey) {
+    throw new Error(`Unknown keyVersion: ${keyVersion}`);
+  }
+
+  // 3. Reconstruct signing string
+  const requestTime = req.headers['request-time'];
+  const webhookPath = '/webhooks/rebell'; // Your webhook endpoint path
+  const signingString = `POST ${webhookPath}\n${requestTime}.${req.rawBody}`;
+
+  // 4. Validate timestamp (10-minute window)
+  const requestTimestamp = new Date(requestTime).getTime();
+  const now = Date.now();
+  if (Math.abs(now - requestTimestamp) > 10 * 60 * 1000) {
+    throw new Error('Timestamp outside acceptable window');
+  }
+
+  // 5. Verify signature
+  const verifier = crypto.createVerify('RSA-SHA256');
+  verifier.update(signingString, 'utf8');
+
+  const signatureBuffer = Buffer.from(signature, 'base64url');
+  return verifier.verify(publicKey, signatureBuffer);
+}
+```
+
+```python Python
+import base64
+from datetime import datetime, timezone
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+
+def verify_webhook_signature(request, rebell_public_keys):
+    # 1. Parse signature header
+    signature_header = request.headers.get('Signature')
+    parts = dict(part.split('=') for part in signature_header.split(', '))
+
+    algorithm = parts['algorithm']
+    key_version = parts['keyVersion']
+    signature = parts['signature']
+
+    # 2. Get the correct public key
+    public_key_pem = rebell_public_keys.get(key_version)
+    if not public_key_pem:
+        raise ValueError(f"Unknown keyVersion: {key_version}")
+
+    public_key = serialization.load_pem_public_key(public_key_pem.encode())
+
+    # 3. Reconstruct signing string
+    request_time = request.headers.get('Request-Time')
+    webhook_path = '/webhooks/rebell'
+    raw_body = request.data.decode('utf-8')
+    signing_string = f"POST {webhook_path}\n{request_time}.{raw_body}"
+
+    # 4. Validate timestamp (10-minute window)
+    request_timestamp = datetime.fromisoformat(request_time.replace('Z', '+00:00'))
+    now = datetime.now(timezone.utc)
+    if abs((now - request_timestamp).total_seconds()) > 600:
+        raise ValueError('Timestamp outside acceptable window')
+
+    # 5. Verify signature
+    try:
+        signature_bytes = base64.urlsafe_b64decode(signature + '==')
+        public_key.verify(
+            signature_bytes,
+            signing_string.encode('utf-8'),
+            padding.PKCS1v15(),
+            hashes.SHA256()
+        )
+        return True
+    except Exception:
+        return False
+```
+
+</CodeGroup>
+
+## Common Errors and Resolution
+
+<AccordionGroup>
+  <Accordion title="INVALID_SIGNATURE">
+    **Caused by:**
+    - Incorrect signing string construction
+    - Wrong body serialization (extra spaces, different field order)
+    - Incorrect header values
+    - Using a retired `keyVersion`
+    - Base64 vs Base64URL encoding mismatch
+
+    **How to fix:**
+    - Log the exact signing string before signing
+    - Compare with what you expect byte-by-byte
+    - Ensure JSON serialization is consistent (no pretty-printing)
+    - Verify you're using `SHA256withRSA` algorithm
+    - Check that signature uses Base64URL encoding (not standard Base64)
+
+    ```javascript Debug Signing String
+    // Log for debugging
+    console.log('Signing string:');
+    console.log(JSON.stringify(signingString)); // Shows escape characters
+    console.log('Bytes:', Buffer.from(signingString).toString('hex'));
+    ```
+  </Accordion>
+
+  <Accordion title="TIMESTAMP_INVALID">
+    **Caused by:**
+    - Clock skew greater than ±5 minutes
+    - Bad timezone conversions
+    - Non-UTC timestamps
+    - Missing `Z` suffix
+
+    **How to fix:**
+    - Use NTP time synchronization on your servers
+    - Always use UTC with `Z` suffix
+    - Verify timestamp format: `2024-03-21T10:15:00Z`
+
+    ```javascript Correct Timestamp
+    // Correct
+    const timestamp = new Date().toISOString(); // "2024-03-21T10:15:00.000Z"
+
+    // Also correct (no milliseconds)
+    const timestamp2 = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+    ```
+  </Accordion>
+
+  <Accordion title="ACCESS_DENIED">
+    **Caused by:**
+    - Wrong `Client-Id`
+    - Missing or wrong `keyVersion`
+    - Using production credentials in sandbox (or vice versa)
+    - Public key not registered with Rebell
+
+    **How to fix:**
+    - Verify your merchant credential set
+    - Ensure environment separation (sandbox vs production)
+    - Confirm public key is uploaded to Rebell dashboard
+    - Check `keyVersion` matches the registered key
+  </Accordion>
+
+  <Accordion title="Body Serialization Issues">
+    **Caused by:**
+    - Pretty-printed JSON (with newlines/indentation)
+    - Different field ordering
+    - Unicode encoding differences
+    - Trailing whitespace
+
+    **How to fix:**
+    - Use compact JSON serialization
+    - Ensure consistent field ordering
+    - Use UTF-8 encoding
+
+    ```javascript Consistent Serialization
+    // Correct - compact, no spaces
+    const body = JSON.stringify(data);
+    // Result: {"productCode":"123","amount":100}
+
+    // Wrong - pretty printed
+    const body = JSON.stringify(data, null, 2);
+    // Result: {\n  "productCode": "123",\n  "amount": 100\n}
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Security Recommendations
+
+<Warning>
+**Critical Security Requirements:**
+
+- ✅ Store private keys in a secure HSM/KMS (e.g., AWS KMS, HashiCorp Vault)
+- ✅ Never include private keys in frontend or mobile apps
+- ✅ Use strict file permissions on key material (e.g., `chmod 600`)
+- ✅ Regenerate keys periodically (at least annually)
+- ✅ Monitor failed signature attempts for intrusion detection
+- ✅ Use HTTPS for all communication
+- ✅ Keep separate keys for sandbox and production environments
+- ✅ Implement key rotation without downtime
+</Warning>
+
+### Key Storage Best Practices
+
+<Tabs>
+  <Tab title="Environment Variables">
+    ```bash
+    # Store as environment variable (base64 encoded)
+    export REBELL_PRIVATE_KEY=$(cat private-key.pem | base64)
+    ```
+
+    ```javascript
+    const privateKey = Buffer.from(process.env.REBELL_PRIVATE_KEY, 'base64').toString();
+    ```
+  </Tab>
+
+  <Tab title="AWS KMS">
+    ```javascript
+    const { KMSClient, SignCommand } = require('@aws-sdk/client-kms');
+
+    const kms = new KMSClient({ region: 'eu-west-1' });
+
+    async function signWithKMS(signingString) {
+      const command = new SignCommand({
+        KeyId: 'alias/rebell-signing-key',
+        Message: Buffer.from(signingString),
+        MessageType: 'RAW',
+        SigningAlgorithm: 'RSASSA_PKCS1_V1_5_SHA_256'
+      });
+
+      const response = await kms.send(command);
+      return Buffer.from(response.Signature).toString('base64url');
+    }
+    ```
+  </Tab>
+
+  <Tab title="HashiCorp Vault">
+    ```javascript
+    const vault = require('node-vault')();
+
+    async function signWithVault(signingString) {
+      const result = await vault.write('transit/sign/rebell-key', {
+        input: Buffer.from(signingString).toString('base64'),
+        hash_algorithm: 'sha2-256',
+        signature_algorithm: 'pkcs1v15'
+      });
+
+      return result.data.signature.replace('vault:v1:', '');
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Testing Checklist
+
+Test these scenarios before going live:
+
+<Checks>
+  - Successful signature generation and API call
+  - Signature verification for webhooks
+  - Timestamp validation (within ±5 minute window)
+  - Timestamp rejection (outside window)
+  - Invalid signature handling
+  - Key rotation (both keys work during transition)
+  - Different environments (sandbox vs production)
+  - Empty body requests
+  - Large payload requests
+  - Special characters in request body
+</Checks>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication & Environments" icon="lock" href="/payment-integration/authentication-environments">
+    Higher-level overview of authentication setup
+  </Card>
+
+  <Card title="Webhooks" icon="webhook" href="/payment-integration/webhooks">
+    Implement webhook handlers with signature verification
+  </Card>
+
+  <Card title="Error Handling" icon="triangle-exclamation" href="/payment-integration/error-handling">
+    Handle signature-related errors
+  </Card>
+
+  <Card title="Quick Integration Guide" icon="rocket" href="/payment-integration/quick-integration-guide">
+    End-to-end integration overview
+  </Card>
+</CardGroup>

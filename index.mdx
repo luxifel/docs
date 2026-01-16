@@ -1,97 +1,159 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: Introduction
+description: Learn how to integrate with the Rebell SuperApp platform through payment APIs or Mini Apps.
 ---
 
-## Setting up
+The Rebell SuperApp provides a unified platform where users can access payment services and merchant experiences through Mini Apps. Merchants can integrate either through direct payment APIs or by building Mini Apps inside the SuperApp.
 
-Get your documentation site up and running in minutes.
+## Core Platform Components
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="SuperApp Core" icon="mobile">
+    The main mobile application hosting wallet, notifications, and Mini App access
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Payments Platform" icon="credit-card">
+    APIs and services to initiate, authorize, and settle payments
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Mini App Framework" icon="window">
+    Sandboxed JavaScript runtime for merchant applications
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Integration Layer" icon="plug">
+    Onboarding, credentials, APIs, webhooks, and SDKs
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## Choose Your Integration Path
 
-Everything you need to create world-class documentation.
+<Tabs>
+  <Tab title="Payment APIs">
+    ### Direct Payment Integration
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+    **Best for:** Ecommerce, POS systems, backend-driven flows
 
-## Need inspiration?
+    **What you get:**
+    - QR-based payments (scan or be scanned)
+    - App-to-app payment flows
+    - Server-to-server authentication
+    - Webhook notifications
+    - Full control over UI
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+    **Supported payment methods:**
+    - Retail Pay (merchant scans user QR)
+    - QR Order Pay (user scans merchant QR)
+    - Link Pay (app redirection)
+
+    [Explore Payment Integration →](/payment-overview)
+  </Tab>
+
+  <Tab title="Mini Apps">
+    ### Build Inside the SuperApp
+
+    **Best for:** Multi-step flows, digital services, loyalty programs
+
+    **What you get:**
+    - Runs inside SuperApp sandbox
+    - Pre-built UI components
+    - Built-in authentication
+    - Native payment integration
+    - No app distribution needed
+
+    **Ideal use cases:**
+    - Mobility and parking
+    - Food ordering
+    - Entertainment and ticketing
+    - Loyalty and rewards
+
+    [Explore Mini App Development →](/mini-app-development)
+  </Tab>
+
+  <Tab title="Quick Start">
+    ### Fast Web Integration
+
+    **Best for:** Simple checkout flows, quick implementation
+
+    **What you get:**
+    - Pre-built payment button
+    - Mobile deep links
+    - Server SDKs
+    - Minimal setup time
+
+    **Integration options:**
+    - Rebell Web Button
+    - Android/iOS deep links
+    - OpenAPI specifications
+    - Postman collections
+
+    [Explore Quick Integration →](/quick-integration-guide)
+  </Tab>
+</Tabs>
+
+## Integration Process
+
+<Steps>
+  <Step title="Complete Merchant Onboarding">
+    Register your business and complete compliance verification (AML/KYB). Rebell operates as a regulated payment institution under Italian and EU financial rules.
+  </Step>
+
+  <Step title="Receive Your Credentials">
+    Get your Client-Id, RSA public key registration, and sandbox access after approval.
+  </Step>
+
+  <Step title="Choose Your Integration">
+    Select between Payment APIs, Mini App development, or quick web integration based on your needs.
+  </Step>
+
+  <Step title="Build and Test">
+    Integrate using our APIs, SDKs, or Mini App framework. Test thoroughly in the sandbox environment.
+  </Step>
+
+  <Step title="Go Live">
+    Deploy to production after successful testing and final review.
+  </Step>
+</Steps>
+
+## Quick Comparison
+
+| Feature | Payment APIs | Mini Apps | Web Integration |
+|---------|-------------|-----------|-----------------|
+| **Integration Speed** | Moderate | Slower | Fast |
+| **Customization** | Full | Moderate | Limited |
+| **UI Control** | Complete | Framework-based | Pre-built |
+| **Use Case** | Backend systems, POS | Digital services | Simple checkout |
+| **Authentication** | Server-to-server | Built-in | Simplified |
+
+## What You'll Need
+
+Before starting your integration, ensure you have:
+
+- Completed merchant onboarding and compliance checks
+- Received your Client-Id and credentials
+- Access to sandbox environment
+- Development resources (backend system or Mini App developer)
+- Understanding of your chosen integration path
+
+<Note>
+The onboarding process includes AML/KYB verification, document checks, and contractual acceptance. This section will be expanded once the official onboarding portal is finalized.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Payment Integration" icon="credit-card" href="/payment-overview">
+    Integrate payments with Retail Pay, QR Order Pay, or Link Pay
+  </Card>
+  <Card title="Mini App Development" icon="window" href="/mini-app-development">
+    Build interactive experiences inside the SuperApp
+  </Card>
+  <Card title="Authentication & Environments" icon="key" href="/authentication-environments">
+    Set up credentials and understand environment architecture
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Explore detailed API documentation and schemas
+  </Card>
+</CardGroup>
+
+## Need Help?
+
+- **API Schemas** → See OpenAPI Reference / Postman Collection
+- **UX Guidelines** → See Product Guides
+- **Technical Support** → Contact your integration manager

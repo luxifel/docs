@@ -1,0 +1,547 @@
+---
+title: Error Handling & Result Codes
+description: Understand Rebell's structured error model and implement safe recovery logic across all payment flows.
+---
+
+Rebell APIs use a structured error model that clearly separates **transport-level errors**, **business-level outcomes**, and **payment lifecycle states**.
+
+You must always interpret both the HTTP status code and the business result object contained in the response body.
+
+<Info>
+A request may return HTTP `200 OK` while still representing a business failure. Always check the `result` object.
+</Info>
+
+## Error Layers
+
+Every API response conveys information at three different layers:
+
+| Layer | Description | Example |
+|-------|-------------|---------|
+| **HTTP Status Code** | Whether the request was correctly received and processed at a protocol level | `200`, `400`, `500` |
+| **Business Result Object** (`result`) | The outcome of the requested operation at a business level | `SUCCESS`, `PAYMENT_FAIL` |
+| **Payment Status** (`paymentStatus` / webhook) | The final or intermediate state of the payment transaction | `SUCCESS`, `FAIL`, `PROCESSING` |
+
+## Result Object Structure
+
+All Rebell API responses include a `result` object:
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "Optional description"
+  }
+}
+```
+
+### Result Fields
+
+<ParamField path="resultCode" type="string">
+  A detailed business outcome code (e.g., `SUCCESS`, `PAYMENT_FAIL`, `USER_REJECTED`)
+</ParamField>
+
+<ParamField path="resultStatus" type="string">
+  A high-level status flag used to drive merchant logic: `S`, `U`, or `F`
+</ParamField>
+
+<ParamField path="resultMessage" type="string">
+  An optional, human-readable message intended for debugging or logging (not for end users)
+</ParamField>
+
+## Result Status Values
+
+The `resultStatus` field provides a fast way to determine how to proceed.
+
+| resultStatus | Meaning | Merchant Action |
+|--------------|---------|-----------------|
+| **S** | Success | Continue the flow |
+| **U** | Processing / Unknown | Wait or use [Inquiry API](/payment-integration/inquiring-payment-api) |
+| **F** | Failure | Abort payment |
+
+<Warning>
+**Important:** Always evaluate `resultStatus` before inspecting specific result codes. This ensures consistent handling across all error scenarios.
+</Warning>
+
+## HTTP Status Codes
+
+HTTP status codes indicate whether the API request itself was accepted at the protocol level.
+
+| HTTP Code | Meaning | Should Retry |
+|-----------|---------|--------------|
+| `200` | Request processed | No |
+| `400` | Invalid request | No |
+| `401` | Invalid signature or credentials | No |
+| `403` | Access denied | No |
+| `429` | Rate limit exceeded | Yes (with backoff) |
+| `500` / `503` | Temporary system error | Yes |
+
+<Info>
+Only **network-level or 5xx errors** should trigger automatic retries. Business failures (HTTP 200 with `resultStatus: F`) should not be retried.
+</Info>
+
+## Common Result Codes
+
+The following result codes are shared across multiple payment flows:
+
+| resultCode | Description | Recommended Action |
+|------------|-------------|-------------------|
+| `SUCCESS` | Operation completed successfully | Continue |
+| `PROCESSING` | Payment pending | Wait / use Inquiry |
+| `PAYMENT_FAIL` | Payment failed | Do not retry |
+| `USER_REJECTED` | User declined the payment | Allow new attempt |
+| `INSUFFICIENT_BALANCE` | User has insufficient funds | Suggest top-up |
+| `RISK_REJECT` | Rejected by risk or compliance rules | Do not retry |
+| `ORDER_STATUS_INVALID` | Invalid order state | Create new order |
+| `PAYMENT_NOT_FOUND` | Payment does not exist | Verify IDs / environment |
+| `INVALID_CODE` | Invalid or expired payment code | Ask user to refresh code |
+| `QR_EXPIRED` | QR code has expired | Generate new QR |
+| `PARAM_ILLEGAL` | Invalid request parameters | Fix request body |
+| `ACCESS_DENIED` | Credentials don't match payment | Verify Client-Id |
+| `REQUEST_TRAFFIC_EXCEED_LIMIT` | Rate limit exceeded | Reduce request frequency |
+
+## Handling Errors by Payment Flow
+
+<Tabs>
+  <Tab title="Retail Pay">
+    Error handling for [Retail Pay](/payment-integration/retail-pay) (merchant scans user QR):
+
+    | Result | Action |
+    |--------|--------|
+    | `SUCCESS` | Payment is final, complete sale |
+    | `PROCESSING` | Start [Inquiry polling](/payment-integration/inquiring-payment-api) |
+    | `INVALID_CODE` | Ask user to refresh payment code in SuperApp |
+    | `USER_REJECTED` | Abort transaction, offer alternative payment |
+    | `PAYMENT_FAIL` | Offer alternative payment method |
+    | `INSUFFICIENT_BALANCE` | Inform user, suggest top-up |
+
+    ```javascript Retail Pay Error Handling
+    async function handleRetailPayResponse(response) {
+      switch (response.result.resultStatus) {
+        case 'S':
+          // Payment successful
+          return completeTransaction(response.paymentId);
+
+        case 'U':
+          // Processing - start polling
+          return pollPaymentStatus(response.paymentId);
+
+        case 'F':
+          // Failed - handle specific error
+          switch (response.result.resultCode) {
+            case 'INVALID_CODE':
+              return showError('Please refresh your payment code and try again');
+            case 'USER_REJECTED':
+              return showError('Payment was cancelled');
+            case 'INSUFFICIENT_BALANCE':
+              return showError('Insufficient balance. Please top up and try again');
+            default:
+              return showError('Payment failed. Please try another payment method');
+          }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="QR Order Pay">
+    Error handling for [QR Order Pay](/payment-integration/qr-order-pay) (user scans merchant QR):
+
+    | Result | Action |
+    |--------|--------|
+    | `SUCCESS` | Wait for webhook and fulfill order |
+    | `QR_EXPIRED` | Generate a new QR code |
+    | `USER_REJECTED` | Keep order open, allow retry |
+    | `PAYMENT_FAIL` | Allow retry with new QR |
+    | `ORDER_STATUS_INVALID` | Create new order |
+
+    ```javascript QR Order Pay Error Handling
+    async function handleQROrderResponse(response) {
+      if (response.result.resultStatus === 'S') {
+        // QR generated successfully - display it
+        return displayQRCode(response.qrCode);
+      }
+
+      // Handle errors
+      switch (response.result.resultCode) {
+        case 'ORDER_STATUS_INVALID':
+          return createNewOrder();
+        case 'PARAM_ILLEGAL':
+          console.error('Invalid request parameters');
+          return showError('Unable to generate QR code');
+        default:
+          return showError('Failed to create payment. Please try again');
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Link Pay">
+    Error handling for [Link Pay](/payment-integration/link-pay) (app-to-app redirect):
+
+    | Result | Action |
+    |--------|--------|
+    | `SUCCESS` | Redirect user, fulfill order after webhook |
+    | `PROCESSING` | Wait for webhook or use Inquiry |
+    | `ORDER_STATUS_INVALID` | Generate a new payment link |
+    | `PAYMENT_FAIL` | Restart checkout |
+    | `PAYMENT_IN_PROCESS` | Check existing payment status |
+
+    ```javascript Link Pay Error Handling
+    async function handleLinkPayResponse(response) {
+      if (response.result.resultStatus === 'S') {
+        // Redirect user to Rebell
+        return redirectToPayment(response.redirectUrl, response.appLinks);
+      }
+
+      switch (response.result.resultCode) {
+        case 'ORDER_STATUS_INVALID':
+          return generateNewPaymentLink();
+        case 'PAYMENT_IN_PROCESS':
+          return checkExistingPayment();
+        default:
+          return showError('Unable to initiate payment. Please try again');
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Inquiry API">
+    Error handling for [Inquiry API](/payment-integration/inquiring-payment-api):
+
+    | paymentStatus | Action |
+    |---------------|--------|
+    | `SUCCESS` | Stop polling, mark order as paid |
+    | `FAIL` | Stop polling, mark order as failed |
+    | `PROCESSING` | Continue polling (within limits) |
+
+    | resultCode | Action |
+    |------------|--------|
+    | `PAYMENT_NOT_FOUND` | Verify paymentId and environment |
+    | `ACCESS_DENIED` | Check Client-Id credentials |
+    | `REQUEST_TRAFFIC_EXCEED_LIMIT` | Reduce polling frequency |
+
+    ```javascript Inquiry Error Handling
+    async function handleInquiryResponse(response) {
+      // Check API-level result first
+      if (response.result.resultStatus === 'F') {
+        switch (response.result.resultCode) {
+          case 'PAYMENT_NOT_FOUND':
+            console.error('Payment not found - check paymentId');
+            return { status: 'error', retry: false };
+          case 'ACCESS_DENIED':
+            console.error('Access denied - check credentials');
+            return { status: 'error', retry: false };
+          case 'REQUEST_TRAFFIC_EXCEED_LIMIT':
+            return { status: 'rate_limited', retry: true, delay: 5000 };
+        }
+      }
+
+      // Check payment status
+      switch (response.paymentStatus) {
+        case 'SUCCESS':
+          return { status: 'paid', retry: false };
+        case 'FAIL':
+          return { status: 'failed', retry: false };
+        case 'PROCESSING':
+          return { status: 'pending', retry: true };
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Retry & Idempotency Rules
+
+Retries must be handled carefully to avoid duplicate payments.
+
+<Tabs>
+  <Tab title="Safe to Retry">
+    <Check>
+    **These scenarios are safe to retry:**
+
+    - Network timeouts (no response received)
+    - HTTP 5xx errors (server-side issues)
+    - Same request with the **same `paymentRequestId`**
+    - Connection failures before response
+    - TLS/SSL errors
+    </Check>
+
+    ```javascript Safe Retry Logic
+    async function safeRetry(paymentRequest, maxRetries = 3) {
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const response = await callPaymentAPI(paymentRequest);
+
+          // Got a response - don't retry regardless of business result
+          return response;
+
+        } catch (error) {
+          if (isNetworkError(error) || isServerError(error)) {
+            // Safe to retry with same paymentRequestId
+            console.log(`Attempt ${attempt} failed, retrying...`);
+            await delay(1000 * attempt); // Exponential backoff
+            continue;
+          }
+          throw error; // Don't retry other errors
+        }
+      }
+      throw new Error('Max retries exceeded');
+    }
+    ```
+  </Tab>
+
+  <Tab title="Never Retry">
+    <Error>
+    **Never retry these scenarios:**
+
+    - Business failures (`PAYMENT_FAIL`, `USER_REJECTED`, `RISK_REJECT`)
+    - Requests using a **new `paymentRequestId`** for the same order
+    - Requests after receiving final `SUCCESS`
+    - HTTP 4xx errors (client-side issues)
+    - Invalid signature errors
+    </Error>
+
+    ```javascript Never Retry These
+    function shouldRetry(response, error) {
+      // Never retry business failures
+      if (response?.result?.resultStatus === 'F') {
+        return false;
+      }
+
+      // Never retry after success
+      if (response?.result?.resultStatus === 'S') {
+        return false;
+      }
+
+      // Never retry 4xx errors
+      if (error?.status >= 400 && error?.status < 500) {
+        return false;
+      }
+
+      return true;
+    }
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+**Critical:** The `paymentRequestId` acts as the idempotency key and must be unique per payment attempt. Never generate a new `paymentRequestId` when retrying the same payment.
+</Warning>
+
+## Webhook Error Handling
+
+Webhook delivery is **at-least-once**. Your webhook handlers must be idempotent.
+
+| Scenario | Action |
+|----------|--------|
+| Duplicate events | Ignore and return HTTP 200 |
+| Invalid signatures | Reject and log (return 4xx) |
+| Temporary internal errors | Return non-2xx to trigger retry |
+| Unknown event types | Log and return HTTP 200 |
+
+```javascript Webhook Error Handling
+app.post('/webhooks/rebell', async (req, res) => {
+  // Verify signature first
+  if (!verifySignature(req)) {
+    console.error('Invalid webhook signature');
+    return res.status(401).send('Invalid signature');
+  }
+
+  try {
+    const { paymentId, paymentStatus } = req.body;
+
+    // Check for duplicate (idempotency)
+    const existing = await db.payments.findOne({ paymentId });
+    if (existing?.status === 'paid' || existing?.status === 'failed') {
+      console.log('Duplicate webhook, ignoring');
+      return res.status(200).send('OK');
+    }
+
+    // Process the event
+    await processPaymentResult(req.body);
+    return res.status(200).send('OK');
+
+  } catch (error) {
+    console.error('Webhook processing error:', error);
+    // Return 5xx to trigger retry
+    return res.status(500).send('Internal error');
+  }
+});
+```
+
+<Info>
+Webhooks always represent the **final payment outcome**. See [Webhooks](/payment-integration/webhooks) for complete implementation details.
+</Info>
+
+## User-Facing Error Messages
+
+Technical error codes should **never** be exposed directly to end users. Map them to friendly messages:
+
+| resultCode | User Message |
+|------------|--------------|
+| `USER_REJECTED` | "Payment cancelled" |
+| `INSUFFICIENT_BALANCE` | "Insufficient balance. Please top up your account." |
+| `PROCESSING` | "Waiting for confirmation..." |
+| `PAYMENT_FAIL` | "Payment failed. Please try again." |
+| `INVALID_CODE` | "Payment code expired. Please refresh and try again." |
+| `QR_EXPIRED` | "QR code expired. Please scan the new code." |
+| `RISK_REJECT` | "Payment could not be completed. Please try another method." |
+| Network errors | "Connection error. Please check your internet and try again." |
+
+```javascript User Message Mapping
+const userMessages = {
+  USER_REJECTED: 'Payment cancelled',
+  INSUFFICIENT_BALANCE: 'Insufficient balance. Please top up your account.',
+  PROCESSING: 'Waiting for confirmation...',
+  PAYMENT_FAIL: 'Payment failed. Please try again.',
+  INVALID_CODE: 'Payment code expired. Please refresh and try again.',
+  QR_EXPIRED: 'QR code expired. Please scan the new code.',
+  RISK_REJECT: 'Payment could not be completed. Please try another method.',
+  ORDER_STATUS_INVALID: 'This order is no longer valid. Please start again.',
+  PAYMENT_NOT_FOUND: 'Payment not found. Please contact support.',
+  default: 'Something went wrong. Please try again.'
+};
+
+function getUserMessage(resultCode) {
+  return userMessages[resultCode] || userMessages.default;
+}
+```
+
+## Complete Error Handling Example
+
+Here's a comprehensive error handling implementation:
+
+```javascript Complete Error Handler
+class PaymentErrorHandler {
+  constructor() {
+    this.maxRetries = 3;
+    this.retryDelay = 1000;
+  }
+
+  async handlePaymentResponse(response, context) {
+    const { resultStatus, resultCode, resultMessage } = response.result;
+
+    // Log for debugging
+    console.log(`Payment response: ${resultCode} (${resultStatus})`, {
+      paymentId: response.paymentId,
+      context,
+      message: resultMessage
+    });
+
+    switch (resultStatus) {
+      case 'S':
+        return this.handleSuccess(response, context);
+      case 'U':
+        return this.handleProcessing(response, context);
+      case 'F':
+        return this.handleFailure(response, context);
+      default:
+        throw new Error(`Unknown resultStatus: ${resultStatus}`);
+    }
+  }
+
+  handleSuccess(response, context) {
+    return {
+      success: true,
+      paymentId: response.paymentId,
+      action: 'complete',
+      userMessage: 'Payment successful!'
+    };
+  }
+
+  handleProcessing(response, context) {
+    return {
+      success: false,
+      pending: true,
+      paymentId: response.paymentId,
+      action: 'poll',
+      userMessage: 'Waiting for confirmation...'
+    };
+  }
+
+  handleFailure(response, context) {
+    const { resultCode } = response.result;
+
+    // Determine if retry is allowed
+    const canRetry = !['USER_REJECTED', 'RISK_REJECT', 'INSUFFICIENT_BALANCE']
+      .includes(resultCode);
+
+    return {
+      success: false,
+      pending: false,
+      error: resultCode,
+      canRetry,
+      action: canRetry ? 'retry' : 'abort',
+      userMessage: this.getUserMessage(resultCode)
+    };
+  }
+
+  getUserMessage(resultCode) {
+    const messages = {
+      USER_REJECTED: 'Payment cancelled',
+      INSUFFICIENT_BALANCE: 'Insufficient balance',
+      RISK_REJECT: 'Payment could not be completed',
+      INVALID_CODE: 'Please refresh your payment code',
+      QR_EXPIRED: 'QR code expired',
+      PAYMENT_FAIL: 'Payment failed. Please try again.'
+    };
+    return messages[resultCode] || 'Something went wrong. Please try again.';
+  }
+
+  shouldRetryRequest(error) {
+    // Network errors - safe to retry
+    if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
+      return true;
+    }
+    // 5xx server errors - safe to retry
+    if (error.status >= 500) {
+      return true;
+    }
+    // 429 rate limit - retry with backoff
+    if (error.status === 429) {
+      return true;
+    }
+    return false;
+  }
+}
+```
+
+## Testing Checklist
+
+Test these error scenarios in sandbox before going live:
+
+<Checks>
+  - SUCCESS response handling
+  - PROCESSING response and polling flow
+  - PAYMENT_FAIL handling (no retry)
+  - USER_REJECTED handling
+  - INSUFFICIENT_BALANCE handling
+  - INVALID_CODE / QR_EXPIRED recovery
+  - Network timeout with retry
+  - HTTP 5xx with retry and backoff
+  - HTTP 429 rate limiting
+  - Idempotency (same paymentRequestId)
+  - Webhook duplicate handling
+  - Invalid webhook signature rejection
+  - User-facing message display
+</Checks>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="webhook" href="/payment-integration/webhooks">
+    Implement webhook handlers for payment notifications
+  </Card>
+
+  <Card title="Inquiring Payment API" icon="magnifying-glass" href="/payment-integration/inquiring-payment-api">
+    Poll payment status for PROCESSING transactions
+  </Card>
+
+  <Card title="Retail Pay" icon="store" href="/payment-integration/retail-pay">
+    Merchant-initiated payment flow
+  </Card>
+
+  <Card title="Authentication Deep Dive" icon="key" href="/payment-integration/authentication-deep-dive">
+    Request signing and verification details
+  </Card>
+</CardGroup>
