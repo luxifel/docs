@@ -1,0 +1,123 @@
+---
+title: Send Push Notification
+description: Send a push notification to a user's device.
+---
+
+`POST /v1/messages/sendPush`
+
+Sends a push notification to a user's device through the Rebell app. Use this to notify users about order updates, promotions, or other time-sensitive information.
+
+## Request Parameters
+
+<ParamField body="requestId" type="string" required>
+  Unique request identifier (idempotency key).
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="targetUserId" type="string" required>
+  User ID to send the notification to.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  Notification title.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="content" type="string" required>
+  Notification body text.
+
+  **Max length**: 256 characters
+</ParamField>
+
+<ParamField body="targetUrl" type="string">
+  URL or deep link to open when notification is tapped.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extended information as JSON string.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="messageId" type="string">
+  Unique message identifier for tracking
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "requestId": "PUSH-20240110-001",
+  "targetUserId": "1000001119398804xxxx",
+  "title": "Your order is ready!",
+  "content": "Order #12345 is ready for pickup at Store A",
+  "targetUrl": "rebell://orders/12345"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "messageId": "MSG2024011000001"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | Notification sent | Message delivered to queue |
+| `F` | `USER_NOT_EXIST` | User not found | Verify targetUserId |
+| `F` | `USER_NOT_SUBSCRIBED` | User disabled notifications | Cannot send |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters | Check request |
+| `U` | `SENDING` | Notification queued | Will be delivered |
+
+## Implementation Example
+
+```javascript
+async function notifyOrderReady(order) {
+  const response = await rebellAPI.sendPush({
+    requestId: `PUSH-ORDER-${order.id}-${Date.now()}`,
+    targetUserId: order.customerId,
+    title: 'Your order is ready!',
+    content: `Order #${order.id} is ready for pickup at ${order.storeName}`,
+    targetUrl: `rebell://orders/${order.id}`
+  });
+
+  if (response.result.resultStatus === 'S') {
+    console.log(`Push sent: ${response.messageId}`);
+    return true;
+  }
+
+  console.error(`Push failed: ${response.result.resultMessage}`);
+  return false;
+}
+```
+
+## Best Practices
+
+<Checks>
+  - Keep titles short and actionable
+  - Include relevant context in the content
+  - Use deep links to take users directly to relevant content
+  - Don't send excessive notifications
+  - Respect user notification preferences
+</Checks>

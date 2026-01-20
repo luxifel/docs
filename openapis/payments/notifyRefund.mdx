@@ -1,0 +1,88 @@
+---
+title: Refund Notify
+description: Webhook notification for refund status changes.
+---
+
+`POST /webhooks/refundNotify`
+
+Inbound webhook that Rebell sends when a refund status changes. Configure your webhook URL in the `refundNotifyUrl` parameter when requesting refunds.
+
+## Webhook Payload
+
+<ParamField body="refundId" type="string" required>
+  Rebell refund identifier
+</ParamField>
+
+<ParamField body="refundRequestId" type="string" required>
+  Merchant refund request ID
+</ParamField>
+
+<ParamField body="paymentId" type="string" required>
+  Original payment identifier
+</ParamField>
+
+<ParamField body="refundStatus" type="string" required>
+  Refund status: `SUCCESS` or `FAIL`
+</ParamField>
+
+<ParamField body="refundAmount" type="object" required>
+  Refund amount details
+</ParamField>
+
+<ParamField body="refundTime" type="string">
+  Refund completion time (ISO 8601)
+</ParamField>
+
+## Expected Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  }
+}
+```
+
+## Example Webhook Payload
+
+```json
+{
+  "refundId": "2024011198765432101234",
+  "refundRequestId": "REFUND-20240111-001",
+  "paymentId": "2024011012345678901234",
+  "refundStatus": "SUCCESS",
+  "refundAmount": {
+    "currency": "EUR",
+    "value": "1500"
+  },
+  "refundTime": "2024-01-11T10:15:30+01:00"
+}
+```
+
+## Webhook Handler
+
+```javascript
+app.post('/webhooks/refund', express.json(), (req, res) => {
+  if (!verifySignature(req)) {
+    return res.status(401).json({
+      result: { resultStatus: 'F' }
+    });
+  }
+
+  const { refundId, refundRequestId, refundStatus } = req.body;
+
+  if (refundStatus === 'SUCCESS') {
+    updateOrderRefundStatus(refundRequestId, 'refunded');
+    notifyCustomer('Your refund has been processed');
+  } else {
+    updateOrderRefundStatus(refundRequestId, 'refund_failed');
+    notifyAdmin('Refund failed', { refundRequestId });
+  }
+
+  res.json({
+    result: { resultStatus: 'S', resultCode: 'SUCCESS' }
+  });
+});
+```

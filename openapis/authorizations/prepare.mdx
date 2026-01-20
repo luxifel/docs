@@ -1,0 +1,185 @@
+---
+title: Prepare Authorization
+description: Prepare contract information for agreement payment subscription flows.
+---
+
+`POST /v1/authorizations/prepare`
+
+The `prepare` endpoint is used to set up contract information for agreement payment scenarios. It returns an authorization URL that the user visits to sign the payment agreement.
+
+## Use Case
+
+Use this endpoint when implementing subscription or recurring payment flows:
+
+1. User wants to set up automatic payments
+2. You call `prepare` to create the contract terms
+3. User is redirected to the authorization URL
+4. User reviews and signs the agreement in the Rebell app
+5. You receive an `authCode` via callback
+6. Exchange the `authCode` for an `accessToken` using [applyToken](/openapis/authorizations/applyToken)
+
+## Request Parameters
+
+<ParamField body="referenceClientId" type="string" required>
+  Identifier to distinguish merchant businesses.
+
+  **Max length**: 16 characters
+</ParamField>
+
+<ParamField body="scopes" type="string" required>
+  Authorization scope. Use `AGREEMENT_PAY` for agreement payment scenarios.
+
+  **Max length**: 16 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  JSON string containing additional contract configuration.
+
+  **Max length**: 4096 characters
+
+  <Expandable title="extendInfo fields">
+    <ParamField body="contractTitle" type="string" required>
+      Contract title displayed on the authorization page.
+
+      **Max length**: 64 characters
+    </ParamField>
+
+    <ParamField body="contractDesc" type="string" required>
+      Contract description explaining the payment terms to users.
+
+      **Max length**: 2048 characters
+    </ParamField>
+
+    <ParamField body="agreedAmount" type="object">
+      Single transaction amount limit.
+
+      <Expandable title="properties">
+        <ParamField body="currency" type="string">
+          Currency code (e.g., `EUR`)
+        </ParamField>
+        <ParamField body="value" type="string">
+          Amount in minor units
+        </ParamField>
+      </Expandable>
+    </ParamField>
+
+    <ParamField body="startTime" type="string">
+      First deduction date in `yyyy-MM-dd` format.
+    </ParamField>
+
+    <ParamField body="contractStatusNotifyUrl" type="string">
+      Webhook URL for contract status change notifications.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="authUrl" type="string">
+  Authorization URL for the user to sign the contract. Pass this URL to `my.call("signContract")` JSAPI or redirect the user to it.
+
+  **Max length**: 256 characters
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "referenceClientId": "305XST2CSG0N4P0xxxx",
+  "scopes": "AGREEMENT_PAY",
+  "extendInfo": "{\"contractTitle\":\"Monthly Subscription\",\"contractDesc\":\"Automatic payment of €9.99 on the 1st of each month for Premium membership.\",\"agreedAmount\":{\"currency\":\"EUR\",\"value\":\"999\"},\"startTime\":\"2025-02-01\",\"contractStatusNotifyUrl\":\"https://merchant.example.com/webhooks/contract-status\"}"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "authUrl": "https://wallet.rebellapp.com/auth?authId=xxxxx"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | Contract prepared successfully | Save `authUrl` for user redirection |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters | Check request parameters |
+| `F` | `INVALID_AUTH_CLIENT` | Invalid auth client ID | Verify your `referenceClientId` |
+| `F` | `INVALID_AUTH_CLIENT_STATUS` | Auth client status invalid | Contact support |
+
+## Implementation Example
+
+<CodeGroup>
+```javascript Node.js
+async function prepareAgreementPayment(userId, plan) {
+  const extendInfo = {
+    contractTitle: `${plan.name} Subscription`,
+    contractDesc: `Automatic payment of €${(plan.price / 100).toFixed(2)} ${plan.frequency} for ${plan.name}.`,
+    agreedAmount: {
+      currency: 'EUR',
+      value: String(plan.price)
+    },
+    startTime: getNextBillingDate(),
+    contractStatusNotifyUrl: `${process.env.BASE_URL}/webhooks/contract-status`
+  };
+
+  const response = await rebellAPI.call('/v1/authorizations/prepare', {
+    referenceClientId: userId,
+    scopes: 'AGREEMENT_PAY',
+    extendInfo: JSON.stringify(extendInfo)
+  });
+
+  if (response.result.resultStatus === 'S') {
+    // Store authUrl for this user/subscription
+    await saveAuthUrl(userId, plan.id, response.authUrl);
+    return response.authUrl;
+  }
+
+  throw new Error(`Prepare failed: ${response.result.resultMessage}`);
+}
+```
+
+```python Python
+def prepare_agreement_payment(user_id: str, plan: dict) -> str:
+    extend_info = {
+        'contractTitle': f"{plan['name']} Subscription",
+        'contractDesc': f"Automatic payment of €{plan['price'] / 100:.2f} {plan['frequency']} for {plan['name']}.",
+        'agreedAmount': {
+            'currency': 'EUR',
+            'value': str(plan['price'])
+        },
+        'startTime': get_next_billing_date(),
+        'contractStatusNotifyUrl': f"{os.environ['BASE_URL']}/webhooks/contract-status"
+    }
+
+    response = rebell_api.call('/v1/authorizations/prepare', {
+        'referenceClientId': user_id,
+        'scopes': 'AGREEMENT_PAY',
+        'extendInfo': json.dumps(extend_info)
+    })
+
+    if response['result']['resultStatus'] == 'S':
+        save_auth_url(user_id, plan['id'], response['authUrl'])
+        return response['authUrl']
+
+    raise Exception(f"Prepare failed: {response['result']['resultMessage']}")
+```
+</CodeGroup>
+
+## Next Steps
+
+After the user completes authorization at the `authUrl`, you'll receive an `authCode` via your callback. Use it with:
+
+<Card title="Apply Token" icon="key" href="/openapis/authorizations/applyToken">
+  Exchange the authorization code for an access token
+</Card>

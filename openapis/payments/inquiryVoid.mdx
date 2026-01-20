@@ -1,0 +1,68 @@
+---
+title: Inquiry Void
+description: Query the status of a void request.
+---
+
+`POST /v1/payments/inquiryVoid`
+
+Queries the current status of a void request.
+
+## Request Parameters
+
+<ParamField body="voidId" type="string">
+  Rebell void identifier.
+</ParamField>
+
+<ParamField body="voidRequestId" type="string">
+  Merchant void request ID.
+
+  <Note>At least one of `voidId` or `voidRequestId` is required.</Note>
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="voidDetail" type="object">
+  Void details including status and amount
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "voidId": "2024011055555555501234"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "voidDetail": {
+    "voidId": "2024011055555555501234",
+    "voidAmount": {
+      "currency": "EUR",
+      "value": "2500"
+    },
+    "voidedTime": "2024-01-10T16:45:00+01:00",
+    "voidStatus": "SUCCESS"
+  }
+}
+```
+
+## Void Status Values
+
+| Status | Description |
+|--------|-------------|
+| `INIT` | Void request initiated |
+| `SUCCESS` | Void completed successfully |
+| `FAILED` | Void processing failed |
+| `PENDING` | Awaiting manual review |

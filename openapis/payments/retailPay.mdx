@@ -1,0 +1,241 @@
+---
+title: Retail Pay
+description: Initiate a retail payment by scanning a customer-presented QR or barcode.
+---
+
+`POST /v1/payments/retailPay`
+
+Initiates a retail payment where the merchant scans the customer's wallet QR code or barcode. This is the "Customer Presented Mode" (CPM) flow for in-store payments.
+
+## Use Case
+
+The customer opens their Rebell wallet app and displays their payment QR code or barcode. The merchant scans this code and initiates the payment.
+
+<Steps>
+  <Step title="Customer Displays Code">
+    Customer opens Rebell app and shows their payment QR/barcode
+  </Step>
+
+  <Step title="Merchant Scans">
+    Merchant POS scans the code to get the `paymentAuthCode`
+  </Step>
+
+  <Step title="API Call">
+    Merchant backend calls `retailPay` with the scanned code
+  </Step>
+
+  <Step title="Payment Processed">
+    Payment is processed immediately (synchronous response)
+  </Step>
+
+  <Step title="Webhook Notification">
+    Merchant receives webhook confirmation
+  </Step>
+</Steps>
+
+## Request Parameters
+
+<ParamField body="productCode" type="string" required>
+  Payment product code assigned by Rebell.
+
+  **Max length**: 32 characters
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string" required>
+  Merchant-generated unique identifier (idempotency key). Must be unique per transaction.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="paymentAuthCode" type="string" required>
+  The QR code or barcode content scanned from the customer's wallet.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="paymentAmount" type="object" required>
+  Payment amount details.
+
+  <Expandable title="properties">
+    <ParamField body="currency" type="string" required>
+      ISO-4217 currency code (e.g., `EUR`)
+    </ParamField>
+    <ParamField body="value" type="string" required>
+      Amount in minor units (e.g., `1000` for €10.00)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="order" type="object">
+  Order details.
+
+  <Expandable title="properties">
+    <ParamField body="orderDescription" type="string" required>
+      Description shown to the customer
+    </ParamField>
+    <ParamField body="merchant" type="object">
+      Merchant information
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="paymentNotifyUrl" type="string" required>
+  Webhook URL to receive payment notifications.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extended information as JSON string.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="paymentRequestId" type="string">
+  Echo of the merchant's payment request ID
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Rebell-assigned payment identifier for tracking and reconciliation
+</ResponseField>
+
+<ResponseField name="paymentTime" type="string">
+  Payment completion time in ISO 8601 format
+</ResponseField>
+
+<ResponseField name="paymentAmount" type="object">
+  Confirmed payment amount
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "productCode": "5105010010000100040",
+  "paymentRequestId": "RETAIL-20240110-001",
+  "paymentAuthCode": "289123456789012345",
+  "paymentAmount": {
+    "currency": "EUR",
+    "value": "2500"
+  },
+  "order": {
+    "orderDescription": "Coffee and pastry",
+    "merchant": {
+      "store": {
+        "externalStoreId": "STORE_001"
+      }
+    }
+  },
+  "paymentNotifyUrl": "https://merchant.example.com/webhooks/payment"
+}
+```
+
+## Example Response
+
+**Success**:
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "paymentRequestId": "RETAIL-20240110-001",
+  "paymentId": "2024011012345678901234",
+  "paymentTime": "2024-01-10T14:30:45+01:00",
+  "paymentAmount": {
+    "currency": "EUR",
+    "value": "2500"
+  }
+}
+```
+
+**Processing** (async):
+```json
+{
+  "result": {
+    "resultCode": "PAYMENT_IN_PROCESS",
+    "resultStatus": "U",
+    "resultMessage": "Payment is being processed"
+  },
+  "paymentRequestId": "RETAIL-20240110-001",
+  "paymentId": "2024011012345678901234"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | Payment successful | Complete the transaction |
+| `F` | `ORDER_IS_CLOSED` | Order already completed | Check order status |
+| `F` | `INVALID_AUTH_CODE` | Auth code invalid or expired | Ask customer to refresh code |
+| `F` | `INSUFFICIENT_BALANCE` | Customer has insufficient funds | Inform customer |
+| `F` | `RISK_REJECT` | Payment rejected by risk system | Try alternative payment |
+| `U` | `PAYMENT_IN_PROCESS` | Payment processing | Poll with inquiryPayment |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error | Retry or poll status |
+
+## Implementation Example
+
+```javascript
+async function processRetailPayment(authCode, amount, orderId) {
+  const paymentRequestId = `RETAIL-${orderId}-${Date.now()}`;
+
+  const response = await rebellAPI.retailPay({
+    productCode: process.env.REBELL_PRODUCT_CODE,
+    paymentRequestId,
+    paymentAuthCode: authCode,
+    paymentAmount: {
+      currency: 'EUR',
+      value: String(amount)
+    },
+    order: {
+      orderDescription: `Order #${orderId}`,
+      merchant: {
+        store: { externalStoreId: process.env.STORE_ID }
+      }
+    },
+    paymentNotifyUrl: `${process.env.BASE_URL}/webhooks/payment`
+  });
+
+  if (response.result.resultStatus === 'S') {
+    // Payment successful
+    return {
+      success: true,
+      paymentId: response.paymentId,
+      paymentTime: response.paymentTime
+    };
+  }
+
+  if (response.result.resultStatus === 'U') {
+    // Payment processing - need to poll
+    return {
+      success: false,
+      pending: true,
+      paymentId: response.paymentId,
+      paymentRequestId
+    };
+  }
+
+  // Payment failed
+  throw new PaymentError(response.result.resultCode, response.result.resultMessage);
+}
+```
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Inquiry Payment" icon="magnifying-glass" href="/openapis/payments/inquiryPayment">
+    Check payment status when result is unknown
+  </Card>
+
+  <Card title="Payment Notify" icon="bell" href="/openapis/payments/notifyPayment">
+    Handle payment webhooks
+  </Card>
+</CardGroup>

@@ -1,0 +1,102 @@
+---
+title: Message Transmission Security
+description: Security requirements for API communication including signing and signature validation.
+---
+
+Message signing and signature validation is mandatory for all requests and responses. This ensures message authenticity, integrity, and non-repudiation.
+
+## Security Architecture
+
+The platform enforces a two-layer security approach:
+
+<CardGroup cols={2}>
+  <Card title="Request Signing" icon="pen-to-square">
+    All outgoing requests must be digitally signed before transmission
+  </Card>
+
+  <Card title="Response Validation" icon="shield-check">
+    All incoming responses must have their signatures verified before processing
+  </Card>
+</CardGroup>
+
+## Why Signing is Required
+
+<AccordionGroup>
+  <Accordion title="Authentication">
+    Digital signatures prove that the request originated from an authorized party with access to the private key.
+  </Accordion>
+
+  <Accordion title="Integrity">
+    Any modification to the signed content invalidates the signature, ensuring data hasn't been tampered with in transit.
+  </Accordion>
+
+  <Accordion title="Non-Repudiation">
+    The sender cannot deny having sent a signed message, providing an audit trail for all transactions.
+  </Accordion>
+
+  <Accordion title="Replay Protection">
+    The `Request-Time` header prevents old requests from being replayed by attackers.
+  </Accordion>
+</AccordionGroup>
+
+## Key Management
+
+### Key Requirements
+
+| Requirement | Specification |
+|-------------|---------------|
+| Algorithm | RSA with SHA-256 (RSA256) |
+| Key Size | 2048 bits minimum |
+| Format | PEM or PKCS#8 |
+
+### Key Pair Setup
+
+<Steps>
+  <Step title="Generate Key Pair">
+    Generate a 2048-bit RSA key pair using OpenSSL or your preferred tool
+
+    ```bash
+    # Generate private key
+    openssl genrsa -out private_key.pem 2048
+
+    # Extract public key
+    openssl rsa -in private_key.pem -pubout -out public_key.pem
+    ```
+  </Step>
+
+  <Step title="Share Public Key">
+    Provide your public key to Rebell during onboarding. This key will be used to verify your request signatures.
+  </Step>
+
+  <Step title="Receive Platform Public Key">
+    Receive Rebell's public key to verify response signatures.
+  </Step>
+
+  <Step title="Secure Storage">
+    Store your private key securely. Never expose it in client-side code or version control.
+  </Step>
+</Steps>
+
+## Security Best Practices
+
+<Checks>
+  - Use 2048-bit or larger RSA keys
+  - Store private keys in secure key management systems
+  - Never hardcode private keys in source code
+  - Rotate keys periodically according to your security policy
+  - Always verify response signatures before processing data
+  - Validate the `Response-Time` header to detect replay attacks
+  - Use HTTPS for all API communications
+</Checks>
+
+<Warning>
+**Private Key Security**: Your private key should never be exposed. If you suspect your private key has been compromised, contact Rebell support immediately to rotate your keys.
+</Warning>
+
+## Implementation Guide
+
+For detailed implementation instructions, see:
+
+<Card title="Call an API via Signing" icon="code" href="/openapis/message-transmission-security/call-api">
+  Step-by-step guide to signing requests and validating responses
+</Card>

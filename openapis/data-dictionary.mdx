@@ -1,0 +1,231 @@
+---
+title: Data Dictionary (v1)
+description: Common data types, models, and enumerations used across v1 APIs.
+---
+
+This page documents the common data structures and types used across all v1 OpenAPI endpoints.
+
+## Core Models
+
+### Amount
+
+Represents a monetary amount in minor units.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `currency` | String | Yes | Three-character ISO-4217 currency code (max 3 chars) |
+| `value` | String | Yes | Positive integer in smallest currency unit (max 16 chars) |
+
+```json
+{
+  "currency": "EUR",
+  "value": "1000"  // Represents €10.00
+}
+```
+
+<Note>
+The `value` field represents the amount in the smallest unit of the currency. For EUR, 1000 = €10.00. For currencies without decimal places, use the full amount.
+</Note>
+
+### Result
+
+Standard response result object included in all API responses.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `resultStatus` | String | No | Status code: `S` (success), `F` (failed), `U` (unknown), `A` (accepted) |
+| `resultCode` | String | No | Result code identifier (max 64 chars) |
+| `resultMessage` | String | No | Detailed description of the result (max 256 chars) |
+
+```json
+{
+  "resultStatus": "S",
+  "resultCode": "SUCCESS",
+  "resultMessage": "Success"
+}
+```
+
+### Order
+
+Contains order and transaction details.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `orderDescription` | String | Yes | Description for user consumption records (max 256 chars) |
+| `orderCreateTime` | Datetime | No | Order creation time, ISO 8601 format (max 32 chars) |
+| `merchant` | Merchant | No | Merchant information object |
+| `buyer` | Buyer | No | Buyer information (optional for pre-creation) |
+| `env` | Env | No | Environment/device information |
+| `extendInfo` | String | No | Extended data for special use cases (max 2048 chars) |
+
+```json
+{
+  "orderDescription": "Premium subscription - Monthly",
+  "orderCreateTime": "2024-01-10T12:00:00+01:00",
+  "merchant": {
+    "merchantName": "Acme Store",
+    "store": {
+      "externalStoreId": "STORE_001"
+    }
+  }
+}
+```
+
+### Merchant
+
+Merchant business information.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `merchantMCC` | String | No | Merchant category code (max 32 chars) |
+| `merchantName` | String | No | Merchant name (max 256 chars) |
+| `store` | Store | No | Store details object |
+
+### Store
+
+Physical or virtual store information.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `externalStoreId` | String | No | External store identifier (max 64 chars) |
+| `storeName` | String | No | Store name (max 256 chars) |
+| `storeMCC` | String | No | Store business category code (max 32 chars) |
+| `storeTerminalId` | String | No | Store terminal unique identifier (max 64 chars) |
+| `storeOperatorId` | String | No | Store operator unique identifier (max 64 chars) |
+
+### Buyer
+
+Buyer/customer information.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `referenceBuyerId` | String | No | Buyer unique identification (max 64 chars) |
+| `buyerName` | UserName | No | Buyer name object |
+| `buyerPhoneNo` | String | No | Mobile phone number (max 24 chars) |
+
+### UserName
+
+User name components.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `firstName` | String | No | First name (max 32 chars) |
+| `lastName` | String | No | Last name (max 32 chars) |
+
+### Env
+
+Environment and device information for risk assessment.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `terminalType` | String | No | Terminal type (enum: TerminalType) |
+| `osType` | String | No | Operating system type (enum: OSType) |
+| `userAgent` | String | No | User agent string (max 1024 chars) |
+| `deviceTokenId` | String | No | Device token identifier (max 128 chars) |
+| `clientIp` | String | No | Client device IP address (max 128 chars) |
+| `cookieId` | String | No | User cookie identifier (max 128 chars) |
+| `storeTerminalId` | String | No | Store terminal identifier (max 64 chars) |
+| `storeTerminalRequestTime` | String | No | Store terminal request time (max 32 chars) |
+| `extendInfo` | String | No | Extended information (max 2048 chars) |
+
+### RedirectActionForm
+
+Redirect URL information for authorization flows.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `redirectUrl` | String | Yes | Redirect URL (max 2048 chars) |
+
+### ContentTemplate
+
+Template for notification content.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `templateParameters` | Map | No | JSON key-value pairs for template variables |
+| `language` | String | No | RFC 1766 format (e.g., `zh-CN`, `en-US`) |
+
+### VoidDetail
+
+Void transaction details.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `voidId` | String | No | Void request unique identifier (max 64 chars) |
+| `voidAmount` | Amount | No | Payment void amount object |
+| `voidedTime` | Datetime | No | Void processing time (ISO 8601 format) |
+| `voidSource` | String | No | Void request source (enum: VoidSource) |
+| `voidStatus` | String | No | Current void status (enum: VoidStatus) |
+
+## Enumerations
+
+### OSType
+
+Operating system types.
+
+| Value | Description |
+|-------|-------------|
+| `IOS` | iOS operating system |
+| `ANDROID` | Android operating system |
+
+### TerminalType
+
+Terminal/client application types.
+
+| Value | Description |
+|-------|-------------|
+| `MINI_APP` | Mini program application |
+| `APP` | Mobile application |
+| `WEB` | Browser web application |
+| `WAP` | Mobile WAP browser |
+| `SYSTEM` | System/backend call |
+
+### VoidSource
+
+Source of void request.
+
+| Value | Description |
+|-------|-------------|
+| `MERCHANT` | Merchant-initiated void |
+| `TIMEOUT` | Timeout-triggered void |
+| `LAST_CONFIRM` | Last confirmation void |
+
+### VoidStatus
+
+Status of void operation.
+
+| Value | Description |
+|-------|-------------|
+| `INIT` | Initial status |
+| `SUCCESS` | Void successfully processed |
+| `FAILED` | Void processing failed |
+| `PENDING` | Awaiting manual handling |
+
+### ResultStatus
+
+Standard result status codes.
+
+| Value | Description |
+|-------|-------------|
+| `S` | Success - Operation completed successfully |
+| `F` | Failed - Operation failed |
+| `U` | Unknown - Result unknown, may need retry or inquiry |
+| `A` | Accepted - Request accepted, processing asynchronously |
+
+## Date and Time Format
+
+All datetime fields follow the **ISO 8601** standard:
+
+```
+YYYY-MM-DDTHH:mm:ss.sssZ
+YYYY-MM-DDTHH:mm:ss+HH:mm
+```
+
+**Examples**:
+- `2024-01-10T12:00:00Z` (UTC)
+- `2024-01-10T13:00:00+01:00` (CET)
+- `2024-01-10T12:00:00.123Z` (with milliseconds)
+
+<Note>
+Request-Time headers require at least second-level precision. Millisecond precision is recommended for better accuracy.
+</Note>

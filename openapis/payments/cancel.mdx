@@ -1,0 +1,61 @@
+---
+title: Cancel Payment
+description: Cancel a pending payment before it's completed.
+---
+
+`POST /v1/payments/cancel`
+
+Cancels a payment that is still in a pending or processing state. Use this when you need to abort a payment before the user completes it.
+
+## Request Parameters
+
+<ParamField body="paymentId" type="string">
+  Rebell payment identifier.
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string">
+  Merchant payment request ID.
+
+  <Note>At least one of `paymentId` or `paymentRequestId` is required.</Note>
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Payment identifier
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "paymentId": "2024011012345678901234",
+  "paymentRequestId": "QR-20240110-001"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "paymentId": "2024011012345678901234"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Payment cancelled successfully |
+| `F` | `ORDER_NOT_EXIST` | Payment not found |
+| `F` | `ORDER_IS_CLOSED` | Payment already completed or cancelled |
+| `F` | `CANCEL_NOT_ALLOWED` | Payment cannot be cancelled in current state |

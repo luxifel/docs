@@ -1,0 +1,266 @@
+---
+title: Inquiry Payment
+description: Query the status of a payment transaction.
+---
+
+`POST /v1/payments/inquiryPayment`
+
+Queries the current status of a payment. Use this endpoint to check payment status when:
+- The initial payment response has `resultStatus: "U"` (unknown)
+- Webhook notification hasn't been received
+- You need to verify payment status before fulfillment
+
+## Request Parameters
+
+<ParamField body="paymentId" type="string">
+  Rebell-assigned payment identifier.
+
+  **Max length**: 64 characters
+
+  <Note>
+  At least one of `paymentId` or `paymentRequestId` is required.
+  </Note>
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string">
+  Merchant-generated payment request ID.
+
+  **Max length**: 64 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Rebell payment identifier
+</ResponseField>
+
+<ResponseField name="paymentRequestId" type="string">
+  Merchant payment request ID
+</ResponseField>
+
+<ResponseField name="paymentStatus" type="string">
+  Current payment status:
+  - `SUCCESS` - Payment completed successfully
+  - `PROCESSING` - Payment is being processed
+  - `FAIL` - Payment failed
+</ResponseField>
+
+<ResponseField name="paymentTime" type="string">
+  Payment completion time (ISO 8601)
+</ResponseField>
+
+<ResponseField name="paymentAmount" type="object">
+  Payment amount details
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "paymentId": "2024011012345678901234",
+  "paymentRequestId": "RETAIL-20240110-001"
+}
+```
+
+## Example Response
+
+**Successful Payment**:
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "paymentId": "2024011012345678901234",
+  "paymentRequestId": "RETAIL-20240110-001",
+  "paymentStatus": "SUCCESS",
+  "paymentTime": "2024-01-10T14:30:45+01:00",
+  "paymentAmount": {
+    "currency": "EUR",
+    "value": "2500"
+  }
+}
+```
+
+**Processing**:
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "paymentId": "2024011012345678901234",
+  "paymentRequestId": "RETAIL-20240110-001",
+  "paymentStatus": "PROCESSING"
+}
+```
+
+**Failed Payment**:
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "paymentId": "2024011012345678901234",
+  "paymentRequestId": "RETAIL-20240110-001",
+  "paymentStatus": "FAIL"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | Query successful | Check `paymentStatus` field |
+| `F` | `ORDER_NOT_EXIST` | Payment not found | Verify paymentId/paymentRequestId |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters | Check request |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error | Retry with backoff |
+
+## Polling Implementation
+
+Use inquiry for polling when waiting for payment completion:
+
+<CodeGroup>
+```javascript Node.js
+async function pollPaymentStatus(paymentId, paymentRequestId, options = {}) {
+  const {
+    maxAttempts = 60,      // Max polling attempts
+    interval = 3000,        // Polling interval (ms)
+    timeout = 180000        // Total timeout (ms)
+  } = options;
+
+  const startTime = Date.now();
+  let attempts = 0;
+
+  while (attempts < maxAttempts && (Date.now() - startTime) < timeout) {
+    attempts++;
+
+    try {
+      const response = await rebellAPI.inquiryPayment({
+        paymentId,
+        paymentRequestId
+      });
+
+      if (response.result.resultStatus === 'S') {
+        switch (response.paymentStatus) {
+          case 'SUCCESS':
+            return {
+              status: 'success',
+              paymentId: response.paymentId,
+              paymentTime: response.paymentTime,
+              amount: response.paymentAmount
+            };
+
+          case 'FAIL':
+            return {
+              status: 'failed',
+              paymentId: response.paymentId
+            };
+
+          case 'PROCESSING':
+            // Continue polling
+            break;
+        }
+      }
+    } catch (error) {
+      console.error(`Polling attempt ${attempts} failed:`, error);
+      // Continue polling on error
+    }
+
+    // Wait before next poll
+    await new Promise(resolve => setTimeout(resolve, interval));
+  }
+
+  return { status: 'timeout' };
+}
+
+// Usage
+const result = await pollPaymentStatus(paymentId, paymentRequestId);
+if (result.status === 'success') {
+  await fulfillOrder(orderId);
+}
+```
+
+```python Python
+import asyncio
+from datetime import datetime, timedelta
+
+async def poll_payment_status(
+    payment_id: str,
+    payment_request_id: str,
+    max_attempts: int = 60,
+    interval: int = 3,
+    timeout: int = 180
+) -> dict:
+    start_time = datetime.now()
+    timeout_delta = timedelta(seconds=timeout)
+    attempts = 0
+
+    while attempts < max_attempts and (datetime.now() - start_time) < timeout_delta:
+        attempts += 1
+
+        try:
+            response = await rebell_api.inquiry_payment({
+                'paymentId': payment_id,
+                'paymentRequestId': payment_request_id
+            })
+
+            if response['result']['resultStatus'] == 'S':
+                payment_status = response.get('paymentStatus')
+
+                if payment_status == 'SUCCESS':
+                    return {
+                        'status': 'success',
+                        'payment_id': response['paymentId'],
+                        'payment_time': response.get('paymentTime'),
+                        'amount': response.get('paymentAmount')
+                    }
+
+                if payment_status == 'FAIL':
+                    return {
+                        'status': 'failed',
+                        'payment_id': response['paymentId']
+                    }
+
+        except Exception as e:
+            print(f"Polling attempt {attempts} failed: {e}")
+
+        await asyncio.sleep(interval)
+
+    return {'status': 'timeout'}
+```
+</CodeGroup>
+
+## Best Practices
+
+<Checks>
+  - Use exponential backoff for extended polling
+  - Set reasonable timeout limits (typically 3-5 minutes)
+  - Combine with webhook handling for reliability
+  - Don't poll indefinitely - implement maximum attempts
+  - Cache inquiry results to reduce API calls
+</Checks>
+
+<Warning>
+Don't rely solely on polling for payment confirmation. Always implement webhook handlers as the primary notification mechanism. Use polling as a fallback or for real-time UI updates.
+</Warning>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Payment Notify" icon="bell" href="/openapis/payments/notifyPayment">
+    Handle payment webhooks
+  </Card>
+
+  <Card title="Retail Pay" icon="store" href="/openapis/payments/retailPay">
+    Initiate retail payments
+  </Card>
+</CardGroup>

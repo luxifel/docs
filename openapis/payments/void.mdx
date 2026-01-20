@@ -1,0 +1,92 @@
+---
+title: Void Payment
+description: Void a payment before settlement.
+---
+
+`POST /v1/payments/void`
+
+Voids a payment before it has been settled. Use this when you need to cancel a payment on the same day before the settlement batch runs.
+
+<Note>
+Void is different from refund: voids cancel transactions before settlement, while refunds reverse transactions after settlement. Voids are typically faster and may avoid processing fees.
+</Note>
+
+## Request Parameters
+
+<ParamField body="paymentId" type="string" required>
+  Payment identifier to void.
+</ParamField>
+
+<ParamField body="voidRequestId" type="string" required>
+  Merchant-generated unique void request ID (idempotency key).
+
+  **Max length**: 64 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="voidId" type="string">
+  Rebell-assigned void identifier
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Original payment identifier
+</ResponseField>
+
+<ResponseField name="voidedTime" type="string">
+  Void processing time (ISO 8601)
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "paymentId": "2024011012345678901234",
+  "voidRequestId": "VOID-20240110-001"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "voidId": "2024011055555555501234",
+  "paymentId": "2024011012345678901234",
+  "voidedTime": "2024-01-10T16:45:00+01:00"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | Payment voided | Update order status |
+| `F` | `ORDER_NOT_EXIST` | Payment not found | Verify paymentId |
+| `F` | `VOID_NOT_ALLOWED` | Payment cannot be voided | Use refund instead |
+| `F` | `ORDER_ALREADY_SETTLED` | Payment already settled | Use refund instead |
+| `U` | `VOID_IN_PROCESS` | Void processing | Poll with inquiryVoid |
+
+## When to Use Void vs Refund
+
+| Scenario | Use |
+|----------|-----|
+| Same-day cancellation before settlement | Void |
+| Cancellation after settlement | Refund |
+| Partial reversal | Refund |
+| Customer changed mind (same day) | Void |
+| Defective product return | Refund |
+
+## Related
+
+<Card title="Inquiry Void" icon="magnifying-glass" href="/openapis/payments/inquiryVoid">
+  Check void status
+</Card>

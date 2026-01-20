@@ -1,0 +1,144 @@
+---
+title: OpenAPI Overview
+description: Introduction to the Rebell OpenAPI platform, message structure, and developer workflow.
+---
+
+Mini programs provide a comprehensive set of OpenAPIs enabling developers to integrate various capabilities including payments, user authorization, and messaging. Communication occurs via HTTPS POST requests with structured request/response patterns.
+
+## API Version
+
+- **Current Version**: v1
+- **URL Format**: `https://{domainName}/api/open/v1/{endpoint}`
+
+<Note>
+Different API versions represent distinct interfaces. Ensure you use the correct version for your integration.
+</Note>
+
+## Message Structure
+
+### Request Components
+
+All API requests follow this structure:
+
+| Component | Description |
+|-----------|-------------|
+| **URL** | `https://{domainName}/api/open/{restfulPath}` |
+| **Method** | POST (HTTPS) |
+| **Authentication** | RSA256 digital signature required |
+
+### Required Headers
+
+<ParamField header="Signature" type="string" required>
+  Digital signature in format: `algorithm=RSA256, keyVersion=1, signature=****`
+</ParamField>
+
+<ParamField header="Client-Id" type="string" required>
+  Your assigned client identifier, used to identify your application and associated keys
+</ParamField>
+
+<ParamField header="Request-Time" type="string" required>
+  ISO 8601 timestamp with minimum second accuracy (e.g., `2024-01-10T12:00:00+01:00`)
+</ParamField>
+
+<ParamField header="Content-Type" type="string">
+  `application/json; charset=UTF-8`
+</ParamField>
+
+### Response Structure
+
+All responses include a standardized `result` object:
+
+```json
+{
+  "result": {
+    "resultStatus": "S",
+    "resultCode": "SUCCESS",
+    "resultMessage": "Success"
+  },
+  // ... additional response fields
+}
+```
+
+<ResponseField name="result.resultStatus" type="string" required>
+  Status indicator:
+  - `S` - Success
+  - `F` - Failed
+  - `U` - Unknown
+  - `A` - Accepted (processing)
+</ResponseField>
+
+<ResponseField name="result.resultCode" type="string">
+  Error or success code (max 64 characters)
+</ResponseField>
+
+<ResponseField name="result.resultMessage" type="string">
+  Detailed description of the result (max 256 characters)
+</ResponseField>
+
+## Developer Workflow
+
+<Steps>
+  <Step title="Understand Requirements">
+    Review API idempotency requirements and authentication specifications
+  </Step>
+
+  <Step title="Generate Keys">
+    Create a 2048-bit RSA key pair for signing requests
+  </Step>
+
+  <Step title="Construct Request">
+    Build signed, encoded requests per the message structure specification
+  </Step>
+
+  <Step title="Send Request">
+    Submit HTTPS POST requests to the appropriate endpoint
+  </Step>
+
+  <Step title="Validate Response">
+    Verify the response signature using the platform's public key
+  </Step>
+
+  <Step title="Handle Result">
+    Process result codes and implement appropriate error handling
+  </Step>
+</Steps>
+
+## Security Requirements
+
+<CardGroup cols={2}>
+  <Card title="Request Signing" icon="signature">
+    All requests must be digitally signed using RSA-SHA256
+  </Card>
+
+  <Card title="Response Validation" icon="shield-check">
+    Always verify response signatures before processing data
+  </Card>
+
+  <Card title="Key Management" icon="key">
+    Use 2048-bit RSA keys exclusively for the RSA256 algorithm
+  </Card>
+
+  <Card title="Message Encoding" icon="code">
+    Proper encoding prevents character ambiguities during transmission
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Idempotency" icon="repeat" href="/openapis/idempotency">
+    Learn how to handle retries safely
+  </Card>
+
+  <Card title="Message Encoding" icon="binary" href="/openapis/message-encoding">
+    Understand encoding requirements
+  </Card>
+
+  <Card title="API Signing" icon="pen" href="/openapis/message-transmission-security/call-api">
+    Step-by-step signing guide
+  </Card>
+
+  <Card title="Data Dictionary" icon="book" href="/openapis/data-dictionary">
+    Common data types and models
+  </Card>
+</CardGroup>

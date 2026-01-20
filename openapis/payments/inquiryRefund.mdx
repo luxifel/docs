@@ -1,0 +1,86 @@
+---
+title: Inquiry Refund
+description: Query the status of a refund request.
+---
+
+`POST /v1/payments/inquiryRefund`
+
+Queries the current status of a refund. Use this when the refund response has an unknown status or to verify refund completion.
+
+## Request Parameters
+
+<ParamField body="refundId" type="string">
+  Rebell refund identifier.
+</ParamField>
+
+<ParamField body="refundRequestId" type="string">
+  Merchant refund request ID.
+
+  <Note>At least one of `refundId` or `refundRequestId` is required.</Note>
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="refundId" type="string">
+  Rebell refund identifier
+</ResponseField>
+
+<ResponseField name="refundRequestId" type="string">
+  Merchant refund request ID
+</ResponseField>
+
+<ResponseField name="refundStatus" type="string">
+  Current refund status:
+  - `SUCCESS` - Refund completed
+  - `PROCESSING` - Refund in progress
+  - `FAIL` - Refund failed
+</ResponseField>
+
+<ResponseField name="refundAmount" type="object">
+  Refund amount details
+</ResponseField>
+
+<ResponseField name="refundTime" type="string">
+  Refund completion time (ISO 8601)
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "refundId": "2024011198765432101234",
+  "refundRequestId": "REFUND-20240111-001"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "refundId": "2024011198765432101234",
+  "refundRequestId": "REFUND-20240111-001",
+  "refundStatus": "SUCCESS",
+  "refundAmount": {
+    "currency": "EUR",
+    "value": "1500"
+  },
+  "refundTime": "2024-01-11T10:15:30+01:00"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Query successful (check `refundStatus`) |
+| `F` | `REFUND_NOT_EXIST` | Refund not found |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |

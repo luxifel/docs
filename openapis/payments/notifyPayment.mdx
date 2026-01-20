@@ -1,0 +1,293 @@
+---
+title: Payment Notify
+description: Webhook notification for payment status changes.
+---
+
+`POST /webhooks/paymentNotify`
+
+This is an inbound webhook that Rebell sends to your server when a payment status changes. Configure your webhook URL in the `paymentNotifyUrl` parameter when creating payments.
+
+<Note>
+This is an **inbound webhook** - Rebell calls your server to notify you of payment events.
+</Note>
+
+## Webhook Payload
+
+<ParamField body="paymentId" type="string" required>
+  Rebell payment identifier
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string" required>
+  Merchant payment request ID (your idempotency key)
+</ParamField>
+
+<ParamField body="paymentStatus" type="string" required>
+  Payment status:
+  - `SUCCESS` - Payment completed successfully
+  - `FAIL` - Payment failed
+</ParamField>
+
+<ParamField body="paymentAmount" type="object" required>
+  Payment amount details
+
+  <Expandable title="properties">
+    <ParamField body="currency" type="string">
+      Currency code
+    </ParamField>
+    <ParamField body="value" type="string">
+      Amount in minor units
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="paymentTime" type="string" required>
+  Payment completion time (ISO 8601)
+</ParamField>
+
+<ParamField body="paymentCreatedTime" type="string">
+  Payment creation time (ISO 8601)
+</ParamField>
+
+## Expected Response
+
+Return a success response to acknowledge receipt:
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  }
+}
+```
+
+<Warning>
+If your webhook fails to respond with a success status, Rebell will retry the notification. Ensure your handler is idempotent to handle duplicate notifications.
+</Warning>
+
+## Example Webhook Payload
+
+**Successful Payment**:
+```json
+{
+  "paymentId": "2024011012345678901234",
+  "paymentRequestId": "RETAIL-20240110-001",
+  "paymentStatus": "SUCCESS",
+  "paymentAmount": {
+    "currency": "EUR",
+    "value": "2500"
+  },
+  "paymentTime": "2024-01-10T14:30:45+01:00",
+  "paymentCreatedTime": "2024-01-10T14:30:00+01:00"
+}
+```
+
+**Failed Payment**:
+```json
+{
+  "paymentId": "2024011012345678901234",
+  "paymentRequestId": "RETAIL-20240110-001",
+  "paymentStatus": "FAIL",
+  "paymentAmount": {
+    "currency": "EUR",
+    "value": "2500"
+  },
+  "paymentTime": "2024-01-10T14:30:45+01:00"
+}
+```
+
+## Webhook Handler Implementation
+
+<CodeGroup>
+```javascript Express.js
+const express = require('express');
+const app = express();
+
+app.post('/webhooks/payment', express.json(), async (req, res) => {
+  // 1. Verify the signature
+  if (!verifyWebhookSignature(req)) {
+    console.error('Invalid webhook signature');
+    return res.status(401).json({
+      result: { resultStatus: 'F', resultCode: 'INVALID_SIGNATURE' }
+    });
+  }
+
+  const {
+    paymentId,
+    paymentRequestId,
+    paymentStatus,
+    paymentAmount,
+    paymentTime
+  } = req.body;
+
+  // 2. Check for duplicate notification (idempotency)
+  const existingRecord = await getPaymentRecord(paymentRequestId);
+  if (existingRecord && existingRecord.webhookProcessed) {
+    // Already processed, return success
+    return res.json({
+      result: { resultStatus: 'S', resultCode: 'SUCCESS' }
+    });
+  }
+
+  try {
+    // 3. Process the payment notification
+    if (paymentStatus === 'SUCCESS') {
+      await handleSuccessfulPayment({
+        paymentId,
+        paymentRequestId,
+        amount: paymentAmount,
+        paidAt: paymentTime
+      });
+    } else if (paymentStatus === 'FAIL') {
+      await handleFailedPayment({
+        paymentId,
+        paymentRequestId
+      });
+    }
+
+    // 4. Mark webhook as processed
+    await markWebhookProcessed(paymentRequestId, paymentId);
+
+    // 5. Return success
+    res.json({
+      result: {
+        resultCode: 'SUCCESS',
+        resultStatus: 'S',
+        resultMessage: 'success'
+      }
+    });
+
+  } catch (error) {
+    console.error('Webhook processing error:', error);
+    // Return failure - Rebell will retry
+    res.status(500).json({
+      result: { resultStatus: 'F', resultCode: 'PROCESS_ERROR' }
+    });
+  }
+});
+
+async function handleSuccessfulPayment(payment) {
+  // Update order status
+  await updateOrderStatus(payment.paymentRequestId, 'paid');
+
+  // Trigger fulfillment
+  await triggerFulfillment(payment.paymentRequestId);
+
+  // Send confirmation to customer
+  await sendPaymentConfirmation(payment);
+}
+
+async function handleFailedPayment(payment) {
+  // Update order status
+  await updateOrderStatus(payment.paymentRequestId, 'payment_failed');
+
+  // Notify customer
+  await sendPaymentFailureNotification(payment.paymentRequestId);
+}
+```
+
+```python Flask
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/webhooks/payment', methods=['POST'])
+def handle_payment_webhook():
+    # 1. Verify the signature
+    if not verify_webhook_signature(request):
+        return jsonify({
+            'result': {'resultStatus': 'F', 'resultCode': 'INVALID_SIGNATURE'}
+        }), 401
+
+    data = request.json
+    payment_id = data['paymentId']
+    payment_request_id = data['paymentRequestId']
+    payment_status = data['paymentStatus']
+    payment_amount = data['paymentAmount']
+    payment_time = data.get('paymentTime')
+
+    # 2. Check for duplicate notification
+    existing = get_payment_record(payment_request_id)
+    if existing and existing.get('webhook_processed'):
+        return jsonify({
+            'result': {'resultStatus': 'S', 'resultCode': 'SUCCESS'}
+        })
+
+    try:
+        # 3. Process the notification
+        if payment_status == 'SUCCESS':
+            handle_successful_payment(
+                payment_id=payment_id,
+                payment_request_id=payment_request_id,
+                amount=payment_amount,
+                paid_at=payment_time
+            )
+        elif payment_status == 'FAIL':
+            handle_failed_payment(
+                payment_id=payment_id,
+                payment_request_id=payment_request_id
+            )
+
+        # 4. Mark as processed
+        mark_webhook_processed(payment_request_id, payment_id)
+
+        # 5. Return success
+        return jsonify({
+            'result': {
+                'resultCode': 'SUCCESS',
+                'resultStatus': 'S',
+                'resultMessage': 'success'
+            }
+        })
+
+    except Exception as e:
+        print(f"Webhook error: {e}")
+        return jsonify({
+            'result': {'resultStatus': 'F', 'resultCode': 'PROCESS_ERROR'}
+        }), 500
+```
+</CodeGroup>
+
+## Signature Verification
+
+Always verify the webhook signature before processing:
+
+```javascript
+function verifyWebhookSignature(req) {
+  const signature = req.headers['signature'];
+  const clientId = req.headers['client-id'];
+  const responseTime = req.headers['response-time'];
+  const body = JSON.stringify(req.body);
+
+  // Extract signature value from header
+  const signatureMatch = signature.match(/signature=([^,]+)/);
+  if (!signatureMatch) return false;
+  const signatureValue = signatureMatch[1];
+
+  // Build content to verify
+  const method = 'POST';
+  const uri = '/webhooks/payment'; // Your webhook path
+  const contentToVerify = `${method} ${uri}\n${clientId}.${responseTime}.${body}`;
+
+  // Verify with Rebell's public key
+  const verifier = crypto.createVerify('RSA-SHA256');
+  verifier.update(contentToVerify);
+  return verifier.verify(REBELL_PUBLIC_KEY, signatureValue, 'base64');
+}
+```
+
+## Best Practices
+
+<Checks>
+  - Always verify webhook signatures before processing
+  - Implement idempotent handling for duplicate notifications
+  - Return responses quickly (within 5 seconds)
+  - Process webhooks asynchronously if needed
+  - Log all webhook events for debugging and auditing
+  - Handle both SUCCESS and FAIL statuses appropriately
+</Checks>
+
+<Warning>
+**Important**: The webhook is your source of truth for payment status. Don't rely solely on the initial API response, especially for asynchronous payments.
+</Warning>

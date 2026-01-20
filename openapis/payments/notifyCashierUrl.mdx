@@ -1,0 +1,49 @@
+---
+title: Notify Cashier URL
+description: Webhook notification for cashier URL events.
+---
+
+`POST /v1/payments/notifyCashierUrl`
+
+Notification endpoint for cashier URL-related events. This webhook is called when there are updates to payment links or cashier page interactions.
+
+## Webhook Payload
+
+<ParamField body="paymentId" type="string" required>
+  Payment identifier
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string" required>
+  Merchant payment request ID
+</ParamField>
+
+<ParamField body="cashierUrl" type="string">
+  Updated cashier URL if applicable
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  Event status
+</ParamField>
+
+## Expected Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  }
+}
+```
+
+## Example Webhook Payload
+
+```json
+{
+  "paymentId": "2024011012345678901234",
+  "paymentRequestId": "LINK-20240110-001",
+  "cashierUrl": "https://pay.rebellapp.com/c/abc123",
+  "status": "CREATED"
+}
+```

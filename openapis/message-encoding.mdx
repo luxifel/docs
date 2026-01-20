@@ -1,0 +1,154 @@
+---
+title: Message Encoding
+description: Encoding requirements for secure and reliable message transmission.
+---
+
+Message encoding prevents errors and ambiguity caused by special characters during transmission. Proper encoding ensures data integrity across all API communications.
+
+## Encoding Requirements
+
+### Byte Data (Signatures & Encrypted Content)
+
+All binary data including signatures and encrypted content must be Base64 encoded before transmission.
+
+**Method**: Base64 encoding
+
+```javascript
+// Encoding a signature
+const signature = crypto.sign('RSA-SHA256', data, privateKey);
+const encodedSignature = signature.toString('base64');
+
+// For URL-safe contexts, use base64url
+const base64UrlSignature = signature
+  .toString('base64')
+  .replace(/\+/g, '-')
+  .replace(/\//g, '_')
+  .replace(/=/g, '');
+```
+
+```python
+import base64
+
+# Encoding a signature
+signature = sign_data(data, private_key)
+encoded_signature = base64.b64encode(signature).decode('utf-8')
+
+# For URL-safe contexts
+url_safe_signature = base64.urlsafe_b64encode(signature).decode('utf-8').rstrip('=')
+```
+
+### HTTPS URL Data
+
+URLs must be percent-encoded before transmission to handle special characters correctly.
+
+**Method**: URL encoding (percent-encoding)
+
+| Original | Encoded |
+|----------|---------|
+| `https://www.merchant.com/callback?order=123` | `https%3A%2F%2Fwww.merchant.com%2Fcallback%3Forder%3D123` |
+| `https://example.com/path with spaces` | `https%3A%2F%2Fexample.com%2Fpath%20with%20spaces` |
+
+```javascript
+// URL encoding
+const callbackUrl = 'https://www.merchant.com/authorizationResult';
+const encodedUrl = encodeURIComponent(callbackUrl);
+// Result: https%3A%2F%2Fwww.merchant.com%2FauthorizationResult
+```
+
+```python
+from urllib.parse import quote
+
+callback_url = 'https://www.merchant.com/authorizationResult'
+encoded_url = quote(callback_url, safe='')
+# Result: https%3A%2F%2Fwww.merchant.com%2FauthorizationResult
+```
+
+## Character Sets
+
+### Request Body
+
+- **Encoding**: UTF-8
+- **Content-Type**: `application/json; charset=UTF-8`
+
+All JSON request bodies should be UTF-8 encoded. Special characters in string values are automatically handled by JSON serialization.
+
+```javascript
+const requestBody = {
+  orderDescription: "Café latté × 2", // UTF-8 characters
+  extendInfo: JSON.stringify({ note: "特殊字符" })
+};
+
+// Send with proper content-type
+fetch(url, {
+  headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+  body: JSON.stringify(requestBody)
+});
+```
+
+## Signature Calculation
+
+When calculating signatures, the content to be signed must be properly encoded:
+
+<Steps>
+  <Step title="Construct String">
+    Build the string to sign from HTTP method, URI, headers, and body
+  </Step>
+
+  <Step title="Encode to Bytes">
+    Convert the string to UTF-8 bytes
+  </Step>
+
+  <Step title="Sign">
+    Apply RSA-SHA256 signature algorithm
+  </Step>
+
+  <Step title="Base64 Encode">
+    Encode the binary signature as Base64
+  </Step>
+</Steps>
+
+```javascript
+// Complete signature flow
+const contentToSign = [
+  'POST',
+  '/api/open/v1/payments/pay',
+  clientId,
+  requestTime,
+  JSON.stringify(body)
+].join('\n');
+
+// Convert to bytes (UTF-8)
+const bytes = Buffer.from(contentToSign, 'utf-8');
+
+// Sign
+const signer = crypto.createSign('RSA-SHA256');
+signer.update(bytes);
+const signature = signer.sign(privateKey);
+
+// Base64 encode
+const encodedSignature = signature.toString('base64');
+```
+
+## Common Encoding Scenarios
+
+| Data Type | Encoding Method | Example Use Case |
+|-----------|-----------------|------------------|
+| Signature | Base64 | Signature header value |
+| Encrypted data | Base64 | Sensitive field encryption |
+| Callback URLs | URL encoding | `paymentNotifyUrl` parameter |
+| JSON body | UTF-8 | Request body transmission |
+| Extended info | JSON string | `extendInfo` field |
+
+## Best Practices
+
+<Checks>
+  - Always specify `charset=UTF-8` in Content-Type header
+  - Use Base64 for all binary data
+  - URL-encode any URLs passed as parameters
+  - Validate encoding before transmission
+  - Decode responses using the same encoding methods
+</Checks>
+
+<Warning>
+**Double Encoding**: Be careful not to encode data twice. If you URL-encode a value and then include it in a JSON body that gets URL-encoded again, you'll have double-encoded data that won't decode correctly.
+</Warning>

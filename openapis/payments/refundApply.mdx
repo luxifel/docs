@@ -1,0 +1,136 @@
+---
+title: Refund Apply
+description: Request a refund for a completed payment.
+---
+
+`POST /v1/payments/refundApply`
+
+Initiates a refund for a previously completed payment. Supports full and partial refunds.
+
+## Request Parameters
+
+<ParamField body="paymentId" type="string" required>
+  Original payment identifier to refund.
+</ParamField>
+
+<ParamField body="refundRequestId" type="string" required>
+  Merchant-generated unique refund ID (idempotency key).
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="refundAmount" type="object" required>
+  Refund amount details.
+
+  <Expandable title="properties">
+    <ParamField body="currency" type="string" required>
+      Must match original payment currency
+    </ParamField>
+    <ParamField body="value" type="string" required>
+      Amount in minor units (must not exceed original payment)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="refundReason" type="string">
+  Reason for the refund (shown to customer).
+
+  **Max length**: 256 characters
+</ParamField>
+
+<ParamField body="refundNotifyUrl" type="string">
+  Webhook URL for refund status notifications.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="refundId" type="string">
+  Rebell-assigned refund identifier
+</ResponseField>
+
+<ResponseField name="refundRequestId" type="string">
+  Echo of merchant refund request ID
+</ResponseField>
+
+<ResponseField name="refundAmount" type="object">
+  Confirmed refund amount
+</ResponseField>
+
+<ResponseField name="refundTime" type="string">
+  Refund processing time (ISO 8601)
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "paymentId": "2024011012345678901234",
+  "refundRequestId": "REFUND-20240111-001",
+  "refundAmount": {
+    "currency": "EUR",
+    "value": "1500"
+  },
+  "refundReason": "Customer requested cancellation",
+  "refundNotifyUrl": "https://merchant.example.com/webhooks/refund"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "refundId": "2024011198765432101234",
+  "refundRequestId": "REFUND-20240111-001",
+  "refundAmount": {
+    "currency": "EUR",
+    "value": "1500"
+  },
+  "refundTime": "2024-01-11T10:15:30+01:00"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | Refund processed | Update order status |
+| `F` | `ORDER_NOT_EXIST` | Original payment not found | Verify paymentId |
+| `F` | `REFUND_AMOUNT_EXCEED` | Refund exceeds available amount | Check refund amount |
+| `F` | `REFUND_NOT_ALLOWED` | Payment cannot be refunded | Check payment status |
+| `U` | `REFUND_IN_PROCESS` | Refund processing | Poll with inquiryRefund |
+
+## Partial Refunds
+
+You can issue multiple partial refunds against a single payment, as long as the total refund amount doesn't exceed the original payment:
+
+```javascript
+// Original payment: €25.00
+// First partial refund: €10.00
+await rebellAPI.refundApply({
+  paymentId: 'PAY_001',
+  refundRequestId: 'REF_001_A',
+  refundAmount: { currency: 'EUR', value: '1000' }
+});
+
+// Second partial refund: €15.00 (remaining amount)
+await rebellAPI.refundApply({
+  paymentId: 'PAY_001',
+  refundRequestId: 'REF_001_B',
+  refundAmount: { currency: 'EUR', value: '1500' }
+});
+```
+
+## Related
+
+<Card title="Inquiry Refund" icon="magnifying-glass" href="/openapis/payments/inquiryRefund">
+  Check refund status
+</Card>

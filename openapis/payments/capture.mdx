@@ -1,0 +1,98 @@
+---
+title: Capture Payment
+description: Capture a pre-authorized payment.
+---
+
+`POST /v1/payments/capture`
+
+Captures a previously authorized payment. Use this in scenarios where you pre-authorize an amount and capture it later (e.g., hotel bookings, car rentals).
+
+## Request Parameters
+
+<ParamField body="paymentId" type="string" required>
+  Pre-authorized payment identifier.
+</ParamField>
+
+<ParamField body="captureRequestId" type="string" required>
+  Merchant-generated unique capture ID (idempotency key).
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="captureAmount" type="object" required>
+  Amount to capture (can be less than or equal to authorized amount).
+
+  <Expandable title="properties">
+    <ParamField body="currency" type="string" required>
+      Must match authorization currency
+    </ParamField>
+    <ParamField body="value" type="string" required>
+      Amount in minor units
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="captureId" type="string">
+  Rebell capture identifier
+</ResponseField>
+
+<ResponseField name="captureAmount" type="object">
+  Captured amount
+</ResponseField>
+
+<ResponseField name="captureTime" type="string">
+  Capture processing time (ISO 8601)
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "paymentId": "2024011012345678901234",
+  "captureRequestId": "CAPTURE-20240115-001",
+  "captureAmount": {
+    "currency": "EUR",
+    "value": "15000"
+  }
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "captureId": "2024011588888888801234",
+  "captureAmount": {
+    "currency": "EUR",
+    "value": "15000"
+  },
+  "captureTime": "2024-01-15T10:00:00+01:00"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Capture successful |
+| `F` | `ORDER_NOT_EXIST` | Payment not found |
+| `F` | `CAPTURE_AMOUNT_EXCEED` | Exceeds authorized amount |
+| `F` | `AUTHORIZATION_EXPIRED` | Pre-auth has expired |
+| `U` | `CAPTURE_IN_PROCESS` | Capture processing |
+
+## Related
+
+<Card title="Inquiry Capture" icon="magnifying-glass" href="/openapis/payments/inquiryCapture">
+  Check capture status
+</Card>

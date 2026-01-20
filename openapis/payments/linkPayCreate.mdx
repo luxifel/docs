@@ -1,0 +1,242 @@
+---
+title: Link Pay Create
+description: Create a payment link for app-to-app or browser-to-app redirect flows.
+---
+
+`POST /v1/payments/linkPayCreate`
+
+Creates a payment order that returns redirect URLs for app-to-app or browser-to-app payment flows. The user is redirected to the Rebell SuperApp to authorize the payment.
+
+## Use Case
+
+Ideal for mobile apps, web checkout, and hybrid experiences where you want to redirect users to the Rebell app to complete payment.
+
+<Steps>
+  <Step title="Create Payment">
+    Call `linkPayCreate` to create a payment order
+  </Step>
+
+  <Step title="Receive URLs">
+    Get redirect URL and platform-specific app links
+  </Step>
+
+  <Step title="Redirect User">
+    Redirect user to Rebell using the appropriate link
+  </Step>
+
+  <Step title="User Confirms">
+    User authorizes payment in the Rebell app
+  </Step>
+
+  <Step title="Receive Webhook">
+    Merchant receives payment status via webhook
+  </Step>
+</Steps>
+
+## Request Parameters
+
+<ParamField body="productCode" type="string" required>
+  Payment product code assigned by Rebell.
+
+  **Max length**: 32 characters
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string" required>
+  Merchant-generated unique identifier (idempotency key).
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="paymentAmount" type="object" required>
+  Payment amount details.
+
+  <Expandable title="properties">
+    <ParamField body="currency" type="string" required>
+      ISO-4217 currency code (e.g., `EUR`)
+    </ParamField>
+    <ParamField body="value" type="string" required>
+      Amount in minor units (e.g., `499` for €4.99)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="order" type="object">
+  Order details.
+
+  <Expandable title="properties">
+    <ParamField body="orderDescription" type="string">
+      Description shown to the customer
+    </ParamField>
+    <ParamField body="merchant" type="object">
+      Merchant and store information
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="settlementStrategy" type="object">
+  Settlement configuration.
+
+  <Expandable title="properties">
+    <ParamField body="settlementCurrency" type="string">
+      Settlement currency (e.g., `EUR`)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="paymentNotifyUrl" type="string">
+  Webhook URL for payment notifications.
+</ParamField>
+
+<ParamField body="paymentRedirectUrl" type="string">
+  URL to redirect user after payment completion.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="redirectUrl" type="string">
+  Deep link to open Rebell SuperApp directly
+</ResponseField>
+
+<ResponseField name="appLinks" type="object">
+  Platform-specific app link metadata
+
+  <Expandable title="properties">
+    <ResponseField name="android" type="object">
+      Android-specific data: `applicationId`, `targetPath`, `shortUrl`
+    </ResponseField>
+    <ResponseField name="ios" type="object">
+      iOS-specific data: `bundleId`, `targetPath`, `shortUrl`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Payment identifier for tracking and reconciliation
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "productCode": "5105010010000100040",
+  "paymentRequestId": "checkout-20240110-987",
+  "paymentAmount": {
+    "currency": "EUR",
+    "value": "499"
+  },
+  "order": {
+    "orderDescription": "Monthly subscription - Premium plan",
+    "merchant": {
+      "store": {
+        "externalStoreId": "STORE-77"
+      }
+    }
+  },
+  "settlementStrategy": {
+    "settlementCurrency": "EUR"
+  },
+  "paymentNotifyUrl": "https://merchant.example.com/webhooks/payment"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "redirectUrl": "rebell://pay?orderToken=abcedf123...",
+  "appLinks": {
+    "android": {
+      "applicationId": "com.rebell.superapp",
+      "targetPath": "pay",
+      "shortUrl": "https://app.rebellapp.com/p/abc123"
+    },
+    "ios": {
+      "bundleId": "com.rebell.superapp",
+      "targetPath": "pay",
+      "shortUrl": "https://app.rebellapp.com/p/abc123"
+    }
+  },
+  "paymentId": "2024011000123456"
+}
+```
+
+## Redirect Implementation
+
+<Tabs>
+  <Tab title="Mobile App">
+    ```javascript
+    import { Linking, Platform } from 'react-native';
+
+    async function redirectToRebell(response) {
+      const url = Platform.select({
+        ios: response.appLinks.ios.shortUrl,
+        android: response.appLinks.android.shortUrl,
+        default: response.redirectUrl
+      });
+
+      const canOpen = await Linking.canOpenURL(url);
+      if (canOpen) {
+        await Linking.openURL(url);
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Mobile Web">
+    ```javascript
+    function redirectToRebell(response, platform) {
+      const shortUrl = platform === 'ios'
+        ? response.appLinks.ios.shortUrl
+        : response.appLinks.android.shortUrl;
+
+      // shortUrl handles app-not-installed fallback
+      window.location.href = shortUrl || response.redirectUrl;
+    }
+    ```
+  </Tab>
+
+  <Tab title="Desktop">
+    ```javascript
+    import QRCode from 'qrcode';
+
+    async function showDesktopCheckout(response) {
+      const shortUrl = response.appLinks.android.shortUrl;
+
+      // Render QR code for mobile scanning
+      const canvas = document.getElementById('qr-canvas');
+      await QRCode.toCanvas(canvas, shortUrl, { width: 300 });
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | Order created | Redirect user to payment |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters | Check request |
+| `F` | `ORDER_STATUS_INVALID` | Order in invalid state | Create new order |
+| `F` | `PAYMENT_IN_PROCESS` | Payment already processing | Wait for result |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error | Retry request |
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Inquiry Payment" icon="magnifying-glass" href="/openapis/payments/inquiryPayment">
+    Check payment status
+  </Card>
+
+  <Card title="Link Pay Guide" icon="book" href="/payment-integration/link-pay">
+    Complete integration guide
+  </Card>
+</CardGroup>

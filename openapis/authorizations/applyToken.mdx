@@ -1,0 +1,297 @@
+---
+title: Apply Token
+description: Exchange authorization codes for access tokens or refresh expired tokens.
+---
+
+`POST /v1/authorizations/applyToken`
+
+The `applyToken` endpoint is used to obtain access tokens. It supports two use cases:
+
+1. **Authorization Code Exchange**: Exchange an `authCode` for an `accessToken`
+2. **Token Refresh**: Use a `refreshToken` to obtain a new `accessToken`
+
+## Use Cases
+
+### Authorization Code Flow
+
+After a user completes authorization (e.g., signs an agreement), you receive an `authCode`. Exchange it for tokens:
+
+```
+User signs agreement → You receive authCode → Call applyToken → Receive accessToken
+```
+
+### Token Refresh Flow
+
+When an `accessToken` expires, use the `refreshToken` to get a new one without requiring user interaction:
+
+```
+accessToken expires → Call applyToken with refreshToken → Receive new accessToken
+```
+
+## Request Parameters
+
+<ParamField body="grantType" type="string" required>
+  The type of token grant being requested.
+
+  **Possible values**:
+  - `AUTHORIZATION_CODE` - Exchange an auth code for tokens
+  - `REFRESH_TOKEN` - Refresh an expired access token
+</ParamField>
+
+<ParamField body="authCode" type="string">
+  The authorization code received after user authorization.
+
+  **Required when**: `grantType` is `AUTHORIZATION_CODE`
+</ParamField>
+
+<ParamField body="refreshToken" type="string">
+  The refresh token from a previous token response.
+
+  **Required when**: `grantType` is `REFRESH_TOKEN`
+</ParamField>
+
+<ParamField body="referenceClientId" type="string">
+  Your client reference identifier.
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extended information for wallet and merchant configuration.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="accessToken" type="string">
+  Access token for accessing user resources within the authorized scope.
+</ResponseField>
+
+<ResponseField name="accessTokenExpiryTime" type="string">
+  Access token expiration time in ISO 8601 format.
+</ResponseField>
+
+<ResponseField name="refreshToken" type="string">
+  Token for obtaining new access tokens when the current one expires.
+</ResponseField>
+
+<ResponseField name="refreshTokenExpiryTime" type="string">
+  Refresh token expiration time. After this, the user must re-authorize.
+</ResponseField>
+
+<ResponseField name="customerId" type="string">
+  Resource owner identifier (user ID, app ID, or merchant ID).
+</ResponseField>
+
+<ResponseField name="extendInfo" type="string">
+  Extended information response field.
+</ResponseField>
+
+## Example: Authorization Code Exchange
+
+**Request**:
+```json
+{
+  "referenceClientId": "305XST2CSG0N4P0xxxx",
+  "grantType": "AUTHORIZATION_CODE",
+  "authCode": "2810111301lGZcM9CjlF91WH00039190xxxx",
+  "extendInfo": "{\"customerBelongsTo\":\"siteNameExample\"}"
+}
+```
+
+**Response**:
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "accessToken": "281010033AB2F588D14B43238637264FCA5AAF35xxxx",
+  "accessTokenExpiryTime": "2024-06-06T12:12:12+01:00",
+  "refreshToken": "2810100334F62CBC577F468AAC87CFC6C9107811xxxx",
+  "refreshTokenExpiryTime": "2024-06-08T12:12:12+01:00",
+  "customerId": "1000001119398804xxxx"
+}
+```
+
+## Example: Token Refresh
+
+**Request**:
+```json
+{
+  "referenceClientId": "305XST2CSG0N4P0xxxx",
+  "grantType": "REFRESH_TOKEN",
+  "refreshToken": "2810100334F62CBC577F468AAC87CFC6C9107811xxxx"
+}
+```
+
+**Response**:
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "accessToken": "NEW_ACCESS_TOKEN_HERE",
+  "accessTokenExpiryTime": "2024-06-07T12:12:12+01:00",
+  "refreshToken": "NEW_REFRESH_TOKEN_HERE",
+  "refreshTokenExpiryTime": "2024-06-09T12:12:12+01:00",
+  "customerId": "1000001119398804xxxx"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | Token issued successfully | Store tokens securely |
+| `F` | `PROCESS_FAIL` | Processing failed | Retry the request |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters | Check request parameters |
+| `F` | `INVALID_CODE` | Auth code is invalid | Request new authorization |
+| `F` | `EXPIRED_CODE` | Auth code has expired | Request new authorization |
+| `F` | `USED_CODE` | Auth code already used | Use existing tokens or re-authorize |
+| `F` | `INVALID_REFRESH_TOKEN` | Refresh token is invalid | Request new authorization |
+| `F` | `EXPIRED_REFRESH_TOKEN` | Refresh token has expired | Request new authorization |
+| `F` | `AUTH_CLIENT_UNSUPPORTED_GRANT_TYPE` | Grant type not supported | Check `grantType` value |
+| `F` | `INVALID_AUTH_CLIENT` | Auth client invalid | Verify configuration |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred | Retry with backoff |
+| `U` | `REQUEST_TRAFFIC_EXCEED_LIMIT` | Rate limit exceeded | Implement rate limiting |
+
+## Implementation Example
+
+<CodeGroup>
+```javascript Node.js
+class TokenManager {
+  async exchangeAuthCode(authCode, referenceClientId) {
+    const response = await rebellAPI.call('/v1/authorizations/applyToken', {
+      grantType: 'AUTHORIZATION_CODE',
+      authCode,
+      referenceClientId
+    });
+
+    if (response.result.resultStatus === 'S') {
+      await this.storeTokens(referenceClientId, {
+        accessToken: response.accessToken,
+        accessTokenExpiry: new Date(response.accessTokenExpiryTime),
+        refreshToken: response.refreshToken,
+        refreshTokenExpiry: new Date(response.refreshTokenExpiryTime),
+        customerId: response.customerId
+      });
+      return response;
+    }
+
+    throw new Error(`Token exchange failed: ${response.result.resultCode}`);
+  }
+
+  async refreshAccessToken(referenceClientId) {
+    const stored = await this.getStoredTokens(referenceClientId);
+
+    if (!stored.refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    if (new Date() > stored.refreshTokenExpiry) {
+      throw new Error('Refresh token expired, re-authorization required');
+    }
+
+    const response = await rebellAPI.call('/v1/authorizations/applyToken', {
+      grantType: 'REFRESH_TOKEN',
+      refreshToken: stored.refreshToken,
+      referenceClientId
+    });
+
+    if (response.result.resultStatus === 'S') {
+      await this.storeTokens(referenceClientId, {
+        accessToken: response.accessToken,
+        accessTokenExpiry: new Date(response.accessTokenExpiryTime),
+        refreshToken: response.refreshToken,
+        refreshTokenExpiry: new Date(response.refreshTokenExpiryTime),
+        customerId: response.customerId
+      });
+      return response.accessToken;
+    }
+
+    throw new Error(`Token refresh failed: ${response.result.resultCode}`);
+  }
+
+  async getValidAccessToken(referenceClientId) {
+    const stored = await this.getStoredTokens(referenceClientId);
+
+    // Check if access token is still valid (with 5 min buffer)
+    const bufferTime = 5 * 60 * 1000;
+    if (new Date() < new Date(stored.accessTokenExpiry.getTime() - bufferTime)) {
+      return stored.accessToken;
+    }
+
+    // Refresh the token
+    return this.refreshAccessToken(referenceClientId);
+  }
+}
+```
+
+```python Python
+class TokenManager:
+    async def exchange_auth_code(self, auth_code: str, reference_client_id: str):
+        response = await rebell_api.call('/v1/authorizations/applyToken', {
+            'grantType': 'AUTHORIZATION_CODE',
+            'authCode': auth_code,
+            'referenceClientId': reference_client_id
+        })
+
+        if response['result']['resultStatus'] == 'S':
+            await self.store_tokens(reference_client_id, {
+                'access_token': response['accessToken'],
+                'access_token_expiry': datetime.fromisoformat(response['accessTokenExpiryTime']),
+                'refresh_token': response['refreshToken'],
+                'refresh_token_expiry': datetime.fromisoformat(response['refreshTokenExpiryTime']),
+                'customer_id': response['customerId']
+            })
+            return response
+
+        raise Exception(f"Token exchange failed: {response['result']['resultCode']}")
+
+    async def refresh_access_token(self, reference_client_id: str):
+        stored = await self.get_stored_tokens(reference_client_id)
+
+        if not stored.get('refresh_token'):
+            raise Exception('No refresh token available')
+
+        if datetime.now() > stored['refresh_token_expiry']:
+            raise Exception('Refresh token expired, re-authorization required')
+
+        response = await rebell_api.call('/v1/authorizations/applyToken', {
+            'grantType': 'REFRESH_TOKEN',
+            'refreshToken': stored['refresh_token'],
+            'referenceClientId': reference_client_id
+        })
+
+        if response['result']['resultStatus'] == 'S':
+            await self.store_tokens(reference_client_id, {
+                'access_token': response['accessToken'],
+                'access_token_expiry': datetime.fromisoformat(response['accessTokenExpiryTime']),
+                'refresh_token': response['refreshToken'],
+                'refresh_token_expiry': datetime.fromisoformat(response['refreshTokenExpiryTime']),
+                'customer_id': response['customerId']
+            })
+            return response['accessToken']
+
+        raise Exception(f"Token refresh failed: {response['result']['resultCode']}")
+```
+</CodeGroup>
+
+## Best Practices
+
+<Checks>
+  - Store tokens securely (encrypted at rest)
+  - Refresh tokens before they expire (add a buffer time)
+  - Handle token expiration gracefully in your application
+  - Never expose tokens in client-side code or logs
+  - Implement proper error handling for all result codes
+</Checks>
+
+<Warning>
+When a refresh token expires, the user must go through the full authorization flow again. Plan your token refresh strategy to avoid disrupting user experience.
+</Warning>

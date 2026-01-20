@@ -1,0 +1,64 @@
+---
+title: Inquiry Capture
+description: Query the status of a capture request.
+---
+
+`POST /v1/payments/inquiryCapture`
+
+Queries the current status of a capture request.
+
+## Request Parameters
+
+<ParamField body="captureId" type="string">
+  Rebell capture identifier.
+</ParamField>
+
+<ParamField body="captureRequestId" type="string">
+  Merchant capture request ID.
+
+  <Note>At least one of `captureId` or `captureRequestId` is required.</Note>
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="captureId" type="string">
+  Capture identifier
+</ResponseField>
+
+<ResponseField name="captureStatus" type="string">
+  Capture status: `SUCCESS`, `PROCESSING`, `FAIL`
+</ResponseField>
+
+<ResponseField name="captureAmount" type="object">
+  Captured amount
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "captureRequestId": "CAPTURE-20240115-001"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "captureId": "2024011588888888801234",
+  "captureStatus": "SUCCESS",
+  "captureAmount": {
+    "currency": "EUR",
+    "value": "15000"
+  }
+}
+```

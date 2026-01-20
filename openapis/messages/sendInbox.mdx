@@ -1,0 +1,166 @@
+---
+title: Send Inbox Message
+description: Send a message to a user's in-app inbox.
+---
+
+`POST /v1/messages/sendInbox`
+
+Sends a message to a user's inbox within the Rebell app. Inbox messages persist and can be viewed later, unlike push notifications which are transient.
+
+## Request Parameters
+
+<ParamField body="requestId" type="string" required>
+  Unique request identifier (idempotency key).
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="targetUserId" type="string" required>
+  User ID to send the message to.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  Message title.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="content" type="string" required>
+  Message body text. Supports basic formatting.
+
+  **Max length**: 4096 characters
+</ParamField>
+
+<ParamField body="category" type="string">
+  Message category for organization (e.g., `ORDER`, `PROMOTION`, `SYSTEM`).
+
+  **Max length**: 32 characters
+</ParamField>
+
+<ParamField body="targetUrl" type="string">
+  URL or deep link to open when message is tapped.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+<ParamField body="imageUrl" type="string">
+  URL to an image to display with the message.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extended information as JSON string.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="messageId" type="string">
+  Unique message identifier for tracking
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "requestId": "INBOX-20240110-001",
+  "targetUserId": "1000001119398804xxxx",
+  "title": "Your receipt for Order #12345",
+  "content": "Thank you for your purchase!\n\nOrder Total: €25.00\nPayment Method: Rebell Wallet\nDate: January 10, 2024\n\nView your full receipt for details.",
+  "category": "ORDER",
+  "targetUrl": "rebell://receipts/12345",
+  "imageUrl": "https://merchant.example.com/logo.png"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "messageId": "MSG2024011000002"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | Message sent | Appears in user's inbox |
+| `F` | `USER_NOT_EXIST` | User not found | Verify targetUserId |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters | Check request |
+| `U` | `SENDING` | Message queued | Will be delivered |
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Order Receipts" icon="receipt">
+    Send detailed receipts after purchase
+  </Card>
+
+  <Card title="Promotional Messages" icon="tags">
+    Announce special offers and discounts
+  </Card>
+
+  <Card title="Account Updates" icon="user">
+    Notify about account changes
+  </Card>
+
+  <Card title="Service Announcements" icon="bullhorn">
+    Important service updates
+  </Card>
+</CardGroup>
+
+## Implementation Example
+
+```javascript
+async function sendReceipt(order) {
+  const receiptContent = `
+Thank you for your purchase!
+
+Order #${order.id}
+Date: ${formatDate(order.completedAt)}
+
+${order.items.map(item => `${item.name}: €${(item.price / 100).toFixed(2)}`).join('\n')}
+
+---
+Total: €${(order.total / 100).toFixed(2)}
+Payment: Rebell Wallet
+
+Questions? Contact us at support@merchant.com
+  `.trim();
+
+  const response = await rebellAPI.sendInbox({
+    requestId: `RECEIPT-${order.id}`,
+    targetUserId: order.customerId,
+    title: `Receipt for Order #${order.id}`,
+    content: receiptContent,
+    category: 'ORDER',
+    targetUrl: `rebell://receipts/${order.id}`
+  });
+
+  return response.result.resultStatus === 'S';
+}
+```
+
+## Differences: Push vs Inbox
+
+| Feature | Push Notification | Inbox Message |
+|---------|-------------------|---------------|
+| Persistence | Transient | Stored in inbox |
+| Length | Short (256 chars) | Long (4096 chars) |
+| Visibility | Lock screen/banner | In-app inbox |
+| Use case | Time-sensitive alerts | Receipts, details |
+| Images | No | Yes |

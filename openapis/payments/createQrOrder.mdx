@@ -1,0 +1,241 @@
+---
+title: Create QR Order
+description: Create a merchant-presented QR code for customer scanning.
+---
+
+`POST /v1/payments/createQrOrder`
+
+Creates a payment order and returns a QR code that the merchant displays. The customer scans this QR code with their Rebell app to complete payment.
+
+## Use Case
+
+This is the "Merchant Presented Mode" (MPM) flow for QR-based payments. Ideal for:
+- Point of sale displays
+- Self-service kiosks
+- Table ordering systems
+- Vending machines
+
+<Steps>
+  <Step title="Create Order">
+    Merchant backend calls `createQrOrder` with payment details
+  </Step>
+
+  <Step title="Display QR">
+    Merchant displays the QR code to the customer
+  </Step>
+
+  <Step title="Customer Scans">
+    Customer opens Rebell app and scans the QR code
+  </Step>
+
+  <Step title="Customer Confirms">
+    Customer confirms payment in their app
+  </Step>
+
+  <Step title="Webhook Notification">
+    Merchant receives payment status via webhook
+  </Step>
+</Steps>
+
+## Request Parameters
+
+<ParamField body="bizType" type="string" required>
+  Business type. Use `ORDER_CODE` for QR order payments.
+</ParamField>
+
+<ParamField body="productCode" type="string" required>
+  Payment product code assigned by Rebell.
+</ParamField>
+
+<ParamField body="codeType" type="string" required>
+  QR code type. Use `CGCP` (Customer Generated Code Payment).
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string" required>
+  Merchant-generated unique identifier (idempotency key).
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="paymentAmount" type="object" required>
+  Payment amount details.
+
+  <Expandable title="properties">
+    <ParamField body="currency" type="string" required>
+      ISO-4217 currency code (e.g., `EUR`)
+    </ParamField>
+    <ParamField body="value" type="string" required>
+      Amount in minor units
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="order" type="object">
+  Order details including description and merchant info.
+</ParamField>
+
+<ParamField body="paymentNotifyUrl" type="string">
+  Webhook URL for payment notifications.
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extended information as JSON string.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="paymentRequestId" type="string">
+  Echo of the merchant's payment request ID
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Rebell-assigned payment identifier
+</ResponseField>
+
+<ResponseField name="qrCode" type="string">
+  QR code content to display to the customer
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "bizType": "ORDER_CODE",
+  "productCode": "5105010010000100040",
+  "codeType": "CGCP",
+  "paymentRequestId": "QR-20240110-001",
+  "paymentAmount": {
+    "currency": "EUR",
+    "value": "1500"
+  },
+  "order": {
+    "orderDescription": "Table 5 - Dinner",
+    "orderMemo": "No nuts allergy",
+    "merchant": {
+      "store": {
+        "externalStoreId": "STORE_001"
+      }
+    }
+  },
+  "paymentNotifyUrl": "https://merchant.example.com/webhooks/payment"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "paymentRequestId": "QR-20240110-001",
+  "paymentId": "2024011012345678901234",
+  "qrCode": "https://pay.rebellapp.com/qr/abc123xyz..."
+}
+```
+
+## Displaying the QR Code
+
+Generate a QR code image from the `qrCode` response value:
+
+<CodeGroup>
+```javascript Node.js
+import QRCode from 'qrcode';
+
+async function displayPaymentQR(qrCodeContent) {
+  // Generate as data URL for HTML display
+  const dataUrl = await QRCode.toDataURL(qrCodeContent, {
+    width: 300,
+    margin: 2,
+    color: { dark: '#000000', light: '#ffffff' }
+  });
+
+  return `<img src="${dataUrl}" alt="Scan to pay" />`;
+}
+
+// Or generate to canvas
+async function renderToCanvas(qrCodeContent, canvasElement) {
+  await QRCode.toCanvas(canvasElement, qrCodeContent, {
+    width: 300
+  });
+}
+```
+
+```python Python
+import qrcode
+from io import BytesIO
+import base64
+
+def generate_qr_image(qr_code_content: str) -> str:
+    """Generate QR code as base64 data URL"""
+    qr = qrcode.QRCode(version=1, box_size=10, border=2)
+    qr.add_data(qr_code_content)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    img_str = base64.b64encode(buffer.getvalue()).decode()
+
+    return f"data:image/png;base64,{img_str}"
+```
+</CodeGroup>
+
+## Polling for Payment Status
+
+After displaying the QR code, poll for payment completion:
+
+```javascript
+async function waitForPayment(paymentId, paymentRequestId, timeout = 300000) {
+  const startTime = Date.now();
+  const pollInterval = 3000; // 3 seconds
+
+  while (Date.now() - startTime < timeout) {
+    const status = await rebellAPI.inquiryPayment({
+      paymentId,
+      paymentRequestId
+    });
+
+    if (status.result.resultStatus === 'S') {
+      if (status.paymentStatus === 'SUCCESS') {
+        return { success: true, paymentId };
+      }
+      if (status.paymentStatus === 'FAIL') {
+        return { success: false, reason: status.result.resultMessage };
+      }
+    }
+
+    // Still processing, wait and retry
+    await new Promise(resolve => setTimeout(resolve, pollInterval));
+  }
+
+  return { success: false, reason: 'Timeout waiting for payment' };
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | QR order created | Display QR and start polling |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters | Check request |
+| `F` | `REPEAT_REQ_INCONSISTENT` | Duplicate with different params | Use new paymentRequestId |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error | Retry request |
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Inquiry Payment" icon="magnifying-glass" href="/openapis/payments/inquiryPayment">
+    Poll for payment status
+  </Card>
+
+  <Card title="QR Order Pay Guide" icon="book" href="/payment-integration/qr-order-pay">
+    Complete integration guide
+  </Card>
+</CardGroup>

@@ -1,0 +1,143 @@
+---
+title: Inquiry User Info
+description: Retrieve user information with an authorized access token.
+---
+
+`POST /v1/users/inquiryUserInfo`
+
+Retrieves user information using an access token obtained through the authorization flow. The information returned depends on the scopes granted during authorization.
+
+## Request Parameters
+
+<ParamField body="accessToken" type="string" required>
+  Access token obtained from authorization.
+
+  **Max length**: 128 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+</ResponseField>
+
+<ResponseField name="userId" type="string">
+  User's unique identifier
+</ResponseField>
+
+<ResponseField name="userName" type="object">
+  User's name (if `USER_NAME` scope granted)
+
+  <Expandable title="properties">
+    <ResponseField name="firstName" type="string">
+      User's first name
+    </ResponseField>
+    <ResponseField name="lastName" type="string">
+      User's last name
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="userPhoneNo" type="string">
+  User's phone number (if `USER_PHONE` scope granted)
+</ResponseField>
+
+<ResponseField name="userEmail" type="string">
+  User's email address (if `USER_EMAIL` scope granted)
+</ResponseField>
+
+<ResponseField name="avatar" type="string">
+  URL to user's avatar image (if `USER_AVATAR` scope granted)
+</ResponseField>
+
+<ResponseField name="extendInfo" type="string">
+  Extended user information as JSON string
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "accessToken": "281010033AB2F588D14B43238637264FCA5AAF35xxxx"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  },
+  "userId": "1000001119398804xxxx",
+  "userName": {
+    "firstName": "John",
+    "lastName": "Doe"
+  },
+  "userPhoneNo": "+39123456789",
+  "userEmail": "john.doe@example.com",
+  "avatar": "https://cdn.rebellapp.com/avatars/user123.jpg"
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | User info retrieved | Process user data |
+| `F` | `INVALID_ACCESS_TOKEN` | Token invalid or expired | Re-authorize user |
+| `F` | `INSUFFICIENT_SCOPE` | Token lacks required scope | Request additional scopes |
+| `F` | `USER_NOT_EXIST` | User not found | Check access token |
+
+## Scopes and Data Access
+
+The information returned depends on the scopes granted during authorization:
+
+| Scope | Data Fields |
+|-------|-------------|
+| `USER_ID` | `userId` |
+| `USER_NAME` | `userName.firstName`, `userName.lastName` |
+| `USER_PHONE` | `userPhoneNo` |
+| `USER_EMAIL` | `userEmail` |
+| `USER_AVATAR` | `avatar` |
+| `AGREEMENT_PAY` | Agreement payment access |
+
+## Implementation Example
+
+```javascript
+async function getUserProfile(accessToken) {
+  const response = await rebellAPI.inquiryUserInfo({ accessToken });
+
+  if (response.result.resultStatus === 'S') {
+    return {
+      id: response.userId,
+      name: response.userName
+        ? `${response.userName.firstName} ${response.userName.lastName}`
+        : null,
+      phone: response.userPhoneNo,
+      email: response.userEmail,
+      avatar: response.avatar
+    };
+  }
+
+  if (response.result.resultCode === 'INVALID_ACCESS_TOKEN') {
+    // Token expired, try to refresh
+    const newToken = await tokenManager.refreshAccessToken(userId);
+    return getUserProfile(newToken);
+  }
+
+  throw new Error(`Failed to get user info: ${response.result.resultMessage}`);
+}
+```
+
+## Best Practices
+
+<Checks>
+  - Only request scopes you actually need
+  - Cache user info to reduce API calls
+  - Handle token expiration gracefully
+  - Respect user privacy - don't store unnecessary data
+  - Validate returned data before use
+</Checks>

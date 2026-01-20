@@ -1,0 +1,157 @@
+---
+title: Contract Status Notify
+description: Webhook notification for contract status changes in agreement payment flows.
+---
+
+`POST /v1/authorizations/contractStatusNotify`
+
+This is a webhook endpoint that Rebell calls to notify merchants of contract status changes. The `contractStatusNotifyUrl` is provided by the merchant during the contract signing process.
+
+## Overview
+
+When a user's agreement payment contract status changes (e.g., becomes invalid), Rebell sends a notification to your registered webhook URL.
+
+<Note>
+This is an **inbound webhook** - Rebell calls your server, not the other way around.
+</Note>
+
+## Request Parameters
+
+<ParamField body="accessToken" type="string" required>
+  Access token associated with the contract. Used to access user information.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="contractStatus" type="string" required>
+  Current status of the contract.
+
+  **Possible values**:
+  - `VALID` - Contract is active and valid
+  - `INVALID` - Contract has been terminated or invalidated
+</ParamField>
+
+<ParamField body="modifyTime" type="string">
+  Unix timestamp (10 digits) when the status changed.
+
+  **Example**: `1749634508`
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+
+  <Expandable title="properties">
+    <ResponseField name="resultCode" type="string">
+      Result code (e.g., `SUCCESS`)
+    </ResponseField>
+
+    <ResponseField name="resultStatus" type="string">
+      Status indicator: `S` (success), `F` (failure)
+    </ResponseField>
+
+    <ResponseField name="resultMessage" type="string">
+      Human-readable result message
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "accessToken": "305XST2CSG0N4P0xxxxxxxxxx",
+  "contractStatus": "INVALID",
+  "modifyTime": "1749634508"
+}
+```
+
+## Example Response
+
+Return this response to acknowledge receipt:
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  }
+}
+```
+
+## Webhook Handler Example
+
+<CodeGroup>
+```javascript Express.js
+app.post('/webhooks/contract-status', express.json(), (req, res) => {
+  // 1. Verify the signature (see Authentication docs)
+  if (!verifySignature(req)) {
+    return res.status(401).json({
+      result: { resultStatus: 'F', resultCode: 'UNAUTHORIZED' }
+    });
+  }
+
+  const { accessToken, contractStatus, modifyTime } = req.body;
+
+  // 2. Process the status change
+  if (contractStatus === 'INVALID') {
+    // Contract terminated - disable agreement payments for this user
+    deactivateUserContract(accessToken);
+    notifyUser('Your payment agreement has been cancelled');
+  }
+
+  // 3. Acknowledge receipt
+  res.json({
+    result: {
+      resultCode: 'SUCCESS',
+      resultStatus: 'S',
+      resultMessage: 'success'
+    }
+  });
+});
+```
+
+```python Flask
+@app.route('/webhooks/contract-status', methods=['POST'])
+def handle_contract_status():
+    # 1. Verify the signature
+    if not verify_signature(request):
+        return jsonify({
+            'result': {'resultStatus': 'F', 'resultCode': 'UNAUTHORIZED'}
+        }), 401
+
+    data = request.json
+    access_token = data['accessToken']
+    contract_status = data['contractStatus']
+
+    # 2. Process the status change
+    if contract_status == 'INVALID':
+        deactivate_user_contract(access_token)
+        notify_user('Your payment agreement has been cancelled')
+
+    # 3. Acknowledge receipt
+    return jsonify({
+        'result': {
+            'resultCode': 'SUCCESS',
+            'resultStatus': 'S',
+            'resultMessage': 'success'
+        }
+    })
+```
+</CodeGroup>
+
+## Best Practices
+
+<Checks>
+  - Always verify the request signature before processing
+  - Return a success response promptly (within 5 seconds)
+  - Handle `INVALID` status by disabling agreement payments
+  - Log all status change notifications for auditing
+  - Implement idempotent handling in case of duplicate notifications
+</Checks>
+
+<Warning>
+If your webhook repeatedly fails to respond with a success status, Rebell may stop sending notifications. Ensure your endpoint is reliable and returns `resultStatus: "S"` for successful processing.
+</Warning>

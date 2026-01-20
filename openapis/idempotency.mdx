@@ -1,0 +1,126 @@
+---
+title: Idempotency
+description: Ensure safe retries and prevent duplicate transactions using idempotency keys.
+---
+
+Idempotency ensures that an API call produces the same result regardless of how many times it's executed. This is critical for handling network timeouts and ensuring reliable payment processing.
+
+## What is Idempotency?
+
+An API call is idempotent if it has the same result no matter how many times the call is applied. When a request reaches a final status (Success or Failure), the system returns an identical result on subsequent attempts with the same idempotency identifier.
+
+<Note>
+Idempotency prevents accidental duplicate transactions when retrying requests after network timeouts or failures.
+</Note>
+
+## When to Use Idempotency
+
+The primary use case is handling timeout errors:
+
+1. You send a payment request
+2. Network issues cause a timeout before receiving a response
+3. You don't know if the payment was processed
+4. You safely retry using the same idempotency key
+5. If the original request succeeded, you receive the same successful response
+6. If the original request failed, you receive the same failure response
+7. No duplicate payment is created
+
+## Idempotency Fields by API
+
+Different APIs use different fields as idempotency keys:
+
+| API Endpoint | Idempotency Field | Purpose |
+|--------------|-------------------|---------|
+| `/v1/payments/pay` | `paymentRequestId` | Prevents duplicate charges |
+| `/v1/payments/refund` | `refundRequestId` | Ensures single refund processing |
+| `/v1/payments/retailPay` | `paymentRequestId` | Prevents duplicate retail payments |
+| `/v1/payments/linkPayCreate` | `paymentRequestId` | Prevents duplicate link pay orders |
+| `/v1/payments/createQrOrder` | `paymentRequestId` | Prevents duplicate QR orders |
+| `/v1/messages/sendPush` | `requestId` | Returns same `messageId` for duplicates |
+| `/v1/messages/sendInbox` | `requestId` | Returns same `messageId` for duplicates |
+
+## Implementation Guidelines
+
+### Generate Unique Identifiers
+
+Always generate unique, consistent identifiers for each operation:
+
+```javascript
+// Good: UUID or unique combination
+const paymentRequestId = `PAY-${orderId}-${Date.now()}`;
+
+// Bad: Reusing the same ID for different transactions
+const paymentRequestId = "payment-1"; // Don't do this!
+```
+
+### Retry Strategy
+
+<Steps>
+  <Step title="Initial Request">
+    Send your request with a unique idempotency key
+  </Step>
+
+  <Step title="Handle Timeout">
+    If you receive a timeout or network error, the request status is unknown
+  </Step>
+
+  <Step title="Retry with Same Key">
+    Retry using the **exact same** idempotency key
+  </Step>
+
+  <Step title="Process Response">
+    The system returns the same response as the original request (if it completed)
+  </Step>
+</Steps>
+
+### Best Practices
+
+<Checks>
+  - Generate a new idempotency key for each unique transaction
+  - Store the idempotency key before making the request
+  - Use the same key when retrying failed requests
+  - Never reuse idempotency keys for different transactions
+  - Include relevant context in the key (order ID, timestamp, etc.)
+</Checks>
+
+## Example: Payment Retry
+
+```javascript
+async function processPayment(orderId, amount, maxRetries = 3) {
+  // Generate idempotency key once
+  const paymentRequestId = `PAY-${orderId}-${Date.now()}`;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await rebellAPI.retailPay({
+        paymentRequestId, // Same key for all retries
+        paymentAmount: amount,
+        // ... other fields
+      });
+
+      return response;
+    } catch (error) {
+      if (error.code === 'TIMEOUT' && attempt < maxRetries) {
+        console.log(`Attempt ${attempt} timed out, retrying...`);
+        await sleep(1000 * attempt); // Exponential backoff
+        continue;
+      }
+      throw error;
+    }
+  }
+}
+```
+
+## Important Considerations
+
+<Warning>
+**Key Uniqueness**: Once a request with an idempotency key reaches a terminal state (success or failure), any subsequent request with the same key will return the cached response. This means:
+
+- You cannot change request parameters and use the same key
+- A failed request with key X will always return the same failure
+- To retry with different parameters, you must use a new key
+</Warning>
+
+<Info>
+**Idempotency Window**: Idempotency keys are typically valid for a limited time period (usually 24-48 hours). After this window, the key may be reused, but this is not recommended.
+</Info>

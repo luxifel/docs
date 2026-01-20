@@ -1,0 +1,222 @@
+---
+title: Cancel Token
+description: Revoke access tokens and terminate user authorization.
+---
+
+`POST /v1/authorizations/cancelToken`
+
+The `cancelToken` endpoint is used to revoke an access token, effectively terminating the user's authorization. Use this when a user wants to disconnect their account or when you need to invalidate tokens for security reasons.
+
+## Use Cases
+
+- User requests to unlink their Rebell account
+- User cancels their subscription
+- Security incident requiring token revocation
+- Account deletion or deactivation
+
+## Request Parameters
+
+<ParamField body="accessToken" type="string" required>
+  The access token to revoke.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extended information for additional context.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object
+
+  <Expandable title="properties">
+    <ResponseField name="resultCode" type="string">
+      Result code (e.g., `SUCCESS`)
+    </ResponseField>
+
+    <ResponseField name="resultStatus" type="string">
+      Status indicator: `S` (success), `F` (failure)
+    </ResponseField>
+
+    <ResponseField name="resultMessage" type="string">
+      Human-readable result message
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+```json
+{
+  "accessToken": "281010033AB2F588D14B43238637264FCA5AAF35xxxx"
+}
+```
+
+## Example Response
+
+```json
+{
+  "result": {
+    "resultCode": "SUCCESS",
+    "resultStatus": "S",
+    "resultMessage": "success"
+  }
+}
+```
+
+## Result Codes
+
+| resultStatus | resultCode | Description | Action |
+|-------------|-----------|-------------|--------|
+| `S` | `SUCCESS` | Token revoked successfully | Clean up local token storage |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters | Check request parameters |
+| `F` | `INVALID_ACCESS_TOKEN` | Token is invalid or already revoked | No action needed |
+| `F` | `PROCESS_FAIL` | Processing failed | Retry the request |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error | Retry with backoff |
+
+## Implementation Example
+
+<CodeGroup>
+```javascript Node.js
+async function disconnectUser(userId) {
+  // Get the stored access token for this user
+  const stored = await getStoredTokens(userId);
+
+  if (!stored.accessToken) {
+    // Already disconnected or never connected
+    return { success: true, message: 'User not connected' };
+  }
+
+  try {
+    const response = await rebellAPI.call('/v1/authorizations/cancelToken', {
+      accessToken: stored.accessToken
+    });
+
+    if (response.result.resultStatus === 'S' ||
+        response.result.resultCode === 'INVALID_ACCESS_TOKEN') {
+      // Token revoked or already invalid - clean up local storage
+      await deleteStoredTokens(userId);
+      return { success: true, message: 'User disconnected' };
+    }
+
+    throw new Error(`Cancel failed: ${response.result.resultMessage}`);
+  } catch (error) {
+    // Even on error, consider cleaning up local tokens
+    // The token may already be invalid
+    console.error('Token cancellation error:', error);
+    await deleteStoredTokens(userId);
+    throw error;
+  }
+}
+
+// Usage in API endpoint
+app.post('/api/disconnect', async (req, res) => {
+  try {
+    const result = await disconnectUser(req.user.id);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to disconnect' });
+  }
+});
+```
+
+```python Python
+async def disconnect_user(user_id: str) -> dict:
+    # Get the stored access token for this user
+    stored = await get_stored_tokens(user_id)
+
+    if not stored.get('access_token'):
+        # Already disconnected or never connected
+        return {'success': True, 'message': 'User not connected'}
+
+    try:
+        response = await rebell_api.call('/v1/authorizations/cancelToken', {
+            'accessToken': stored['access_token']
+        })
+
+        if (response['result']['resultStatus'] == 'S' or
+            response['result']['resultCode'] == 'INVALID_ACCESS_TOKEN'):
+            # Token revoked or already invalid - clean up local storage
+            await delete_stored_tokens(user_id)
+            return {'success': True, 'message': 'User disconnected'}
+
+        raise Exception(f"Cancel failed: {response['result']['resultMessage']}")
+    except Exception as error:
+        # Even on error, consider cleaning up local tokens
+        print(f"Token cancellation error: {error}")
+        await delete_stored_tokens(user_id)
+        raise
+```
+</CodeGroup>
+
+## Handling Subscription Cancellation
+
+When a user cancels a subscription that uses agreement payments:
+
+<Steps>
+  <Step title="Cancel Subscription">
+    Update your subscription system to mark the subscription as cancelled
+  </Step>
+
+  <Step title="Revoke Token">
+    Call `cancelToken` to revoke the access token
+  </Step>
+
+  <Step title="Clean Up">
+    Delete stored tokens from your database
+  </Step>
+
+  <Step title="Notify User">
+    Confirm to the user that their payment agreement has been cancelled
+  </Step>
+</Steps>
+
+```javascript
+async function cancelSubscription(subscriptionId) {
+  const subscription = await getSubscription(subscriptionId);
+
+  // 1. Mark subscription as cancelled
+  await updateSubscription(subscriptionId, { status: 'cancelled' });
+
+  // 2. Revoke the token
+  if (subscription.accessToken) {
+    try {
+      await rebellAPI.call('/v1/authorizations/cancelToken', {
+        accessToken: subscription.accessToken
+      });
+    } catch (error) {
+      // Log but don't fail - token might already be invalid
+      console.warn('Token revocation failed:', error);
+    }
+  }
+
+  // 3. Clean up stored tokens
+  await deleteStoredTokens(subscription.userId);
+
+  // 4. Notify user
+  await sendEmail(subscription.userId, {
+    subject: 'Subscription Cancelled',
+    template: 'subscription-cancelled'
+  });
+
+  return { success: true };
+}
+```
+
+## Best Practices
+
+<Checks>
+  - Always clean up locally stored tokens after cancellation
+  - Handle `INVALID_ACCESS_TOKEN` gracefully (token may already be revoked)
+  - Log token revocation events for audit purposes
+  - Notify users when their authorization is revoked
+  - Consider revoking tokens during account deletion flows
+</Checks>
+
+<Note>
+After calling `cancelToken`, the associated `refreshToken` is also invalidated. The user will need to go through the full authorization flow to reconnect.
+</Note>

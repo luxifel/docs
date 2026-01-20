@@ -1,0 +1,188 @@
+---
+title: Error Codes
+description: Complete reference of error codes and their meanings across all OpenAPIs.
+---
+
+This page documents all error codes returned by the OpenAPI platform. Use this reference to understand error responses and implement appropriate handling.
+
+## Result Status Values
+
+All API responses include a `result` object with a `resultStatus` field:
+
+| Status | Meaning | Action |
+|--------|---------|--------|
+| `S` | Success | Request completed successfully |
+| `F` | Failed | Request failed, check `resultCode` for details |
+| `U` | Unknown | Result unknown, retry or poll for status |
+| `A` | Accepted | Request accepted, processing asynchronously |
+
+## Common Error Codes
+
+These error codes may appear across multiple APIs:
+
+### Authentication & Authorization
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `INVALID_SIGNATURE` | F | Request signature validation failed | Verify signing algorithm and key |
+| `INVALID_CLIENT` | F | Client ID not recognized | Check Client-Id header |
+| `INVALID_ACCESS_TOKEN` | F | Access token invalid or expired | Refresh or re-authorize |
+| `EXPIRED_ACCESS_TOKEN` | F | Access token has expired | Use refresh token |
+| `INSUFFICIENT_SCOPE` | F | Token lacks required permissions | Request additional scopes |
+| `UNAUTHORIZED` | F | Not authorized for this operation | Check credentials |
+
+### Request Validation
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `PARAM_ILLEGAL` | F | One or more parameters invalid | Check request parameters |
+| `MISSING_REQUIRED_PARAM` | F | Required parameter not provided | Add missing parameter |
+| `INVALID_AMOUNT` | F | Amount format or value invalid | Check amount format |
+| `INVALID_CURRENCY` | F | Currency code not supported | Use valid ISO-4217 code |
+| `REQUEST_TIME_INVALID` | F | Request timestamp out of range | Sync server clock |
+
+### Rate Limiting
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `REQUEST_TRAFFIC_EXCEED_LIMIT` | U | Rate limit exceeded | Implement backoff and retry |
+| `SYSTEM_BUSY` | U | System under heavy load | Retry after delay |
+
+### System Errors
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `UNKNOWN_EXCEPTION` | U | Unexpected system error | Retry with exponential backoff |
+| `PROCESS_FAIL` | F | Processing failed | Retry the request |
+| `SERVICE_UNAVAILABLE` | U | Service temporarily unavailable | Retry later |
+
+## Payment-Specific Error Codes
+
+### Payment Creation
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `ORDER_NOT_EXIST` | F | Payment/order not found | Verify payment ID |
+| `ORDER_IS_CLOSED` | F | Order already completed or cancelled | Create new order |
+| `ORDER_STATUS_INVALID` | F | Order in invalid state | Check order status |
+| `REPEAT_REQ_INCONSISTENT` | F | Duplicate request with different params | Use new paymentRequestId |
+| `PAYMENT_IN_PROCESS` | U | Payment being processed | Poll for status |
+
+### Payment Processing
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `INVALID_AUTH_CODE` | F | Payment auth code invalid/expired | Customer refreshes QR |
+| `INSUFFICIENT_BALANCE` | F | Customer has insufficient funds | Inform customer |
+| `RISK_REJECT` | F | Rejected by risk system | Contact support |
+| `USER_NOT_EXIST` | F | User account not found | Verify user ID |
+| `PAYMENT_TIMEOUT` | F | Payment timed out | Create new payment |
+
+### Refunds
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `REFUND_AMOUNT_EXCEED` | F | Refund exceeds available amount | Check refund amount |
+| `REFUND_NOT_ALLOWED` | F | Payment cannot be refunded | Check payment state |
+| `REFUND_IN_PROCESS` | U | Refund being processed | Poll for status |
+| `REFUND_NOT_EXIST` | F | Refund record not found | Verify refund ID |
+
+### Void
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `VOID_NOT_ALLOWED` | F | Payment cannot be voided | Use refund instead |
+| `ORDER_ALREADY_SETTLED` | F | Payment already settled | Use refund instead |
+| `VOID_IN_PROCESS` | U | Void being processed | Poll for status |
+
+### Capture
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `CAPTURE_AMOUNT_EXCEED` | F | Exceeds authorized amount | Check capture amount |
+| `AUTHORIZATION_EXPIRED` | F | Pre-authorization expired | Create new authorization |
+| `CAPTURE_IN_PROCESS` | U | Capture being processed | Poll for status |
+
+## Authorization-Specific Error Codes
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `INVALID_AUTH_CLIENT` | F | Auth client configuration invalid | Check client setup |
+| `INVALID_AUTH_CLIENT_STATUS` | F | Auth client disabled | Contact support |
+| `INVALID_CODE` | F | Authorization code invalid | Request new auth |
+| `EXPIRED_CODE` | F | Authorization code expired | Request new auth |
+| `USED_CODE` | F | Authorization code already used | Use existing tokens |
+| `INVALID_REFRESH_TOKEN` | F | Refresh token invalid | Re-authorize user |
+| `EXPIRED_REFRESH_TOKEN` | F | Refresh token expired | Re-authorize user |
+| `AUTH_CLIENT_UNSUPPORTED_GRANT_TYPE` | F | Grant type not supported | Check grantType value |
+
+## Message-Specific Error Codes
+
+| Code | Status | Description | Resolution |
+|------|--------|-------------|------------|
+| `USER_NOT_SUBSCRIBED` | F | User disabled notifications | Cannot send |
+| `MESSAGE_CONTENT_INVALID` | F | Message content violates policy | Review content |
+| `SENDING` | U | Message queued for delivery | Will be delivered |
+
+## Error Handling Best Practices
+
+<Steps>
+  <Step title="Check Result Status">
+    First check `resultStatus` to determine if the request succeeded
+  </Step>
+
+  <Step title="Handle by Status">
+    - `S`: Process successful response
+    - `F`: Handle failure based on `resultCode`
+    - `U`: Implement retry or polling logic
+    - `A`: Wait for async completion
+  </Step>
+
+  <Step title="Log Details">
+    Log `resultCode` and `resultMessage` for debugging
+  </Step>
+
+  <Step title="User Communication">
+    Map technical errors to user-friendly messages
+  </Step>
+</Steps>
+
+## Example Error Handling
+
+```javascript
+async function handleAPIResponse(response) {
+  const { result } = response;
+
+  switch (result.resultStatus) {
+    case 'S':
+      return { success: true, data: response };
+
+    case 'F':
+      // Categorize failures
+      if (['INVALID_SIGNATURE', 'INVALID_CLIENT', 'UNAUTHORIZED'].includes(result.resultCode)) {
+        throw new AuthenticationError(result.resultMessage);
+      }
+      if (['PARAM_ILLEGAL', 'MISSING_REQUIRED_PARAM'].includes(result.resultCode)) {
+        throw new ValidationError(result.resultMessage);
+      }
+      if (['INSUFFICIENT_BALANCE', 'RISK_REJECT'].includes(result.resultCode)) {
+        throw new PaymentDeclinedError(result.resultCode, result.resultMessage);
+      }
+      throw new APIError(result.resultCode, result.resultMessage);
+
+    case 'U':
+      // Unknown status - may need retry or polling
+      if (result.resultCode === 'REQUEST_TRAFFIC_EXCEED_LIMIT') {
+        throw new RateLimitError('Rate limit exceeded');
+      }
+      return { success: false, pending: true, shouldRetry: true };
+
+    case 'A':
+      // Accepted for async processing
+      return { success: false, pending: true, shouldPoll: true };
+
+    default:
+      throw new APIError('UNKNOWN_STATUS', `Unknown status: ${result.resultStatus}`);
+  }
+}
+```
