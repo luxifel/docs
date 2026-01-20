@@ -1,33 +1,201 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: API Reference
+description: Complete technical reference for the Rebell Payments API with request/response schemas, authentication, and testing.
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+This section provides the complete technical specification for the Rebell Payments API. Use this reference alongside the [Payment Integration guides](/payment-integration/quick-integration-guide) for implementation details and best practices.
 
-## Welcome
+## Base URLs
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+<CardGroup cols={2}>
+  <Card title="Sandbox" icon="flask">
+    ```
+    https://sandbox-api.rebellapp.com
+    ```
+    For development and testing. Payments are simulated.
+  </Card>
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+  <Card title="Production" icon="shield-check">
+    ```
+    https://api.rebellapp.com
+    ```
+    Live environment. Requires merchant onboarding.
+  </Card>
+</CardGroup>
+
+<Warning>
+Sandbox and production use separate credentials. Keys registered in sandbox do not carry over to production.
+</Warning>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API requests require RSA-SHA256 signature authentication. Every request must include these headers:
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Client-Id` | Yes | Your merchant identifier |
+| `Request-Time` | Yes | ISO 8601 UTC timestamp (e.g., `2024-01-10T12:22:30Z`) |
+| `Signature` | Yes | RSA signature: `algorithm=SHA256withRSA, keyVersion=<n>, signature=<base64>` |
+| `Content-Type` | Yes | Must be `application/json` |
+
+### Signature Construction
+
+The signature is computed over a signing string built from:
+
 ```
+<HTTP_METHOD> <HTTP_PATH>
+<Client-Id>.<Request-Time>.<REQUEST_BODY>
+```
+
+**Example signing string:**
+
+```
+POST /v1/payments/retailPay
+2022091495540562874792.2024-01-10T12:22:30Z.{"productCode":"51051000101000100040",...}
+```
+
+<Info>
+For detailed signing implementation with code examples in Node.js, Python, and Java, see [Authentication & Environments](/payment-integration/authentication-environments) or the [Authentication Deep Dive](/payment-integration/authentication-deep-dive).
+</Info>
+
+## Request Format
+
+All requests use JSON with the following conventions:
+
+- **Amounts** are specified in minor units (cents). Example: `1250` = €12.50
+- **Timestamps** use ISO 8601 format in UTC (with `Z` suffix)
+- **IDs** must be unique per transaction (`paymentRequestId` serves as idempotency key)
+
+```json Example Request Body
+{
+  "productCode": "51051000101000100040",
+  "paymentRequestId": "order-123-abc",
+  "paymentAmount": {
+    "currency": "EUR",
+    "value": 1250
+  },
+  "order": {
+    "orderDescription": "Coffee order"
+  }
+}
+```
+
+## Response Format
+
+All responses include a `result` object indicating the outcome:
+
+```json Success Response
+{
+  "result": {
+    "resultStatus": "S",
+    "resultCode": "SUCCESS",
+    "resultMessage": "Success"
+  },
+  "paymentId": "2024032100123456",
+  "paymentRequestId": "order-123-abc"
+}
+```
+
+### Result Status Codes
+
+| Status | Meaning | Action |
+|--------|---------|--------|
+| `S` | Success | Transaction completed successfully |
+| `F` | Failure | Transaction failed - check `resultCode` for details |
+| `U` | Unknown | Indeterminate state - use Inquiry API to check status |
+| `A` | Accepted | Request accepted, processing asynchronously |
+
+<Warning>
+**Never assume the initial API response is final.** Always implement webhooks to receive the authoritative payment result.
+</Warning>
+
+## Available Endpoints
+
+### Payments
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/v1/payments/createQROrder` | POST | Create a merchant-presented QR code for payment |
+| `/v1/payments/retailPay` | POST | Process payment from customer-presented QR/barcode |
+| `/v1/payments/linkPayCreate` | POST | Create a redirect link for app-to-app payment |
+| `/v1/payments/inquiryPayment` | POST | Query payment status |
+
+### Webhooks
+
+| Endpoint | Direction | Description |
+|----------|-----------|-------------|
+| Your webhook URL | Rebell → Merchant | Receives payment notifications (`payment.succeeded`, `payment.failed`) |
+
+## Error Handling
+
+When a request fails, the response includes error details:
+
+```json Error Response
+{
+  "result": {
+    "resultStatus": "F",
+    "resultCode": "INVALID_SIGNATURE",
+    "resultMessage": "Request signature validation failed"
+  }
+}
+```
+
+### Common Error Codes
+
+| Code | Description | Resolution |
+|------|-------------|------------|
+| `INVALID_SIGNATURE` | Signature validation failed | Verify signing string construction and key |
+| `TIMESTAMP_INVALID` | Request-Time outside ±5 minute window | Sync server clock with NTP |
+| `INVALID_CLIENT_ID` | Client-Id not recognized | Verify credentials for correct environment |
+| `ORDER_NOT_EXIST` | Payment/order not found | Verify paymentId or paymentRequestId |
+| `REPEAT_REQUEST` | Duplicate paymentRequestId | Use unique ID for each transaction |
+
+For complete error reference, see [Error Handling & Result Codes](/payment-integration/error-handling).
+
+## Rate Limits
+
+| Environment | Limit |
+|-------------|-------|
+| Sandbox | 100 requests/minute |
+| Production | Contact Rebell for limits based on your integration |
+
+## Testing in Sandbox
+
+The sandbox environment simulates the full payment flow:
+
+1. **Create payments** using test credentials
+2. **Simulate user actions** - payments auto-complete after creation
+3. **Receive webhooks** to your configured endpoint
+4. **Query status** using the Inquiry API
+
+<Tip>
+Test all error scenarios in sandbox before going to production. See the [Testing Checklist](/payment-integration/quick-integration-guide#testing-checklist) for comprehensive test cases.
+</Tip>
+
+## SDK & Code Examples
+
+Complete signing and API client implementations are available in the [Authentication Deep Dive](/payment-integration/authentication-deep-dive):
+
+- **Node.js** - `RebellClient` class with full signing
+- **Python** - `RebellClient` class with cryptography library
+- **Java** - Signing utilities and HTTP client examples
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="Quick Integration Guide" icon="rocket" href="/payment-integration/quick-integration-guide">
+    Step-by-step integration walkthrough
+  </Card>
+
+  <Card title="Authentication Deep Dive" icon="key" href="/payment-integration/authentication-deep-dive">
+    Detailed signing implementation
+  </Card>
+
+  <Card title="Webhooks" icon="webhook" href="/payment-integration/webhooks">
+    Webhook setup and signature verification
+  </Card>
+
+  <Card title="Error Handling" icon="triangle-exclamation" href="/payment-integration/error-handling">
+    Complete error codes reference
+  </Card>
+</CardGroup>

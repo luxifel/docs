@@ -467,6 +467,7 @@
             "group": "Payments",
             "pages": [
               "api-reference/payments/createQROrder",
+              "api-reference/payments/linkPayCreate",
               "api-reference/payments/retailPay",
               "api-reference/payments/inquiryPayment"
             ]

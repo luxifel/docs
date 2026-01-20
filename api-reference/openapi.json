@@ -7,8 +7,12 @@
   },
   "servers": [
     {
-      "url": "https://api.rebell.com",
+      "url": "https://api.rebellapp.com",
       "description": "Production"
+    },
+    {
+      "url": "https://sandbox-api.rebellapp.com",
+      "description": "Sandbox (testing)"
     }
   ],
   "tags": [
@@ -107,14 +111,19 @@
         },
         "x-codeSamples": [
           {
-            "lang": "Node.js",
-            "label": "Node (on-the-fly signature)",
-            "source": "\n```js\nimport fetch from \"node-fetch\";\nimport crypto from \"crypto\";\nconst BASE = \"https://api.rebell.com\";\nconst PATH = \"/v1/payments/createQROrder\";\nconst METHOD = \"POST\";\nconst CLIENT_ID = \"YOUR_CLIENT_ID\";\nconst KEY_VERSION = \"0\";\nconst PRIVATE_KEY = process.env.REBELL_PRIVKEY_PEM;\nconst body = {bizType: ORDER_CODE, codeType: CGCP, order: {orderDescription: Latte x2}, paymentAmount: {\n    currency: EUR, value: 1000}, paymentNotifyUrl: 'https://merchant.example.com/rebell/webhook',\n  paymentRequestId: REQ_demo_001, productCode: '5105010010000100040'};\nconst requestTime = new Date().toISOString();\nconst toSign = [METHOD, PATH, CLIENT_ID, requestTime, JSON.stringify(body)].join(\"\\n\");\nconst signer = crypto.createSign(\"RSA-SHA256\");\nsigner.update(toSign);\nconst signatureB64 = signer.sign(PRIVATE_KEY, \"base64\");\nconst res = await fetch(BASE + PATH, {\n  method: METHOD,\n  headers: {\n    \"content-type\":\"application/json\",\n    \"Client-Id\": CLIENT_ID,\n    \"Request-Time\": requestTime,\n    \"Signature\": `algorithm=SHA256withRSA, keyVersion=${KEY_VERSION}, signature=${signatureB64}`\n  },\n  body: JSON.stringify(body)\n});\nconsole.log(res.status, await res.text());\n```\n"
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl -X POST https://api.rebellapp.com/v1/payments/createQROrder \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Client-Id: YOUR_CLIENT_ID\" \\\n  -H \"Request-Time: 2024-01-10T12:00:00Z\" \\\n  -H \"Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE\" \\\n  -d '{\n    \"bizType\": \"ORDER_CODE\",\n    \"productCode\": \"5105010010000100040\",\n    \"codeType\": \"CGCP\",\n    \"paymentRequestId\": \"REQ_abc_123\",\n    \"paymentAmount\": {\n      \"currency\": \"EUR\",\n      \"value\": 1000\n    },\n    \"order\": {\n      \"orderDescription\": \"Latte x2\"\n    },\n    \"paymentNotifyUrl\": \"https://merchant.example.com/webhook\"\n  }'"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "Node.js",
+            "source": "const response = await fetch('https://api.rebellapp.com/v1/payments/createQROrder', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Client-Id': 'YOUR_CLIENT_ID',\n    'Request-Time': new Date().toISOString(),\n    'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n  },\n  body: JSON.stringify({\n    bizType: 'ORDER_CODE',\n    productCode: '5105010010000100040',\n    codeType: 'CGCP',\n    paymentRequestId: 'REQ_abc_123',\n    paymentAmount: { currency: 'EUR', value: 1000 },\n    order: { orderDescription: 'Latte x2' },\n    paymentNotifyUrl: 'https://merchant.example.com/webhook'\n  })\n});\n\nconst data = await response.json();\nconsole.log(data.qrCode); // Display QR code to customer"
           },
           {
             "lang": "Python",
-            "label": "Python (on-the-fly signature)",
-            "source": "\n```python\nimport json, base64, requests, datetime\nfrom cryptography.hazmat.primitives import serialization, hashes\nfrom cryptography.hazmat.primitives.asymmetric import padding\nBASE = \"https://api.rebell.com\"\nPATH = \"/v1/payments/createQROrder\"\nMETHOD = \"POST\"\nCLIENT_ID = \"YOUR_CLIENT_ID\"\nKEY_VERSION = \"0\"\nbody = {bizType: ORDER_CODE, codeType: CGCP, order: {orderDescription: Latte x2}, paymentAmount: {\n    currency: EUR, value: 1000}, paymentNotifyUrl: 'https://merchant.example.com/rebell/webhook',\n  paymentRequestId: REQ_demo_001, productCode: '5105010010000100040'}\nbody_json = json.dumps(body, separators=(',',':')) if body else \"\"\nrequest_time = datetime.datetime.utcnow().isoformat() + \"Z\"\nto_sign = \"\\n\".join([METHOD, PATH, CLIENT_ID, request_time, body_json])\nwith open(\"private_key.pem\",\"rb\") as f:\n    key = serialization.load_pem_private_key(f.read(), password=None)\nsignature = key.sign(to_sign.encode(), padding.PKCS1v15(), hashes.SHA256())\nsignature_b64 = base64.b64encode(signature).decode()\nheaders = {\n    \"content-type\":\"application/json\",\n    \"Client-Id\": CLIENT_ID,\n    \"Request-Time\": request_time,\n    \"Signature\": f\"algorithm=SHA256withRSA, keyVersion={KEY_VERSION}, signature={signature_b64}\"\n}\nr = requests.post(BASE+PATH, headers=headers, data=body_json or None)\nprint(r.status_code, r.text)\n```\n"
+            "label": "Python",
+            "source": "import requests\n\nresponse = requests.post(\n    'https://api.rebellapp.com/v1/payments/createQROrder',\n    headers={\n        'Content-Type': 'application/json',\n        'Client-Id': 'YOUR_CLIENT_ID',\n        'Request-Time': '2024-01-10T12:00:00Z',\n        'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n    },\n    json={\n        'bizType': 'ORDER_CODE',\n        'productCode': '5105010010000100040',\n        'codeType': 'CGCP',\n        'paymentRequestId': 'REQ_abc_123',\n        'paymentAmount': {'currency': 'EUR', 'value': 1000},\n        'order': {'orderDescription': 'Latte x2'},\n        'paymentNotifyUrl': 'https://merchant.example.com/webhook'\n    }\n)\n\ndata = response.json()\nprint(data['qrCode'])  # Display QR code to customer"
           }
         ]
       }
@@ -175,14 +184,19 @@
         },
         "x-codeSamples": [
           {
-            "lang": "Node.js",
-            "label": "Node (on-the-fly signature)",
-            "source": "\n```js\nimport fetch from \"node-fetch\";\nimport crypto from \"crypto\";\nconst BASE = \"https://api.rebell.com\";\nconst PATH = \"/v1/payments/inquiryPayment\";\nconst METHOD = \"POST\";\nconst CLIENT_ID = \"YOUR_CLIENT_ID\";\nconst KEY_VERSION = \"0\";\nconst PRIVATE_KEY = process.env.REBELL_PRIVKEY_PEM;\nconst body = {paymentId: PAY_demo_001, paymentRequestId: REQ_demo_001};\nconst requestTime = new Date().toISOString();\nconst toSign = [METHOD, PATH, CLIENT_ID, requestTime, JSON.stringify(body)].join(\"\\n\");\nconst signer = crypto.createSign(\"RSA-SHA256\");\nsigner.update(toSign);\nconst signatureB64 = signer.sign(PRIVATE_KEY, \"base64\");\nconst res = await fetch(BASE + PATH, {\n  method: METHOD,\n  headers: {\n    \"content-type\":\"application/json\",\n    \"Client-Id\": CLIENT_ID,\n    \"Request-Time\": requestTime,\n    \"Signature\": `algorithm=SHA256withRSA, keyVersion=${KEY_VERSION}, signature=${signatureB64}`\n  },\n  body: JSON.stringify(body)\n});\nconsole.log(res.status, await res.text());\n```\n"
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl -X POST https://api.rebellapp.com/v1/payments/inquiryPayment \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Client-Id: YOUR_CLIENT_ID\" \\\n  -H \"Request-Time: 2024-01-10T12:00:00Z\" \\\n  -H \"Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE\" \\\n  -d '{\n    \"paymentId\": \"20220914595540652867492\",\n    \"paymentRequestId\": \"REQ_abc_123\"\n  }'"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "Node.js",
+            "source": "const response = await fetch('https://api.rebellapp.com/v1/payments/inquiryPayment', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Client-Id': 'YOUR_CLIENT_ID',\n    'Request-Time': new Date().toISOString(),\n    'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n  },\n  body: JSON.stringify({\n    paymentId: '20220914595540652867492',\n    paymentRequestId: 'REQ_abc_123'\n  })\n});\n\nconst data = await response.json();\nconsole.log(data.paymentStatus); // SUCCESS, PROCESSING, or FAIL"
           },
           {
             "lang": "Python",
-            "label": "Python (on-the-fly signature)",
-            "source": "\n```python\nimport json, base64, requests, datetime\nfrom cryptography.hazmat.primitives import serialization, hashes\nfrom cryptography.hazmat.primitives.asymmetric import padding\nBASE = \"https://api.rebell.com\"\nPATH = \"/v1/payments/inquiryPayment\"\nMETHOD = \"POST\"\nCLIENT_ID = \"YOUR_CLIENT_ID\"\nKEY_VERSION = \"0\"\nbody = {paymentId: PAY_demo_001, paymentRequestId: REQ_demo_001}\nbody_json = json.dumps(body, separators=(',',':')) if body else \"\"\nrequest_time = datetime.datetime.utcnow().isoformat() + \"Z\"\nto_sign = \"\\n\".join([METHOD, PATH, CLIENT_ID, request_time, body_json])\nwith open(\"private_key.pem\",\"rb\") as f:\n    key = serialization.load_pem_private_key(f.read(), password=None)\nsignature = key.sign(to_sign.encode(), padding.PKCS1v15(), hashes.SHA256())\nsignature_b64 = base64.b64encode(signature).decode()\nheaders = {\n    \"content-type\":\"application/json\",\n    \"Client-Id\": CLIENT_ID,\n    \"Request-Time\": request_time,\n    \"Signature\": f\"algorithm=SHA256withRSA, keyVersion={KEY_VERSION}, signature={signature_b64}\"\n}\nr = requests.post(BASE+PATH, headers=headers, data=body_json or None)\nprint(r.status_code, r.text)\n```\n"
+            "label": "Python",
+            "source": "import requests\n\nresponse = requests.post(\n    'https://api.rebellapp.com/v1/payments/inquiryPayment',\n    headers={\n        'Content-Type': 'application/json',\n        'Client-Id': 'YOUR_CLIENT_ID',\n        'Request-Time': '2024-01-10T12:00:00Z',\n        'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n    },\n    json={\n        'paymentId': '20220914595540652867492',\n        'paymentRequestId': 'REQ_abc_123'\n    }\n)\n\ndata = response.json()\nprint(data['paymentStatus'])  # SUCCESS, PROCESSING, or FAIL"
           }
         ]
       }
@@ -253,14 +267,108 @@
         },
         "x-codeSamples": [
           {
-            "lang": "Node.js",
-            "label": "Node (on-the-fly signature)",
-            "source": "\n```js\nimport fetch from \"node-fetch\";\nimport crypto from \"crypto\";\nconst BASE = \"https://api.rebell.com\";\nconst PATH = \"/v1/payments/retailPay\";\nconst METHOD = \"POST\";\nconst CLIENT_ID = \"YOUR_CLIENT_ID\";\nconst KEY_VERSION = \"0\";\nconst PRIVATE_KEY = process.env.REBELL_PRIVKEY_PEM;\nconst body = {paymentAmount: {currency: EUR, value: 2500}, paymentAuthCode: '289123456789012345',\n  paymentNotifyUrl: 'https://merchant.example.com/rebell/webhook', paymentRequestId: REQ_demo_002,\n  productCode: '5105010010000100040'};\nconst requestTime = new Date().toISOString();\nconst toSign = [METHOD, PATH, CLIENT_ID, requestTime, JSON.stringify(body)].join(\"\\n\");\nconst signer = crypto.createSign(\"RSA-SHA256\");\nsigner.update(toSign);\nconst signatureB64 = signer.sign(PRIVATE_KEY, \"base64\");\nconst res = await fetch(BASE + PATH, {\n  method: METHOD,\n  headers: {\n    \"content-type\":\"application/json\",\n    \"Client-Id\": CLIENT_ID,\n    \"Request-Time\": requestTime,\n    \"Signature\": `algorithm=SHA256withRSA, keyVersion=${KEY_VERSION}, signature=${signatureB64}`\n  },\n  body: JSON.stringify(body)\n});\nconsole.log(res.status, await res.text());\n```\n"
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl -X POST https://api.rebellapp.com/v1/payments/retailPay \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Client-Id: YOUR_CLIENT_ID\" \\\n  -H \"Request-Time: 2024-01-10T12:00:00Z\" \\\n  -H \"Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE\" \\\n  -d '{\n    \"productCode\": \"5105010010000100040\",\n    \"paymentRequestId\": \"REQ_abc_456\",\n    \"paymentAuthCode\": \"289123456789012345\",\n    \"paymentAmount\": {\n      \"currency\": \"EUR\",\n      \"value\": 2500\n    },\n    \"order\": {\n      \"orderDescription\": \"In-store purchase\"\n    },\n    \"paymentNotifyUrl\": \"https://merchant.example.com/webhook\"\n  }'"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "Node.js",
+            "source": "const response = await fetch('https://api.rebellapp.com/v1/payments/retailPay', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Client-Id': 'YOUR_CLIENT_ID',\n    'Request-Time': new Date().toISOString(),\n    'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n  },\n  body: JSON.stringify({\n    productCode: '5105010010000100040',\n    paymentRequestId: 'REQ_abc_456',\n    paymentAuthCode: '289123456789012345', // Scanned from customer's wallet\n    paymentAmount: { currency: 'EUR', value: 2500 },\n    order: { orderDescription: 'In-store purchase' },\n    paymentNotifyUrl: 'https://merchant.example.com/webhook'\n  })\n});\n\nconst data = await response.json();\nif (data.result.resultStatus === 'S') {\n  console.log('Payment successful:', data.paymentId);\n}"
           },
           {
             "lang": "Python",
-            "label": "Python (on-the-fly signature)",
-            "source": "\n```python\nimport json, base64, requests, datetime\nfrom cryptography.hazmat.primitives import serialization, hashes\nfrom cryptography.hazmat.primitives.asymmetric import padding\nBASE = \"https://api.rebell.com\"\nPATH = \"/v1/payments/retailPay\"\nMETHOD = \"POST\"\nCLIENT_ID = \"YOUR_CLIENT_ID\"\nKEY_VERSION = \"0\"\nbody = {paymentAmount: {currency: EUR, value: 2500}, paymentAuthCode: '289123456789012345',\n  paymentNotifyUrl: 'https://merchant.example.com/rebell/webhook', paymentRequestId: REQ_demo_002,\n  productCode: '5105010010000100040'}\nbody_json = json.dumps(body, separators=(',',':')) if body else \"\"\nrequest_time = datetime.datetime.utcnow().isoformat() + \"Z\"\nto_sign = \"\\n\".join([METHOD, PATH, CLIENT_ID, request_time, body_json])\nwith open(\"private_key.pem\",\"rb\") as f:\n    key = serialization.load_pem_private_key(f.read(), password=None)\nsignature = key.sign(to_sign.encode(), padding.PKCS1v15(), hashes.SHA256())\nsignature_b64 = base64.b64encode(signature).decode()\nheaders = {\n    \"content-type\":\"application/json\",\n    \"Client-Id\": CLIENT_ID,\n    \"Request-Time\": request_time,\n    \"Signature\": f\"algorithm=SHA256withRSA, keyVersion={KEY_VERSION}, signature={signature_b64}\"\n}\nr = requests.post(BASE+PATH, headers=headers, data=body_json or None)\nprint(r.status_code, r.text)\n```\n"
+            "label": "Python",
+            "source": "import requests\n\nresponse = requests.post(\n    'https://api.rebellapp.com/v1/payments/retailPay',\n    headers={\n        'Content-Type': 'application/json',\n        'Client-Id': 'YOUR_CLIENT_ID',\n        'Request-Time': '2024-01-10T12:00:00Z',\n        'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n    },\n    json={\n        'productCode': '5105010010000100040',\n        'paymentRequestId': 'REQ_abc_456',\n        'paymentAuthCode': '289123456789012345',  # Scanned from customer's wallet\n        'paymentAmount': {'currency': 'EUR', 'value': 2500},\n        'order': {'orderDescription': 'In-store purchase'},\n        'paymentNotifyUrl': 'https://merchant.example.com/webhook'\n    }\n)\n\ndata = response.json()\nif data['result']['resultStatus'] == 'S':\n    print('Payment successful:', data['paymentId'])"
+          }
+        ]
+      }
+    },
+    "/v1/payments/linkPayCreate": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Create Link Pay Order (App-to-App or Browser Redirect)",
+        "operationId": "linkPayCreate",
+        "description": "Create a payment order that returns redirect URLs for app-to-app or browser-to-app payment flows. The user is redirected to the Rebell SuperApp to authorize the payment.",
+        "security": [
+          {
+            "RebellSignature": [],
+            "ClientId": [],
+            "RequestTime": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkPayCreateRequest"
+              },
+              "examples": {
+                "example": {
+                  "value": {
+                    "productCode": "5105010010000100040",
+                    "paymentRequestId": "checkout-20240321-987",
+                    "paymentAmount": {
+                      "currency": "EUR",
+                      "value": 499
+                    },
+                    "order": {
+                      "orderDescription": "Monthly subscription - Premium plan",
+                      "merchant": {
+                        "store": {
+                          "externalStoreId": "STORE-77"
+                        }
+                      }
+                    },
+                    "settlementStrategy": {
+                      "settlementCurrency": "EUR"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkPayCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "label": "cURL",
+            "source": "curl -X POST https://api.rebellapp.com/v1/payments/linkPayCreate \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Client-Id: YOUR_CLIENT_ID\" \\\n  -H \"Request-Time: 2024-01-10T12:00:00Z\" \\\n  -H \"Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE\" \\\n  -d '{\n    \"productCode\": \"5105010010000100040\",\n    \"paymentRequestId\": \"checkout-20240321-987\",\n    \"paymentAmount\": {\n      \"currency\": \"EUR\",\n      \"value\": 499\n    },\n    \"order\": {\n      \"orderDescription\": \"Monthly subscription - Premium plan\"\n    },\n    \"settlementStrategy\": {\n      \"settlementCurrency\": \"EUR\"\n    }\n  }'"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "Node.js",
+            "source": "const response = await fetch('https://api.rebellapp.com/v1/payments/linkPayCreate', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Client-Id': 'YOUR_CLIENT_ID',\n    'Request-Time': new Date().toISOString(),\n    'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n  },\n  body: JSON.stringify({\n    productCode: '5105010010000100040',\n    paymentRequestId: `checkout-${orderId}-${Date.now()}`,\n    paymentAmount: { currency: 'EUR', value: 499 },\n    order: { orderDescription: 'Monthly subscription - Premium plan' },\n    settlementStrategy: { settlementCurrency: 'EUR' }\n  })\n});\n\nconst data = await response.json();\n// Redirect user to Rebell app\nwindow.location.href = data.appLinks.ios.shortUrl; // or android"
+          },
+          {
+            "lang": "Python",
+            "label": "Python",
+            "source": "import requests\n\nresponse = requests.post(\n    'https://api.rebellapp.com/v1/payments/linkPayCreate',\n    headers={\n        'Content-Type': 'application/json',\n        'Client-Id': 'YOUR_CLIENT_ID',\n        'Request-Time': '2024-01-10T12:00:00Z',\n        'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n    },\n    json={\n        'productCode': '5105010010000100040',\n        'paymentRequestId': f'checkout-{order_id}-{int(time.time())}',\n        'paymentAmount': {'currency': 'EUR', 'value': 499},\n        'order': {'orderDescription': 'Monthly subscription - Premium plan'},\n        'settlementStrategy': {'settlementCurrency': 'EUR'}\n    }\n)\n\ndata = response.json()\n# Return redirect URLs to frontend\nredirect_url = data['redirectUrl']\napp_links = data['appLinks']"
           }
         ]
       }
@@ -296,14 +404,14 @@
         },
         "x-codeSamples": [
           {
-            "lang": "Node.js",
-            "label": "Node (on-the-fly signature)",
-            "source": "\n```js\nimport fetch from \"node-fetch\";\nimport crypto from \"crypto\";\nconst BASE = \"https://api.rebell.com\";\nconst PATH = \"/webhooks/paymentNotify\";\nconst METHOD = \"POST\";\nconst CLIENT_ID = \"YOUR_CLIENT_ID\";\nconst KEY_VERSION = \"0\";\nconst PRIVATE_KEY = process.env.REBELL_PRIVKEY_PEM;\nconst body = {paymentAmount: {currency: EUR, value: 1000}, paymentId: PAY_demo_001, paymentRequestId: REQ_demo_001,\n  paymentStatus: SUCCESS, paymentTime: '2025-01-01T12:00:00Z'};\nconst requestTime = new Date().toISOString();\nconst toSign = [METHOD, PATH, CLIENT_ID, requestTime, JSON.stringify(body)].join(\"\\n\");\nconst signer = crypto.createSign(\"RSA-SHA256\");\nsigner.update(toSign);\nconst signatureB64 = signer.sign(PRIVATE_KEY, \"base64\");\nconst res = await fetch(BASE + PATH, {\n  method: METHOD,\n  headers: {\n    \"content-type\":\"application/json\",\n    \"Client-Id\": CLIENT_ID,\n    \"Request-Time\": requestTime,\n    \"Signature\": `algorithm=SHA256withRSA, keyVersion=${KEY_VERSION}, signature=${signatureB64}`\n  },\n  body: JSON.stringify(body)\n});\nconsole.log(res.status, await res.text());\n```\n"
+            "lang": "JavaScript",
+            "label": "Express.js Handler",
+            "source": "// Webhook endpoint to receive payment notifications\napp.post('/webhooks/rebell', express.json(), (req, res) => {\n  // 1. Verify the signature (see Authentication docs)\n  if (!verifySignature(req)) {\n    return res.status(401).json({ result: { resultStatus: 'F' } });\n  }\n\n  const { paymentId, paymentRequestId, paymentStatus, paymentAmount } = req.body;\n\n  // 2. Process the payment result\n  if (paymentStatus === 'SUCCESS') {\n    // Update order status, trigger fulfillment, etc.\n    updateOrderStatus(paymentRequestId, 'paid');\n  } else if (paymentStatus === 'FAIL') {\n    updateOrderStatus(paymentRequestId, 'failed');\n  }\n\n  // 3. Acknowledge receipt\n  res.json({ result: { resultStatus: 'S' } });\n});"
           },
           {
             "lang": "Python",
-            "label": "Python (on-the-fly signature)",
-            "source": "\n```python\nimport json, base64, requests, datetime\nfrom cryptography.hazmat.primitives import serialization, hashes\nfrom cryptography.hazmat.primitives.asymmetric import padding\nBASE = \"https://api.rebell.com\"\nPATH = \"/webhooks/paymentNotify\"\nMETHOD = \"POST\"\nCLIENT_ID = \"YOUR_CLIENT_ID\"\nKEY_VERSION = \"0\"\nbody = {paymentAmount: {currency: EUR, value: 1000}, paymentId: PAY_demo_001, paymentRequestId: REQ_demo_001,\n  paymentStatus: SUCCESS, paymentTime: '2025-01-01T12:00:00Z'}\nbody_json = json.dumps(body, separators=(',',':')) if body else \"\"\nrequest_time = datetime.datetime.utcnow().isoformat() + \"Z\"\nto_sign = \"\\n\".join([METHOD, PATH, CLIENT_ID, request_time, body_json])\nwith open(\"private_key.pem\",\"rb\") as f:\n    key = serialization.load_pem_private_key(f.read(), password=None)\nsignature = key.sign(to_sign.encode(), padding.PKCS1v15(), hashes.SHA256())\nsignature_b64 = base64.b64encode(signature).decode()\nheaders = {\n    \"content-type\":\"application/json\",\n    \"Client-Id\": CLIENT_ID,\n    \"Request-Time\": request_time,\n    \"Signature\": f\"algorithm=SHA256withRSA, keyVersion={KEY_VERSION}, signature={signature_b64}\"\n}\nr = requests.post(BASE+PATH, headers=headers, data=body_json or None)\nprint(r.status_code, r.text)\n```\n"
+            "label": "Flask Handler",
+            "source": "from flask import Flask, request, jsonify\n\n@app.route('/webhooks/rebell', methods=['POST'])\ndef handle_payment_webhook():\n    # 1. Verify the signature (see Authentication docs)\n    if not verify_signature(request):\n        return jsonify({'result': {'resultStatus': 'F'}}), 401\n\n    data = request.json\n    payment_status = data['paymentStatus']\n    payment_request_id = data['paymentRequestId']\n\n    # 2. Process the payment result\n    if payment_status == 'SUCCESS':\n        update_order_status(payment_request_id, 'paid')\n    elif payment_status == 'FAIL':\n        update_order_status(payment_request_id, 'failed')\n\n    # 3. Acknowledge receipt\n    return jsonify({'result': {'resultStatus': 'S'}})"
           }
         ],
         "operationId": "paymentNotify"
@@ -641,6 +749,98 @@
         "properties": {
           "result": {
             "$ref": "#/components/schemas/Result"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "SettlementStrategy": {
+        "type": "object",
+        "properties": {
+          "settlementCurrency": {
+            "type": "string",
+            "description": "Settlement currency (e.g., EUR)"
+          }
+        }
+      },
+      "LinkPayCreateRequest": {
+        "type": "object",
+        "properties": {
+          "productCode": {
+            "type": "string",
+            "description": "Payment product type assigned by Rebell"
+          },
+          "paymentRequestId": {
+            "type": "string",
+            "description": "Merchant-generated unique ID (idempotency key). Must be unique per transaction."
+          },
+          "paymentAmount": {
+            "$ref": "#/components/schemas/Amount"
+          },
+          "order": {
+            "$ref": "#/components/schemas/Order"
+          },
+          "settlementStrategy": {
+            "$ref": "#/components/schemas/SettlementStrategy"
+          }
+        },
+        "required": [
+          "productCode",
+          "paymentRequestId",
+          "paymentAmount"
+        ]
+      },
+      "AppLinkPlatform": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "description": "Android application ID or iOS bundle ID"
+          },
+          "bundleId": {
+            "type": "string",
+            "description": "iOS bundle ID"
+          },
+          "targetPath": {
+            "type": "string",
+            "description": "Deep link path within the app"
+          },
+          "shortUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Short URL for the redirect"
+          }
+        }
+      },
+      "AppLinks": {
+        "type": "object",
+        "properties": {
+          "android": {
+            "$ref": "#/components/schemas/AppLinkPlatform"
+          },
+          "ios": {
+            "$ref": "#/components/schemas/AppLinkPlatform"
+          }
+        },
+        "description": "Platform-specific app link metadata"
+      },
+      "LinkPayCreateResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Result"
+          },
+          "redirectUrl": {
+            "type": "string",
+            "description": "Deep link to open Rebell SuperApp directly"
+          },
+          "appLinks": {
+            "$ref": "#/components/schemas/AppLinks"
+          },
+          "paymentId": {
+            "type": "string",
+            "description": "Payment identifier to be used for inquiry or reconciliation"
           }
         },
         "required": [
