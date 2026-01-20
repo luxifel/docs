@@ -1,0 +1,104 @@
+---
+title: my.startCompass
+description: Start listening for compass heading data.
+---
+
+Use this API to start the compass sensor. After calling this, you can use `my.onCompassChange` to receive compass heading data.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.startCompass({
+  success() {
+    console.log('Compass started');
+    my.onCompassChange((res) => {
+      console.log('Heading:', res.direction);
+    });
+  }
+});
+```
+
+### Navigation App
+
+```javascript
+Page({
+  onLoad() {
+    my.startCompass({
+      success: () => {
+        my.onCompassChange(this.updateCompass);
+      },
+      fail(err) {
+        my.showToast({
+          content: 'Compass not available',
+          type: 'fail'
+        });
+      }
+    });
+  },
+
+  updateCompass(res) {
+    this.setData({
+      heading: Math.round(res.direction),
+      compassRotation: -res.direction
+    });
+  },
+
+  onUnload() {
+    my.offCompassChange(this.updateCompass);
+  }
+});
+```
+
+### Combining with Location
+
+```javascript
+Page({
+  async onLoad() {
+    // Start compass for heading
+    my.startCompass({
+      success: () => {
+        my.onCompassChange(this.updateHeading);
+      }
+    });
+
+    // Get current location
+    my.getLocation({
+      success: (res) => {
+        this.setData({
+          latitude: res.latitude,
+          longitude: res.longitude
+        });
+      }
+    });
+  },
+
+  updateHeading(res) {
+    this.setData({ heading: res.direction });
+  }
+});
+```
+
+<Warning>
+The compass may not be available on all devices. Always handle the `fail` callback to provide a fallback experience.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onCompassChange" icon="compass" href="/jsapi/device/compass/my.onCompassChange">
+    Listen for compass data
+  </Card>
+  <Card title="my.offCompassChange" icon="xmark" href="/jsapi/device/compass/my.offCompassChange">
+    Stop listening
+  </Card>
+</CardGroup>

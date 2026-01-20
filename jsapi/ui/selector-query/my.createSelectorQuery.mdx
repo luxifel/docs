@@ -1,0 +1,36 @@
+---
+title: my.createSelectorQuery
+description: Create a selector query to get element information.
+---
+
+Use this API to create a query object for selecting elements and getting their properties.
+
+## Parameters
+
+This API does not require any parameters.
+
+## Return Value
+
+Returns a SelectorQuery object.
+
+## Code Example
+
+```javascript
+const query = my.createSelectorQuery();
+
+query.select('#myElement').boundingClientRect();
+query.selectViewport().scrollOffset();
+
+query.exec((res) => {
+  console.log('Element rect:', res[0]);
+  console.log('Scroll offset:', res[1]);
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.pageScrollTo" icon="arrow-down" href="/jsapi/ui/scroll/my.pageScrollTo">
+    Scroll page to position
+  </Card>
+</CardGroup>

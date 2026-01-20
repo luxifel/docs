@@ -1,0 +1,86 @@
+---
+title: my.getScreenOrientation
+description: Get the current screen orientation.
+---
+
+Use this API to get the current screen orientation of the device.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| orientation | String | Current orientation: `portrait`, `landscape`, `portraitUpsideDown`, `landscapeLeft`, `landscapeRight` |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.getScreenOrientation({
+  success(res) {
+    console.log('Current orientation:', res.orientation);
+  }
+});
+```
+
+### Adaptive Layout
+
+```javascript
+Page({
+  data: {
+    isLandscape: false
+  },
+
+  onLoad() {
+    this.checkOrientation();
+    my.onScreenOrientationChange(this.handleOrientationChange);
+  },
+
+  checkOrientation() {
+    my.getScreenOrientation({
+      success: (res) => {
+        const isLandscape = res.orientation.includes('landscape');
+        this.setData({ isLandscape });
+      }
+    });
+  },
+
+  handleOrientationChange(res) {
+    const isLandscape = res.orientation.includes('landscape');
+    this.setData({ isLandscape });
+  },
+
+  onUnload() {
+    my.offScreenOrientationChange(this.handleOrientationChange);
+  }
+});
+```
+
+## Orientation Values
+
+| Value | Description |
+|-------|-------------|
+| `portrait` | Device held upright |
+| `landscape` | Device held sideways |
+| `portraitUpsideDown` | Device held upside down |
+| `landscapeLeft` | Device rotated left |
+| `landscapeRight` | Device rotated right |
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.setScreenOrientation" icon="rotate" href="/jsapi/device/screen-orientation/my.setScreenOrientation">
+    Set screen orientation
+  </Card>
+  <Card title="my.onScreenOrientationChange" icon="mobile" href="/jsapi/device/screen-orientation/my.onScreenOrientationChange">
+    Listen for orientation changes
+  </Card>
+</CardGroup>

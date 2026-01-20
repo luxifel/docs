@@ -1,0 +1,121 @@
+---
+title: my.onBluetoothDeviceFound
+description: Listen for newly discovered Bluetooth devices.
+---
+
+Use this API to listen for newly discovered Bluetooth devices during discovery. The callback triggers when new devices are found.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Callback when devices are found |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| devices | Array | Array of newly found devices |
+
+## Device Object Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| deviceId | String | Device identifier |
+| name | String | Device name (may be empty) |
+| RSSI | Number | Signal strength (dBm) |
+| advertisData | ArrayBuffer | Advertisement data |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.onBluetoothDeviceFound((res) => {
+  res.devices.forEach(device => {
+    console.log('Found:', device.name, device.deviceId);
+  });
+});
+```
+
+### Build Device List
+
+```javascript
+Page({
+  data: {
+    devices: []
+  },
+
+  onLoad() {
+    my.openBluetoothAdapter({
+      success: () => {
+        this.setupDeviceListener();
+        this.startScan();
+      }
+    });
+  },
+
+  setupDeviceListener() {
+    my.onBluetoothDeviceFound((res) => {
+      const { devices } = this.data;
+
+      res.devices.forEach(newDevice => {
+        const exists = devices.find(d => d.deviceId === newDevice.deviceId);
+        if (!exists && newDevice.name) {
+          devices.push(newDevice);
+        }
+      });
+
+      this.setData({ devices });
+    });
+  },
+
+  startScan() {
+    my.startBluetoothDevicesDiscovery();
+  },
+
+  onUnload() {
+    my.offBluetoothDeviceFound();
+    my.closeBluetoothAdapter();
+  }
+});
+```
+
+### Find Specific Device
+
+```javascript
+Page({
+  findDevice(targetName) {
+    my.onBluetoothDeviceFound((res) => {
+      const target = res.devices.find(d => d.name === targetName);
+
+      if (target) {
+        my.stopBluetoothDevicesDiscovery();
+        my.offBluetoothDeviceFound();
+        this.connectToDevice(target);
+      }
+    });
+
+    my.startBluetoothDevicesDiscovery();
+  },
+
+  connectToDevice(device) {
+    console.log('Connecting to:', device.name);
+  }
+});
+```
+
+<Tip>
+Remember to call `my.offBluetoothDeviceFound` when done to stop receiving device updates.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offBluetoothDeviceFound" icon="xmark" href="/jsapi/device/bluetooth/my.offBluetoothDeviceFound">
+    Stop listening
+  </Card>
+  <Card title="my.startBluetoothDevicesDiscovery" icon="magnifying-glass" href="/jsapi/device/bluetooth/my.startBluetoothDevicesDiscovery">
+    Start discovery
+  </Card>
+</CardGroup>

@@ -1,0 +1,90 @@
+---
+title: my.hideBackHome
+description: Hide the home button in the navigation bar and tab bar menu.
+---
+
+Use this API to hide the home button in the top navigation bar and the return-home option in the upper right corner menu.
+
+## Parameters
+
+This API does not require any parameters.
+
+## Default Behavior
+
+- The home button displays by default if the user's entry point is not the homepage
+- The return-home option won't appear if the tab bar redirects to `pages/index/index` in app.json
+
+## Code Example
+
+### Basic Usage with Feature Detection
+
+```javascript
+Page({
+  onReady() {
+    if (my.canIUse('hideBackHome')) {
+      my.hideBackHome();
+    }
+  }
+});
+```
+
+### Delayed Execution
+
+```javascript
+Page({
+  onLoad() {
+    my.reLaunch({
+      url: '../other-page/other-page'
+    });
+
+    // Hide the home button after 5 seconds
+    setTimeout(() => {
+      my.hideBackHome();
+    }, 5000);
+  }
+});
+```
+
+### Conditional Hiding
+
+```javascript
+Page({
+  onReady() {
+    // Hide home button for specific user flows
+    if (this.data.isOnboardingFlow) {
+      my.hideBackHome();
+    }
+  }
+});
+```
+
+<Warning>
+Use this API carefully. Hiding the home button may confuse users who expect to navigate back to the main page. Only hide it when your user flow specifically requires it.
+</Warning>
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Onboarding Flows">
+    Hide the home button during multi-step onboarding to prevent users from accidentally leaving the flow.
+  </Accordion>
+
+  <Accordion title="Payment Flows">
+    Hide during critical payment steps to ensure users complete the transaction.
+  </Accordion>
+
+  <Accordion title="Kiosk Mode">
+    Hide when the Mini Program is used in a kiosk or single-purpose context.
+  </Accordion>
+</AccordionGroup>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.setNavigationBar" icon="bars" href="/jsapi/ui/navigation-bar/my.setNavigationBar">
+    Customize navigation bar
+  </Card>
+  <Card title="my.reLaunch" icon="rotate" href="/jsapi/ui/route/my.reLaunch">
+    Relaunch to a page
+  </Card>
+</CardGroup>

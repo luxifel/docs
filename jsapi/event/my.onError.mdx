@@ -1,0 +1,161 @@
+---
+title: my.onError
+description: Listen for JavaScript errors that occur during Mini Program execution.
+---
+
+Use this API to listen for JavaScript errors that occur during Mini Program execution. This allows you to implement custom error handling and logging strategies.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Handler executed when a JS error occurs |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| error | String | The error message |
+
+## Code Example
+
+### Basic Error Handling
+
+```javascript
+App({
+  onLaunch() {
+    my.onError((error) => {
+      console.error('JS Error:', error);
+    });
+  }
+});
+```
+
+### Error Logging Service
+
+```javascript
+App({
+  onLaunch() {
+    my.onError((error) => {
+      // Log error to analytics service
+      this.logError(error);
+    });
+  },
+
+  logError(error) {
+    my.request({
+      url: 'https://api.example.com/errors',
+      method: 'POST',
+      data: {
+        error: error,
+        timestamp: Date.now(),
+        appId: my.getAppIdSync().appId
+      }
+    });
+  }
+});
+```
+
+### Page-Level Error Handling
+
+```javascript
+Page({
+  onShow() {
+    my.onError((error) => {
+      console.warn('Error on page:', error);
+
+      // Show user-friendly message
+      my.showToast({
+        content: 'Something went wrong',
+        type: 'fail'
+      });
+    });
+  },
+
+  onHide() {
+    my.offError();
+  }
+});
+```
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Error Monitoring">
+    ```javascript
+    App({
+      onLaunch() {
+        my.onError((error) => {
+          // Send to monitoring service
+          this.sendToMonitoring({
+            type: 'js_error',
+            message: error,
+            page: getCurrentPages().pop()?.route,
+            time: new Date().toISOString()
+          });
+        });
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Development Debugging">
+    ```javascript
+    App({
+      onLaunch() {
+        my.getRunScene({
+          success: ({ envVersion }) => {
+            if (envVersion === 'develop') {
+              my.onError((error) => {
+                // Show detailed error in development
+                my.alert({
+                  title: 'Debug Error',
+                  content: error
+                });
+              });
+            }
+          }
+        });
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Error Recovery">
+    ```javascript
+    App({
+      onLaunch() {
+        my.onError((error) => {
+          // Attempt to recover from known errors
+          if (error.includes('network')) {
+            my.showToast({
+              content: 'Network error. Retrying...',
+              type: 'fail'
+            });
+            // Retry logic
+          }
+        });
+      }
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+The `my.onError` callback triggers at the same time as the `onError()` method in app registration, with the same parameters.
+</Info>
+
+<Warning>
+Currently, this API only captures JavaScript errors. Native errors and other types of exceptions may not be captured.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offError" icon="xmark" href="/jsapi/event/my.offError">
+    Stop listening for error events
+  </Card>
+  <Card title="my.onUnhandledRejection" icon="exclamation-triangle" href="/jsapi/event/my.onUnhandledRejection">
+    Listen for unhandled Promise rejections
+  </Card>
+</CardGroup>

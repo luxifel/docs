@@ -1,0 +1,26 @@
+---
+title: my.onSocketMessage
+description: Listen for WebSocket messages.
+---
+
+Register a callback for incoming WebSocket messages.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Handler for messages |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| data | String/ArrayBuffer | Received message data |
+
+## Code Example
+
+```javascript
+my.onSocketMessage((res) => {
+  console.log('Received:', res.data);
+});
+```

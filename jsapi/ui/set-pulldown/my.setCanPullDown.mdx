@@ -1,0 +1,40 @@
+---
+title: my.setCanPullDown
+description: Enable or disable pull-down refresh for the page.
+---
+
+Use this API to dynamically enable or disable pull-down refresh functionality.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| canPullDown | Boolean | Yes | Whether to enable pull-down refresh |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+// Disable pull-down refresh
+my.setCanPullDown({
+  canPullDown: false
+});
+
+// Enable pull-down refresh
+my.setCanPullDown({
+  canPullDown: true
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.startPullDownRefresh" icon="rotate" href="/jsapi/ui/pulldown/my.startPullDownRefresh">
+    Start pull-down refresh
+  </Card>
+  <Card title="my.stopPullDownRefresh" icon="xmark" href="/jsapi/ui/pulldown/my.stopPullDownRefresh">
+    Stop pull-down refresh
+  </Card>
+</CardGroup>

@@ -1,0 +1,299 @@
+---
+title: "JSAPI Reference"
+description: "Complete reference of all JavaScript APIs available for Mini Program development."
+---
+
+This page provides a comprehensive reference of all JSAPIs organized by category. Click on any API to view its detailed documentation.
+
+## Basic
+
+Core APIs for version checking, feature detection, and app identification.
+
+| API | Description |
+|-----|-------------|
+| [my.canIUse](/jsapi/basic/my.canIUse) | Check if an API or feature is supported |
+| [my.SDKVersion](/jsapi/basic/my.SDKVersion) | Get the SDK version |
+| [my.getAppIdSync](/jsapi/basic/my.getAppIdSync) | Get the Mini Program App ID synchronously |
+| [my.getRunScene](/jsapi/basic/my.getRunScene) | Get the current running environment |
+
+## In-App Event
+
+APIs for handling app lifecycle events and errors.
+
+| API | Description |
+|-----|-------------|
+| [my.onAppShow](/jsapi/event/my.onAppShow) | Listen for app show events |
+| [my.offAppShow](/jsapi/event/my.offAppShow) | Stop listening for app show events |
+| [my.onAppHide](/jsapi/event/my.onAppHide) | Listen for app hide events |
+| [my.offAppHide](/jsapi/event/my.offAppHide) | Stop listening for app hide events |
+| [my.onError](/jsapi/event/my.onError) | Listen for error events |
+| [my.offError](/jsapi/event/my.offError) | Stop listening for error events |
+| [my.onUnhandledRejection](/jsapi/event/my.onUnhandledRejection) | Listen for unhandled promise rejections |
+| [my.offUnhandledRejection](/jsapi/event/my.offUnhandledRejection) | Stop listening for unhandled rejections |
+
+## UI
+
+### Navigation Bar
+
+| API | Description |
+|-----|-------------|
+| [my.setNavigationBar](/jsapi/ui/navigation-bar/my.setNavigationBar) | Set navigation bar properties |
+| [my.showNavigationBarLoading](/jsapi/ui/navigation-bar/my.showNavigationBarLoading) | Show navigation bar loading indicator |
+| [my.hideNavigationBarLoading](/jsapi/ui/navigation-bar/my.hideNavigationBarLoading) | Hide navigation bar loading indicator |
+| [my.hideBackHome](/jsapi/ui/navigation-bar/my.hideBackHome) | Hide the back to home button |
+
+### Tab Bar
+
+| API | Description |
+|-----|-------------|
+| [my.hideTabBar](/jsapi/ui/tab-bar/my.hideTabBar) | Hide the tab bar |
+| [my.setTabBarStyle](/jsapi/ui/tab-bar/my.setTabBarStyle) | Set tab bar style |
+
+### Route
+
+| API | Description |
+|-----|-------------|
+| [my.navigateTo](/jsapi/ui/route/my.navigateTo) | Navigate to a new page |
+| [my.navigateBack](/jsapi/ui/route/my.navigateBack) | Navigate back to previous page |
+| [my.redirectTo](/jsapi/ui/route/my.redirectTo) | Redirect to a page (closes current) |
+| [my.reLaunch](/jsapi/ui/route/my.reLaunch) | Relaunch to a page (closes all others) |
+| [my.switchTab](/jsapi/ui/route/my.switchTab) | Switch to a tab page |
+
+### Feedback
+
+| API | Description |
+|-----|-------------|
+| [my.alert](/jsapi/ui/feedback/my.alert) | Show alert dialog |
+| [my.confirm](/jsapi/ui/feedback/my.confirm) | Show confirmation dialog |
+| [my.prompt](/jsapi/ui/feedback/my.prompt) | Show prompt dialog with input |
+| [my.showToast](/jsapi/ui/feedback/my.showToast) | Show toast message |
+| [my.hideToast](/jsapi/ui/feedback/my.hideToast) | Hide toast message |
+| [my.showLoading](/jsapi/ui/feedback/my.showLoading) | Show loading indicator |
+| [my.hideLoading](/jsapi/ui/feedback/my.hideLoading) | Hide loading indicator |
+| [my.showActionSheet](/jsapi/ui/feedback/my.showActionSheet) | Show action sheet |
+
+### Pull-down Refresh
+
+| API | Description |
+|-----|-------------|
+| [my.startPullDownRefresh](/jsapi/ui/pulldown/my.startPullDownRefresh) | Start pull-down refresh |
+| [my.stopPullDownRefresh](/jsapi/ui/pulldown/my.stopPullDownRefresh) | Stop pull-down refresh |
+
+### Other UI APIs
+
+| API | Description |
+|-----|-------------|
+| [my.choosePhoneContact](/jsapi/ui/contact/my.choosePhoneContact) | Choose a phone contact |
+| [my.datePicker](/jsapi/ui/choose-date/my.datePicker) | Show date picker |
+| [my.createAnimation](/jsapi/ui/animation/my.createAnimation) | Create animation instance |
+| [my.createCanvasContext](/jsapi/ui/canvas/my.createCanvasContext) | Create canvas context |
+| [my.hideKeyboard](/jsapi/ui/keyboard/my.hideKeyboard) | Hide the keyboard |
+| [my.pageScrollTo](/jsapi/ui/scroll/my.pageScrollTo) | Scroll page to position |
+| [my.createSelectorQuery](/jsapi/ui/selector-query/my.createSelectorQuery) | Create selector query |
+| [my.multiLevelSelect](/jsapi/ui/multi-level-select/my.multiLevelSelect) | Show multi-level selector |
+| [my.setBackgroundColor](/jsapi/ui/set-background/my.setBackgroundColor) | Set page background color |
+| [my.setCanPullDown](/jsapi/ui/set-pulldown/my.setCanPullDown) | Enable/disable pull-down |
+
+## Media
+
+### Image
+
+| API | Description |
+|-----|-------------|
+| [my.chooseImage](/jsapi/media/image/my.chooseImage) | Choose images from album or camera |
+| [my.previewImage](/jsapi/media/image/my.previewImage) | Preview images in fullscreen |
+| [my.saveImage](/jsapi/media/image/my.saveImage) | Save image to album |
+| [my.getImageInfo](/jsapi/media/image/my.getImageInfo) | Get image information |
+| [my.compressImage](/jsapi/media/image/my.compressImage) | Compress an image |
+
+### Video
+
+| API | Description |
+|-----|-------------|
+| [my.chooseVideo](/jsapi/media/video/my.chooseVideo) | Choose video from album or camera |
+
+### Lottie
+
+| API | Description |
+|-----|-------------|
+| [my.createLottieContext](/jsapi/media/lottie/my.createLottieContext) | Create Lottie animation context |
+
+## Storage
+
+| API | Description |
+|-----|-------------|
+| [my.setStorage](/jsapi/storage/my.setStorage) | Store data asynchronously |
+| [my.setStorageSync](/jsapi/storage/my.setStorageSync) | Store data synchronously |
+| [my.getStorage](/jsapi/storage/my.getStorage) | Get stored data asynchronously |
+| [my.getStorageSync](/jsapi/storage/my.getStorageSync) | Get stored data synchronously |
+| [my.removeStorage](/jsapi/storage/my.removeStorage) | Remove stored data asynchronously |
+| [my.removeStorageSync](/jsapi/storage/my.removeStorageSync) | Remove stored data synchronously |
+| [my.clearStorage](/jsapi/storage/my.clearStorage) | Clear all stored data asynchronously |
+| [my.clearStorageSync](/jsapi/storage/my.clearStorageSync) | Clear all stored data synchronously |
+
+## File
+
+| API | Description |
+|-----|-------------|
+| [my.saveFile](/jsapi/file/my.saveFile) | Save file to local storage |
+| [my.getFileInfo](/jsapi/file/my.getFileInfo) | Get file information |
+| [my.getSavedFileInfo](/jsapi/file/my.getSavedFileInfo) | Get saved file information |
+| [my.getSavedFileList](/jsapi/file/my.getSavedFileList) | Get list of saved files |
+| [my.removeSavedFile](/jsapi/file/my.removeSavedFile) | Remove a saved file |
+| [my.chooseFileFromDisk](/jsapi/file/my.chooseFileFromDisk) | Choose file from disk |
+| [my.openDocument](/jsapi/file/my.openDocument) | Open a document |
+
+## Location
+
+| API | Description |
+|-----|-------------|
+| [my.getLocation](/jsapi/location/my.getLocation) | Get current location |
+| [my.openLocation](/jsapi/location/my.openLocation) | Open location in map |
+| [my.chooseLocation](/jsapi/location/my.chooseLocation) | Choose a location on map |
+
+## Map
+
+| API | Description |
+|-----|-------------|
+| [my.createMapContext](/jsapi/map/my.createMapContext) | Create map context |
+| [my.calculateRoute](/jsapi/map/my.calculateRoute) | Calculate route between points |
+
+## Network
+
+| API | Description |
+|-----|-------------|
+| [my.request](/jsapi/network/my.request) | Make HTTP request |
+| [my.uploadFile](/jsapi/network/my.uploadFile) | Upload file |
+| [my.downloadFile](/jsapi/network/my.downloadFile) | Download file |
+| [my.connectSocket](/jsapi/network/my.connectSocket) | Create WebSocket connection |
+| [my.sendSocketMessage](/jsapi/network/my.sendSocketMessage) | Send WebSocket message |
+| [my.closeSocket](/jsapi/network/my.closeSocket) | Close WebSocket connection |
+| [my.onSocketOpen](/jsapi/network/my.onSocketOpen) | Listen for WebSocket open |
+| [my.offSocketOpen](/jsapi/network/my.offSocketOpen) | Stop listening for WebSocket open |
+| [my.onSocketMessage](/jsapi/network/my.onSocketMessage) | Listen for WebSocket messages |
+| [my.offSocketMessage](/jsapi/network/my.offSocketMessage) | Stop listening for WebSocket messages |
+| [my.onSocketError](/jsapi/network/my.onSocketError) | Listen for WebSocket errors |
+| [my.offSocketError](/jsapi/network/my.offSocketError) | Stop listening for WebSocket errors |
+| [my.onSocketClose](/jsapi/network/my.onSocketClose) | Listen for WebSocket close |
+| [my.offSocketClose](/jsapi/network/my.offSocketClose) | Stop listening for WebSocket close |
+
+## Device
+
+### System & Network
+
+| API | Description |
+|-----|-------------|
+| [my.getSystemInfo](/jsapi/device/system/my.getSystemInfo) | Get system information |
+| [my.getNetworkType](/jsapi/device/network-status/my.getNetworkType) | Get network type |
+
+### Clipboard
+
+| API | Description |
+|-----|-------------|
+| [my.getClipboard](/jsapi/device/clipboard/my.getClipboard) | Get clipboard content |
+| [my.setClipboard](/jsapi/device/clipboard/my.setClipboard) | Set clipboard content |
+
+### Sensors
+
+| API | Description |
+|-----|-------------|
+| [my.onAccelerometerChange](/jsapi/device/accelerometer/my.onAccelerometerChange) | Listen for accelerometer changes |
+| [my.offAccelerometerChange](/jsapi/device/accelerometer/my.offAccelerometerChange) | Stop listening for accelerometer |
+| [my.onCompassChange](/jsapi/device/compass/my.onCompassChange) | Listen for compass changes |
+| [my.offCompassChange](/jsapi/device/compass/my.offCompassChange) | Stop listening for compass |
+| [my.watchShake](/jsapi/device/watch-shake/my.watchShake) | Watch for device shake |
+
+### Phone & Screen
+
+| API | Description |
+|-----|-------------|
+| [my.makePhoneCall](/jsapi/device/phone-call/my.makePhoneCall) | Make a phone call |
+| [my.vibrate](/jsapi/device/vibrate/my.vibrate) | Vibrate the device |
+| [my.setKeepScreenOn](/jsapi/device/screen-brightness/my.setKeepScreenOn) | Keep screen on |
+| [my.getScreenBrightness](/jsapi/device/screen-brightness/my.getScreenBrightness) | Get screen brightness |
+| [my.setScreenBrightness](/jsapi/device/screen-brightness/my.setScreenBrightness) | Set screen brightness |
+| [my.getScreenOrientation](/jsapi/device/screen-orientation/my.getScreenOrientation) | Get screen orientation |
+| [my.setScreenOrientation](/jsapi/device/screen-orientation/my.setScreenOrientation) | Set screen orientation |
+| [my.onUserCaptureScreen](/jsapi/device/capture-screen/my.onUserCaptureScreen) | Listen for screenshots |
+| [my.offUserCaptureScreen](/jsapi/device/capture-screen/my.offUserCaptureScreen) | Stop listening for screenshots |
+
+### Settings & Permissions
+
+| API | Description |
+|-----|-------------|
+| [my.getSetting](/jsapi/device/setting/my.getSetting) | Get user settings |
+| [my.openSetting](/jsapi/device/setting/my.openSetting) | Open settings page |
+| [my.showAuthGuide](/jsapi/device/permission-guide/my.showAuthGuide) | Show permission guide |
+
+### Other Device APIs
+
+| API | Description |
+|-----|-------------|
+| [my.getServerTime](/jsapi/device/server-time/my.getServerTime) | Get server time |
+| [my.addPhoneContact](/jsapi/device/add-contact/my.addPhoneContact) | Add phone contact |
+| [my.scan](/jsapi/device/scan/my.scan) | Scan QR/barcode |
+| [my.onMemoryWarning](/jsapi/device/memory-warning/my.onMemoryWarning) | Listen for memory warnings |
+| [my.offMemoryWarning](/jsapi/device/memory-warning/my.offMemoryWarning) | Stop listening for memory warnings |
+| [my.getBatteryInfo](/jsapi/device/battery/my.getBatteryInfo) | Get battery info asynchronously |
+| [my.getBatteryInfoSync](/jsapi/device/battery/my.getBatteryInfoSync) | Get battery info synchronously |
+
+### Bluetooth
+
+| API | Description |
+|-----|-------------|
+| [my.openBluetoothAdapter](/jsapi/device/bluetooth/my.openBluetoothAdapter) | Initialize Bluetooth adapter |
+| [my.closeBluetoothAdapter](/jsapi/device/bluetooth/my.closeBluetoothAdapter) | Close Bluetooth adapter |
+| [my.getBluetoothAdapterState](/jsapi/device/bluetooth/my.getBluetoothAdapterState) | Get Bluetooth adapter state |
+| [my.startBluetoothDevicesDiscovery](/jsapi/device/bluetooth/my.startBluetoothDevicesDiscovery) | Start discovering devices |
+| [my.stopBluetoothDevicesDiscovery](/jsapi/device/bluetooth/my.stopBluetoothDevicesDiscovery) | Stop discovering devices |
+| [my.getBluetoothDevices](/jsapi/device/bluetooth/my.getBluetoothDevices) | Get discovered devices |
+| [my.getConnectedBluetoothDevices](/jsapi/device/bluetooth/my.getConnectedBluetoothDevices) | Get connected devices |
+| [my.connectBLEDevice](/jsapi/device/bluetooth/my.connectBLEDevice) | Connect to BLE device |
+| [my.disconnectBLEDevice](/jsapi/device/bluetooth/my.disconnectBLEDevice) | Disconnect BLE device |
+| [my.getBLEDeviceServices](/jsapi/device/bluetooth/my.getBLEDeviceServices) | Get BLE device services |
+| [my.getBLEDeviceCharacteristics](/jsapi/device/bluetooth/my.getBLEDeviceCharacteristics) | Get BLE characteristics |
+| [my.readBLECharacteristicValue](/jsapi/device/bluetooth/my.readBLECharacteristicValue) | Read BLE characteristic |
+| [my.writeBLECharacteristicValue](/jsapi/device/bluetooth/my.writeBLECharacteristicValue) | Write BLE characteristic |
+| [my.notifyBLECharacteristicValueChange](/jsapi/device/bluetooth/my.notifyBLECharacteristicValueChange) | Enable BLE notifications |
+
+### Biometric Authentication
+
+| API | Description |
+|-----|-------------|
+| [my.checkLocalBioAuthSupported](/jsapi/device/biometric/my.checkLocalBioAuthSupported) | Check biometric support |
+| [my.startLocalBioAuth](/jsapi/device/biometric/my.startLocalBioAuth) | Start biometric authentication |
+
+## Sharing
+
+| API | Description |
+|-----|-------------|
+| [my.showSharePanel](/jsapi/sharing/my.showSharePanel) | Show share panel |
+
+## Update
+
+| API | Description |
+|-----|-------------|
+| [my.getUpdateManager](/jsapi/update/my.getUpdateManager) | Get update manager instance |
+
+## web-view
+
+| API | Description |
+|-----|-------------|
+| [my.createWebViewContext](/jsapi/web-view/my.createWebViewContext) | Create WebView context |
+
+## Alipay Connect
+
+| API | Description |
+|-----|-------------|
+| [my.getSiteInfo](/jsapi/alipay-connect/my.getSiteInfo) | Get site information |
+
+## Open Capabilities
+
+| API | Description |
+|-----|-------------|
+| [my.getAuthCode](/jsapi/open-capabilities/my.getAuthCode) | Get authorization code |
+| [my.getOpenUserInfo](/jsapi/open-capabilities/my.getOpenUserInfo) | Get user information |
+| [my.tradePay](/jsapi/open-capabilities/my.tradePay) | Trigger payment |
+| [my.signContract](/jsapi/open-capabilities/my.signContract) | Sign contract |
+| [my.navigateToMiniProgram](/jsapi/open-capabilities/my.navigateToMiniProgram) | Navigate to another Mini Program |
+| [my.navigateBackMiniProgram](/jsapi/open-capabilities/my.navigateBackMiniProgram) | Navigate back to previous Mini Program |

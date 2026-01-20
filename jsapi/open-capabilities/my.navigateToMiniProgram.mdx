@@ -1,0 +1,40 @@
+---
+title: my.navigateToMiniProgram
+description: Navigate to another Mini Program.
+---
+
+Open another Mini Program from the current one.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| appId | String | Yes | Target Mini Program App ID |
+| path | String | No | Path to open in target Mini Program |
+| extraData | Object | No | Data to pass to target Mini Program |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.navigateToMiniProgram({
+  appId: 'target-mini-program-id',
+  path: 'pages/detail/detail?id=123',
+  extraData: {
+    source: 'myApp'
+  },
+  success: () => {
+    console.log('Navigation successful');
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.navigateBackMiniProgram" icon="arrow-left" href="/jsapi/open-capabilities/my.navigateBackMiniProgram">
+    Return to previous Mini Program
+  </Card>
+</CardGroup>

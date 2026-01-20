@@ -1,0 +1,69 @@
+---
+title: my.showNavigationBarLoading
+description: Show a loading animation in the navigation bar.
+---
+
+Use this API to display a loading indicator in the navigation bar of the current page. This provides visual feedback to users during asynchronous operations.
+
+## Parameters
+
+This API does not require any parameters.
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.showNavigationBarLoading();
+```
+
+### With Network Request
+
+```javascript
+Page({
+  async fetchData() {
+    // Show loading indicator
+    my.showNavigationBarLoading();
+
+    try {
+      const res = await my.request({
+        url: 'https://api.example.com/data'
+      });
+      this.setData({ items: res.data });
+    } finally {
+      // Hide loading indicator
+      my.hideNavigationBarLoading();
+    }
+  }
+});
+```
+
+### With Pull-down Refresh
+
+```javascript
+Page({
+  onPullDownRefresh() {
+    my.showNavigationBarLoading();
+
+    this.refreshData().then(() => {
+      my.hideNavigationBarLoading();
+      my.stopPullDownRefresh();
+    });
+  }
+});
+```
+
+<Tip>
+Always pair `my.showNavigationBarLoading()` with `my.hideNavigationBarLoading()` to ensure the loading indicator is properly removed when the operation completes.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.hideNavigationBarLoading" icon="xmark" href="/jsapi/ui/navigation-bar/my.hideNavigationBarLoading">
+    Hide the loading indicator
+  </Card>
+  <Card title="my.showLoading" icon="spinner" href="/jsapi/ui/feedback/my.showLoading">
+    Show fullscreen loading
+  </Card>
+</CardGroup>

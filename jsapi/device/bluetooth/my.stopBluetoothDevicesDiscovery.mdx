@@ -1,0 +1,93 @@
+---
+title: my.stopBluetoothDevicesDiscovery
+description: Stop discovering Bluetooth devices.
+---
+
+Use this API to stop discovering Bluetooth devices. Call this when you've found the device you need to save battery.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.stopBluetoothDevicesDiscovery({
+  success() {
+    console.log('Stopped scanning');
+  }
+});
+```
+
+### Stop When Device Found
+
+```javascript
+Page({
+  targetDeviceName: 'MyDevice',
+
+  startScan() {
+    my.onBluetoothDeviceFound((res) => {
+      const targetDevice = res.devices.find(
+        d => d.name === this.targetDeviceName
+      );
+
+      if (targetDevice) {
+        // Found target, stop scanning
+        my.stopBluetoothDevicesDiscovery();
+        this.connectToDevice(targetDevice);
+      }
+    });
+
+    my.startBluetoothDevicesDiscovery();
+  },
+
+  connectToDevice(device) {
+    console.log('Connecting to:', device.name);
+    // Connect logic here
+  }
+});
+```
+
+### Scan with Timeout
+
+```javascript
+Page({
+  scanTimeout: null,
+
+  startTimedScan() {
+    my.startBluetoothDevicesDiscovery({
+      success: () => {
+        // Auto-stop after 15 seconds
+        this.scanTimeout = setTimeout(() => {
+          my.stopBluetoothDevicesDiscovery();
+          my.showToast({ content: 'Scan complete' });
+        }, 15000);
+      }
+    });
+  },
+
+  stopScanEarly() {
+    if (this.scanTimeout) {
+      clearTimeout(this.scanTimeout);
+    }
+    my.stopBluetoothDevicesDiscovery();
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.startBluetoothDevicesDiscovery" icon="play" href="/jsapi/device/bluetooth/my.startBluetoothDevicesDiscovery">
+    Start discovery
+  </Card>
+  <Card title="my.getBluetoothDevices" icon="list" href="/jsapi/device/bluetooth/my.getBluetoothDevices">
+    Get discovered devices
+  </Card>
+</CardGroup>

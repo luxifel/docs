@@ -1,0 +1,120 @@
+---
+title: my.addPhoneContact
+description: Add a contact to the user's phone.
+---
+
+Use this API to add a new contact to the user's phone contact list. The user will see a confirmation dialog before the contact is added.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| firstName | String | Yes | Contact's first name |
+| lastName | String | No | Contact's last name |
+| nickName | String | No | Contact's nickname |
+| mobilePhoneNumber | String | No | Mobile phone number |
+| workPhoneNumber | String | No | Work phone number |
+| homePhoneNumber | String | No | Home phone number |
+| email | String | No | Email address |
+| workEmail | String | No | Work email address |
+| organization | String | No | Company/organization name |
+| title | String | No | Job title |
+| workAddressStreet | String | No | Work street address |
+| workAddressCity | String | No | Work city |
+| workAddressState | String | No | Work state/province |
+| workAddressPostalCode | String | No | Work postal code |
+| workAddressCountry | String | No | Work country |
+| homeAddressStreet | String | No | Home street address |
+| homeAddressCity | String | No | Home city |
+| homeAddressState | String | No | Home state/province |
+| homeAddressPostalCode | String | No | Home postal code |
+| homeAddressCountry | String | No | Home country |
+| remark | String | No | Notes/remarks |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.addPhoneContact({
+  firstName: 'John',
+  lastName: 'Doe',
+  mobilePhoneNumber: '+1234567890',
+  success() {
+    my.showToast({ content: 'Contact added' });
+  }
+});
+```
+
+### Business Contact
+
+```javascript
+my.addPhoneContact({
+  firstName: 'Jane',
+  lastName: 'Smith',
+  mobilePhoneNumber: '+1234567890',
+  workPhoneNumber: '+1987654321',
+  email: 'jane.smith@example.com',
+  workEmail: 'jsmith@company.com',
+  organization: 'Acme Corporation',
+  title: 'Sales Manager',
+  workAddressStreet: '123 Business Ave',
+  workAddressCity: 'New York',
+  workAddressState: 'NY',
+  workAddressPostalCode: '10001',
+  workAddressCountry: 'USA',
+  success() {
+    my.showToast({ content: 'Contact saved successfully' });
+  },
+  fail(err) {
+    my.showToast({ content: 'Failed to save contact', type: 'fail' });
+  }
+});
+```
+
+### Add Store Contact
+
+```javascript
+Page({
+  data: {
+    store: {
+      name: 'Downtown Store',
+      phone: '+1234567890',
+      address: '456 Main Street',
+      city: 'Los Angeles'
+    }
+  },
+
+  saveStoreContact() {
+    const { store } = this.data;
+    my.addPhoneContact({
+      firstName: store.name,
+      mobilePhoneNumber: store.phone,
+      workAddressStreet: store.address,
+      workAddressCity: store.city,
+      remark: 'Added from Mini Program',
+      success() {
+        my.showToast({ content: 'Store contact saved' });
+      }
+    });
+  }
+});
+```
+
+<Tip>
+The user will always see a system confirmation dialog before the contact is actually added. This protects user privacy and prevents unwanted contacts.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.choosePhoneContact" icon="address-book" href="/jsapi/ui/contact/my.choosePhoneContact">
+    Choose from contacts
+  </Card>
+  <Card title="my.makePhoneCall" icon="phone" href="/jsapi/device/phone-call/my.makePhoneCall">
+    Make phone call
+  </Card>
+</CardGroup>

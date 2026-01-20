@@ -1,0 +1,30 @@
+---
+title: my.getClipboard
+description: Get content from the clipboard.
+---
+
+Read text content from the device clipboard.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback with clipboard content |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| text | String | Clipboard text content |
+
+## Code Example
+
+```javascript
+my.getClipboard({
+  success: (res) => {
+    console.log('Clipboard:', res.text);
+  }
+});
+```

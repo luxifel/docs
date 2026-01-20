@@ -1,0 +1,37 @@
+---
+title: my.removeStorage
+description: Remove data from local cache asynchronously.
+---
+
+Use this API to remove data with a specified key from local cache.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| key | String | Yes | Storage key to remove |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.removeStorage({
+  key: 'userSettings',
+  success: () => {
+    console.log('Data removed');
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.clearStorage" icon="trash" href="/jsapi/storage/my.clearStorage">
+    Clear all storage
+  </Card>
+  <Card title="my.removeStorageSync" icon="bolt" href="/jsapi/storage/my.removeStorageSync">
+    Remove synchronously
+  </Card>
+</CardGroup>

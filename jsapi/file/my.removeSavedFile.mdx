@@ -1,0 +1,26 @@
+---
+title: my.removeSavedFile
+description: Remove a saved file.
+---
+
+Delete a file that was saved with `my.saveFile`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| apFilePath | String | Yes | File path to remove |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.removeSavedFile({
+  apFilePath: filePath,
+  success: () => {
+    console.log('File removed');
+  }
+});
+```

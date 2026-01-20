@@ -1,0 +1,40 @@
+---
+title: my.choosePhoneContact
+description: Select a contact from the phone's contact list.
+---
+
+Use this API to open the phone's contact picker and select a contact.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback with contact data |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| name | String | Contact name |
+| mobile | String | Contact phone number |
+
+## Code Example
+
+```javascript
+my.choosePhoneContact({
+  success: (res) => {
+    console.log('Name:', res.name);
+    console.log('Phone:', res.mobile);
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.addPhoneContact" icon="user-plus" href="/jsapi/device/add-contact/my.addPhoneContact">
+    Add a phone contact
+  </Card>
+</CardGroup>

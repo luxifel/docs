@@ -1,0 +1,93 @@
+---
+title: my.getBluetoothDevices
+description: Get all discovered Bluetooth devices.
+---
+
+Use this API to get all Bluetooth devices discovered during the current session, including devices that are no longer in range.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| devices | Array | List of discovered devices |
+
+## Device Object Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| deviceId | String | Device identifier |
+| name | String | Device name (may be empty) |
+| RSSI | Number | Signal strength |
+| advertisData | ArrayBuffer | Advertisement data |
+| advertisServiceUUIDs | Array | Advertised service UUIDs |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.getBluetoothDevices({
+  success(res) {
+    console.log('Found devices:', res.devices);
+  }
+});
+```
+
+### Display Device List
+
+```javascript
+Page({
+  data: {
+    devices: []
+  },
+
+  refreshDeviceList() {
+    my.getBluetoothDevices({
+      success: (res) => {
+        // Filter devices with names
+        const namedDevices = res.devices.filter(d => d.name);
+        this.setData({ devices: namedDevices });
+      }
+    });
+  }
+});
+```
+
+### Sort by Signal Strength
+
+```javascript
+Page({
+  getDevicesBySignal() {
+    my.getBluetoothDevices({
+      success: (res) => {
+        // Sort by RSSI (closer devices first)
+        const sorted = res.devices.sort((a, b) => b.RSSI - a.RSSI);
+        this.setData({ devices: sorted });
+      }
+    });
+  }
+});
+```
+
+<Tip>
+This returns all devices found since discovery started. For real-time updates, use `my.onBluetoothDeviceFound` instead.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onBluetoothDeviceFound" icon="magnifying-glass" href="/jsapi/device/bluetooth/my.onBluetoothDeviceFound">
+    Listen for new devices
+  </Card>
+  <Card title="my.getConnectedBluetoothDevices" icon="link" href="/jsapi/device/bluetooth/my.getConnectedBluetoothDevices">
+    Get connected devices
+  </Card>
+</CardGroup>

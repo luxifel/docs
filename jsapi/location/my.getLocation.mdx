@@ -1,0 +1,48 @@
+---
+title: my.getLocation
+description: Get the current geographic location.
+---
+
+Get the user's current location coordinates.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| type | String | No | Coordinate type: `gcj02` (default) or `wgs84` |
+| cacheTimeout | Number | No | Cache timeout in seconds |
+| success | Function | No | Callback with location |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| latitude | Number | Latitude |
+| longitude | Number | Longitude |
+| accuracy | Number | Accuracy in meters |
+| speed | Number | Speed in m/s |
+
+## Code Example
+
+```javascript
+my.getLocation({
+  type: 'gcj02',
+  success: (res) => {
+    console.log('Lat:', res.latitude);
+    console.log('Lng:', res.longitude);
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.openLocation" icon="map-pin" href="/jsapi/location/my.openLocation">
+    Open location in map
+  </Card>
+  <Card title="my.chooseLocation" icon="location-crosshairs" href="/jsapi/location/my.chooseLocation">
+    Choose a location
+  </Card>
+</CardGroup>

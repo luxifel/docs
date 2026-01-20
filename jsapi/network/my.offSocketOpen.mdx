@@ -1,0 +1,20 @@
+---
+title: my.offSocketOpen
+description: Stop listening for WebSocket open events.
+---
+
+Remove a WebSocket open event listener.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | Specific callback to remove |
+
+## Code Example
+
+```javascript
+my.offSocketOpen(myOpenHandler);
+// or remove all
+my.offSocketOpen();
+```

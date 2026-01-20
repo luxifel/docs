@@ -1,0 +1,32 @@
+---
+title: my.scan
+description: Open the QR/barcode scanner.
+---
+
+Scan QR codes or barcodes using the device camera.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| type | String | No | Scan type: `qr`, `bar` |
+| success | Function | No | Callback with scan result |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| code | String | Scanned content |
+
+## Code Example
+
+```javascript
+my.scan({
+  type: 'qr',
+  success: (res) => {
+    console.log('Scanned:', res.code);
+  }
+});
+```

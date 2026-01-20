@@ -1,0 +1,37 @@
+---
+title: my.createWebViewContext
+description: Create a context to control a web-view component.
+---
+
+Create a WebViewContext for communicating with web-view components.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| webviewId | String | Yes | ID of the web-view component |
+
+## Return Value
+
+Returns a WebViewContext object.
+
+## WebViewContext Methods
+
+| Method | Description |
+|--------|-------------|
+| postMessage(data) | Send a message to the web-view |
+
+## Code Example
+
+```javascript
+const webViewContext = my.createWebViewContext('myWebView');
+
+webViewContext.postMessage({
+  action: 'refresh',
+  data: { userId: '123' }
+});
+```
+
+```xml
+<web-view id="myWebView" src="https://example.com" onMessage="onWebViewMessage" />
+```

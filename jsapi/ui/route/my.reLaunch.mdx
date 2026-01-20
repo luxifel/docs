@@ -1,0 +1,45 @@
+---
+title: my.reLaunch
+description: Close all pages and open a new page.
+---
+
+Use this API to close all pages in the page stack and open a new page. This is useful for resetting the navigation state.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| url | String | Yes | Page path with optional query parameters |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.reLaunch({
+  url: 'pages/home/home'
+});
+
+// With query parameters
+my.reLaunch({
+  url: 'pages/home/home?from=logout'
+});
+```
+
+## Use Cases
+
+- Reset app state after logout
+- Return to home after completing a flow
+- Clear navigation history
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.redirectTo" icon="arrow-right-arrow-left" href="/jsapi/ui/route/my.redirectTo">
+    Replace current page
+  </Card>
+  <Card title="my.switchTab" icon="arrows-left-right" href="/jsapi/ui/route/my.switchTab">
+    Navigate to tab page
+  </Card>
+</CardGroup>

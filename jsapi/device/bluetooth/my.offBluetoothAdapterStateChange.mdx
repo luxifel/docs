@@ -1,0 +1,63 @@
+---
+title: my.offBluetoothAdapterStateChange
+description: Stop listening for Bluetooth adapter state changes.
+---
+
+Use this API to stop listening for Bluetooth adapter state changes that were registered with `my.onBluetoothAdapterStateChange()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove All Listeners
+
+```javascript
+my.offBluetoothAdapterStateChange();
+```
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    my.onBluetoothAdapterStateChange(this.handleStateChange);
+  },
+
+  handleStateChange(res) {
+    console.log('State changed:', res.available);
+  },
+
+  onUnload() {
+    my.offBluetoothAdapterStateChange(this.handleStateChange);
+  }
+});
+```
+
+### Complete Bluetooth Cleanup
+
+```javascript
+function cleanupBluetooth() {
+  // Remove all listeners
+  my.offBluetoothAdapterStateChange();
+  my.offBluetoothDeviceFound();
+
+  // Stop discovery and close adapter
+  my.stopBluetoothDevicesDiscovery();
+  my.closeBluetoothAdapter();
+}
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onBluetoothAdapterStateChange" icon="rotate" href="/jsapi/device/bluetooth/my.onBluetoothAdapterStateChange">
+    Listen for state changes
+  </Card>
+  <Card title="my.closeBluetoothAdapter" icon="xmark" href="/jsapi/device/bluetooth/my.closeBluetoothAdapter">
+    Close adapter
+  </Card>
+</CardGroup>

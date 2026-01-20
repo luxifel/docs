@@ -1,0 +1,78 @@
+---
+title: my.offScreenOrientationChange
+description: Stop listening for screen orientation changes.
+---
+
+Use this API to stop listening for screen orientation changes that were registered with `my.onScreenOrientationChange()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove All Listeners
+
+```javascript
+// Remove all orientation change listeners
+my.offScreenOrientationChange();
+```
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    my.onScreenOrientationChange(this.handleOrientation);
+  },
+
+  handleOrientation(res) {
+    console.log('New orientation:', res.orientation);
+  },
+
+  onUnload() {
+    my.offScreenOrientationChange(this.handleOrientation);
+  }
+});
+```
+
+### Toggle Orientation Listener
+
+```javascript
+Page({
+  data: {
+    orientationListenerActive: false
+  },
+
+  toggleOrientationListener() {
+    if (this.data.orientationListenerActive) {
+      my.offScreenOrientationChange(this.onOrientationChange);
+      this.setData({ orientationListenerActive: false });
+    } else {
+      my.onScreenOrientationChange(this.onOrientationChange);
+      this.setData({ orientationListenerActive: true });
+    }
+  },
+
+  onOrientationChange(res) {
+    this.setData({ orientation: res.orientation });
+  }
+});
+```
+
+<Tip>
+Pass the same callback function reference to `my.offScreenOrientationChange()` that was used with `my.onScreenOrientationChange()` to remove only that specific listener.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onScreenOrientationChange" icon="rotate" href="/jsapi/device/screen-orientation/my.onScreenOrientationChange">
+    Listen for orientation changes
+  </Card>
+  <Card title="my.getScreenOrientation" icon="mobile" href="/jsapi/device/screen-orientation/my.getScreenOrientation">
+    Get current orientation
+  </Card>
+</CardGroup>

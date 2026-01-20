@@ -1,0 +1,145 @@
+---
+title: my.canIUse
+description: Check whether a Mini Program API, parameter, return value, component, or attribute is supported in the current version.
+---
+
+Use this API to determine feature availability before using version-specific functionality. This helps ensure graceful degradation on older Mini Program versions.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| schema | String | Yes | The feature schema to check (see syntax below) |
+
+## Schema Syntax
+
+The `my.canIUse` function accepts a dot-notation string to specify what feature to check:
+
+<Tabs>
+  <Tab title="API Checks">
+    **Syntax:** `${API}.${type}.${param}.${option}`
+
+    | Part | Description |
+    |------|-------------|
+    | `API` | Name of the API to check |
+    | `type` | Check type: `object` (parameter), `return` (return value), or `callback` |
+    | `param` | Parameter or return property name |
+    | `option` | Specific option or value to check |
+  </Tab>
+
+  <Tab title="Component Checks">
+    **Syntax:** `${component}.${attribute}.${option}`
+
+    | Part | Description |
+    |------|-------------|
+    | `component` | Name of the component |
+    | `attribute` | Component attribute to check |
+    | `option` | Specific attribute value to check |
+  </Tab>
+</Tabs>
+
+## Return Value
+
+| Type | Description |
+|------|-------------|
+| Boolean | `true` if the feature is supported, `false` otherwise |
+
+## Code Examples
+
+### Check API Availability
+
+```javascript
+// Check if an API exists
+if (my.canIUse('getFileInfo')) {
+  my.getFileInfo({
+    filePath: 'path/to/file',
+    success: (res) => {
+      console.log(res.size);
+    }
+  });
+} else {
+  console.log('getFileInfo API not supported');
+}
+```
+
+### Check API Parameter Support
+
+```javascript
+// Check if a specific parameter is supported
+if (my.canIUse('getLocation.object.type')) {
+  my.getLocation({
+    type: 'gcj02',
+    success: (res) => {
+      console.log(res.latitude, res.longitude);
+    }
+  });
+}
+```
+
+### Check Return Value Support
+
+```javascript
+// Check if a return property exists
+if (my.canIUse('getSystemInfo.return.brand')) {
+  my.getSystemInfo({
+    success: (res) => {
+      console.log('Device brand:', res.brand);
+    }
+  });
+}
+```
+
+### Check Component Attribute Support
+
+```javascript
+// Check if a component attribute value is supported
+if (my.canIUse('button.open-type.getAuthorize')) {
+  // Can use button with open-type="getAuthorize"
+}
+```
+
+## Common Use Cases
+
+<AccordionGroup>
+  <Accordion title="Graceful Degradation">
+    Use `my.canIUse` to provide fallback behavior when features aren't available:
+
+    ```javascript
+    function getLocation() {
+      if (my.canIUse('getLocation.object.type')) {
+        // Use enhanced location API
+        my.getLocation({
+          type: 'gcj02',
+          success: handleLocation
+        });
+      } else {
+        // Fallback to basic location
+        my.getLocation({
+          success: handleLocation
+        });
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Feature Detection for UI">
+    Conditionally render UI elements based on platform capabilities:
+
+    ```javascript
+    Page({
+      data: {
+        canAuthorize: false
+      },
+      onLoad() {
+        this.setData({
+          canAuthorize: my.canIUse('button.open-type.getAuthorize')
+        });
+      }
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+Always check feature availability before using APIs that may not be present in all Mini Program versions. This ensures your app works correctly across different platform versions.
+</Tip>

@@ -1,0 +1,134 @@
+---
+title: my.showAuthGuide
+description: Show a permission authorization guide.
+---
+
+Use this API to display a guide helping users understand and grant specific permissions. This is useful when a permission request was previously denied.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| authType | String | Yes | Permission type to guide for |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Auth Types
+
+| Value | Description |
+|-------|-------------|
+| `LOCATION` | Location permission |
+| `CAMERA` | Camera permission |
+| `PHOTO` | Photo album permission |
+| `CONTACTS` | Contacts permission |
+| `MICROPHONE` | Microphone permission |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.showAuthGuide({
+  authType: 'LOCATION',
+  success() {
+    console.log('Auth guide shown');
+  }
+});
+```
+
+### Permission Request Flow
+
+```javascript
+Page({
+  async getLocation() {
+    my.getLocation({
+      success: (res) => {
+        this.handleLocation(res);
+      },
+      fail: (err) => {
+        // Show authorization guide
+        my.showAuthGuide({
+          authType: 'LOCATION',
+          success: () => {
+            // Guide was shown, user may have granted permission
+            // Try again after a delay
+            setTimeout(() => {
+              my.getLocation({
+                success: (res) => this.handleLocation(res),
+                fail: () => {
+                  my.showToast({
+                    content: 'Location permission required',
+                    type: 'fail'
+                  });
+                }
+              });
+            }, 1000);
+          }
+        });
+      }
+    });
+  },
+
+  handleLocation(res) {
+    console.log('Location:', res.latitude, res.longitude);
+  }
+});
+```
+
+### Camera Permission Guide
+
+```javascript
+Page({
+  takePhoto() {
+    my.chooseImage({
+      sourceType: ['camera'],
+      success: (res) => {
+        this.setData({ photo: res.tempFilePaths[0] });
+      },
+      fail: () => {
+        my.showAuthGuide({
+          authType: 'CAMERA',
+          success: () => {
+            my.showToast({
+              content: 'Please grant camera permission and try again'
+            });
+          }
+        });
+      }
+    });
+  }
+});
+```
+
+### Multiple Permission Types
+
+```javascript
+const permissionGuides = {
+  location: () => my.showAuthGuide({ authType: 'LOCATION' }),
+  camera: () => my.showAuthGuide({ authType: 'CAMERA' }),
+  photo: () => my.showAuthGuide({ authType: 'PHOTO' }),
+  contacts: () => my.showAuthGuide({ authType: 'CONTACTS' })
+};
+
+function showGuideFor(type) {
+  if (permissionGuides[type]) {
+    permissionGuides[type]();
+  }
+}
+```
+
+<Tip>
+Use this API to provide a better user experience when permissions are denied. The guide helps users understand why the permission is needed and how to enable it.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.openSetting" icon="gear" href="/jsapi/device/setting/my.openSetting">
+    Open settings page
+  </Card>
+  <Card title="my.getLocation" icon="location-dot" href="/jsapi/location/my.getLocation">
+    Get location
+  </Card>
+</CardGroup>

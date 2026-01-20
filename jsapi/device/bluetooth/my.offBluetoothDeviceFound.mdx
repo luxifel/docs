@@ -1,0 +1,68 @@
+---
+title: my.offBluetoothDeviceFound
+description: Stop listening for Bluetooth device discovery events.
+---
+
+Use this API to stop listening for Bluetooth device discovery events that were registered with `my.onBluetoothDeviceFound()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove All Listeners
+
+```javascript
+my.offBluetoothDeviceFound();
+```
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    my.onBluetoothDeviceFound(this.handleDeviceFound);
+  },
+
+  handleDeviceFound(res) {
+    console.log('Devices found:', res.devices);
+  },
+
+  onUnload() {
+    my.offBluetoothDeviceFound(this.handleDeviceFound);
+    my.closeBluetoothAdapter();
+  }
+});
+```
+
+### Complete Cleanup
+
+```javascript
+Page({
+  onUnload() {
+    // Stop discovery
+    my.stopBluetoothDevicesDiscovery();
+
+    // Remove listeners
+    my.offBluetoothDeviceFound();
+    my.offBluetoothAdapterStateChange();
+
+    // Close adapter
+    my.closeBluetoothAdapter();
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onBluetoothDeviceFound" icon="magnifying-glass" href="/jsapi/device/bluetooth/my.onBluetoothDeviceFound">
+    Listen for devices
+  </Card>
+  <Card title="my.stopBluetoothDevicesDiscovery" icon="stop" href="/jsapi/device/bluetooth/my.stopBluetoothDevicesDiscovery">
+    Stop discovery
+  </Card>
+</CardGroup>

@@ -1,0 +1,45 @@
+---
+title: my.chooseImage
+description: Choose images from album or camera.
+---
+
+Use this API to select images from the device album or capture using the camera.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| count | Number | No | Maximum number of images (default: 1) |
+| sourceType | Array | No | Sources: `['album']`, `['camera']`, or both |
+| success | Function | No | Callback with image paths |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| apFilePaths | Array | Array of local file paths |
+
+## Code Example
+
+```javascript
+my.chooseImage({
+  count: 3,
+  sourceType: ['album', 'camera'],
+  success: (res) => {
+    console.log('Selected images:', res.apFilePaths);
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.previewImage" icon="eye" href="/jsapi/media/image/my.previewImage">
+    Preview images
+  </Card>
+  <Card title="my.saveImage" icon="download" href="/jsapi/media/image/my.saveImage">
+    Save image
+  </Card>
+</CardGroup>

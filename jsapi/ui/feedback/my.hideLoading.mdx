@@ -1,0 +1,34 @@
+---
+title: my.hideLoading
+description: Hide the loading indicator.
+---
+
+Use this API to hide a loading indicator shown with `my.showLoading()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| page | Object | No | Page object to hide loading on |
+
+## Code Example
+
+```javascript
+my.showLoading({ content: 'Saving...' });
+
+saveData().then(() => {
+  my.hideLoading();
+  my.showToast({ content: 'Saved!', type: 'success' });
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.showLoading" icon="spinner" href="/jsapi/ui/feedback/my.showLoading">
+    Show loading
+  </Card>
+  <Card title="my.hideToast" icon="xmark" href="/jsapi/ui/feedback/my.hideToast">
+    Hide toast
+  </Card>
+</CardGroup>

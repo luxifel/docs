@@ -1,0 +1,128 @@
+---
+title: my.navigateTo
+description: Navigate to a new page while keeping the current page in the stack.
+---
+
+Use this API to navigate to a new page within the Mini Program. The current page is preserved in the page stack, allowing users to return with `my.navigateBack`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| url | String | Yes | Page path with optional query parameters (format: `path?key=value&key2=value2`) |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+<Warning>
+The maximum page stack depth is 10. You can call `navigateTo` at most 10 times before needing to navigate back or use other navigation methods.
+</Warning>
+
+## Code Example
+
+### Basic Navigation
+
+```javascript
+my.navigateTo({
+  url: 'pages/detail/detail'
+});
+```
+
+### With Query Parameters
+
+```javascript
+my.navigateTo({
+  url: 'pages/detail/detail?id=123&type=product'
+});
+```
+
+### Receiving Parameters
+
+```javascript
+// In the target page
+Page({
+  onLoad(query) {
+    console.log(query.id);   // '123'
+    console.log(query.type); // 'product'
+
+    my.alert({
+      content: JSON.stringify(query)
+    });
+  }
+});
+```
+
+### With Callbacks
+
+```javascript
+my.navigateTo({
+  url: 'pages/checkout/checkout',
+  success() {
+    console.log('Navigation successful');
+  },
+  fail(err) {
+    console.error('Navigation failed:', err);
+    my.showToast({
+      content: 'Failed to open page',
+      type: 'fail'
+    });
+  }
+});
+```
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Navigate to Detail Page">
+    ```javascript
+    Page({
+      onItemTap(e) {
+        const { id, name } = e.currentTarget.dataset;
+        my.navigateTo({
+          url: `pages/detail/detail?id=${id}&name=${encodeURIComponent(name)}`
+        });
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Conditional Navigation">
+    ```javascript
+    Page({
+      goToProfile() {
+        if (this.data.isLoggedIn) {
+          my.navigateTo({ url: 'pages/profile/profile' });
+        } else {
+          my.navigateTo({ url: 'pages/login/login' });
+        }
+      }
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Important Notes
+
+- Cannot navigate to tab bar pages (use `my.switchTab` instead)
+- Query parameter values should be URL-encoded if they contain special characters
+- The current page is preserved and can be returned to with `my.navigateBack`
+
+## Differences from Other Navigation APIs
+
+| API | Behavior |
+|-----|----------|
+| `my.navigateTo` | Opens new page, keeps current page in stack |
+| `my.redirectTo` | Replaces current page (cannot go back) |
+| `my.reLaunch` | Closes all pages, opens target page |
+| `my.switchTab` | Navigates to tab page only |
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.navigateBack" icon="arrow-left" href="/jsapi/ui/route/my.navigateBack">
+    Go back to previous page
+  </Card>
+  <Card title="my.redirectTo" icon="arrow-right-arrow-left" href="/jsapi/ui/route/my.redirectTo">
+    Replace current page
+  </Card>
+</CardGroup>

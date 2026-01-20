@@ -1,0 +1,34 @@
+---
+title: my.compressImage
+description: Compress an image file.
+---
+
+Use this API to reduce the file size of an image.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| apFilePaths | Array | Yes | Array of image paths to compress |
+| compressLevel | Number | No | Compression level (0-4, default: 4) |
+| success | Function | No | Callback with compressed paths |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| apFilePaths | Array | Paths to compressed images |
+
+## Code Example
+
+```javascript
+my.compressImage({
+  apFilePaths: ['/local/path/image.jpg'],
+  compressLevel: 2,
+  success: (res) => {
+    console.log('Compressed:', res.apFilePaths);
+  }
+});
+```

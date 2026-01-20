@@ -1,0 +1,141 @@
+---
+title: my.checkBioMetricAvailable
+description: Check if biometric authentication is available.
+---
+
+Use this API to check if biometric authentication (fingerprint or face recognition) is available on the device.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| available | Boolean | Whether biometric is available |
+| type | String | Available type: `fingerPrint`, `facial`, or `none` |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.checkBioMetricAvailable({
+  success(res) {
+    console.log('Biometric available:', res.available);
+    console.log('Type:', res.type);
+  }
+});
+```
+
+### Conditional UI
+
+```javascript
+Page({
+  data: {
+    biometricAvailable: false,
+    biometricType: 'none'
+  },
+
+  onLoad() {
+    my.checkBioMetricAvailable({
+      success: (res) => {
+        this.setData({
+          biometricAvailable: res.available,
+          biometricType: res.type
+        });
+      }
+    });
+  }
+});
+```
+
+### Smart Authentication
+
+```javascript
+Page({
+  authenticate() {
+    my.checkBioMetricAvailable({
+      success: (res) => {
+        if (res.available) {
+          this.useBiometric(res.type);
+        } else {
+          this.usePasswordAuth();
+        }
+      }
+    });
+  },
+
+  useBiometric(type) {
+    const title = type === 'facial'
+      ? 'Look at your device'
+      : 'Touch the fingerprint sensor';
+
+    my.startBioMetricVerify({
+      type: type,
+      title: title,
+      success: (res) => {
+        if (res.success) {
+          this.onAuthSuccess();
+        }
+      },
+      fail: () => {
+        // Fall back to password
+        this.usePasswordAuth();
+      }
+    });
+  },
+
+  usePasswordAuth() {
+    // Show password input
+  },
+
+  onAuthSuccess() {
+    // Proceed with authenticated action
+  }
+});
+```
+
+### Display Biometric Options
+
+```javascript
+Page({
+  data: {
+    authMethods: []
+  },
+
+  onLoad() {
+    const methods = [{ name: 'Password', type: 'password' }];
+
+    my.checkBioMetricAvailable({
+      success: (res) => {
+        if (res.available) {
+          if (res.type === 'fingerPrint') {
+            methods.unshift({ name: 'Fingerprint', type: 'fingerPrint' });
+          } else if (res.type === 'facial') {
+            methods.unshift({ name: 'Face ID', type: 'facial' });
+          }
+        }
+        this.setData({ authMethods: methods });
+      }
+    });
+  }
+});
+```
+
+<Tip>
+Always check biometric availability before showing biometric options in your UI to avoid confusing users on devices without biometric capabilities.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.startBioMetricVerify" icon="fingerprint" href="/jsapi/device/biometric/my.startBioMetricVerify">
+    Start biometric verification
+  </Card>
+</CardGroup>

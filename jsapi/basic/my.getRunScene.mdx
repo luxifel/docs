@@ -1,0 +1,190 @@
+---
+title: my.getRunScene
+description: Get the running environment of the current Mini Program.
+---
+
+Use this API to determine whether the Mini Program is running in a development or production environment.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on successful execution |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| envVersion | String | Current environment: `develop` or `release` |
+
+## Fail Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| error | String | Error code |
+| errorMessage | String | Error description |
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 3 | An unknown error has occurred |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.getRunScene({
+  success(result) {
+    console.log('Environment:', result.envVersion);
+
+    if (result.envVersion === 'develop') {
+      console.log('Running in development mode');
+    } else {
+      console.log('Running in production mode');
+    }
+  },
+  fail(error) {
+    console.error('Failed to get run scene:', error.errorMessage);
+  }
+});
+```
+
+### Using with async/await
+
+```javascript
+async function checkEnvironment() {
+  try {
+    const result = await my.getRunScene();
+    return result.envVersion;
+  } catch (error) {
+    console.error('Error:', error.errorMessage);
+    return null;
+  }
+}
+
+Page({
+  async onLoad() {
+    const env = await checkEnvironment();
+    this.setData({ isDevelopment: env === 'develop' });
+  }
+});
+```
+
+### Conditional Feature Loading
+
+```javascript
+Page({
+  onLoad() {
+    my.getRunScene({
+      success: (res) => {
+        if (res.envVersion === 'develop') {
+          // Enable debug features
+          this.enableDebugMode();
+        }
+
+        // Set environment for analytics
+        this.setData({
+          environment: res.envVersion
+        });
+      }
+    });
+  },
+
+  enableDebugMode() {
+    console.log('Debug mode enabled');
+    // Add debug-specific functionality
+  }
+});
+```
+
+### Display Environment Badge
+
+```javascript
+Page({
+  data: {
+    envBadge: ''
+  },
+
+  onLoad() {
+    my.getRunScene({
+      success: (res) => {
+        this.setData({
+          envBadge: res.envVersion === 'develop' ? 'DEV' : ''
+        });
+      }
+    });
+  }
+});
+```
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Debug Logging">
+    Enable verbose logging only in development:
+
+    ```javascript
+    my.getRunScene({
+      success({ envVersion }) {
+        if (envVersion === 'develop') {
+          console.log = (...args) => {
+            // Enhanced logging for development
+            console.info('[DEV]', ...args);
+          };
+        }
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="API Environment Switching">
+    Switch between development and production APIs:
+
+    ```javascript
+    let apiBaseUrl = '';
+
+    my.getRunScene({
+      success({ envVersion }) {
+        apiBaseUrl = envVersion === 'develop'
+          ? 'https://dev-api.example.com'
+          : 'https://api.example.com';
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Feature Flags">
+    Enable experimental features in development:
+
+    ```javascript
+    const features = {
+      experimentalUI: false,
+      debugPanel: false
+    };
+
+    my.getRunScene({
+      success({ envVersion }) {
+        if (envVersion === 'develop') {
+          features.experimentalUI = true;
+          features.debugPanel = true;
+        }
+      }
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getAppIdSync" icon="fingerprint" href="/jsapi/basic/my.getAppIdSync">
+    Get the App ID
+  </Card>
+  <Card title="my.canIUse" icon="check" href="/jsapi/basic/my.canIUse">
+    Check feature support
+  </Card>
+</CardGroup>

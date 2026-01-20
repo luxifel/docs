@@ -1,0 +1,121 @@
+---
+title: my.openSetting
+description: Open the Mini Program settings page.
+---
+
+Use this API to open the Mini Program settings page where users can manage permissions they have previously granted or denied.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success with current settings |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| authSetting | Object | Current authorization settings |
+
+## authSetting Object
+
+| Property | Type | Description |
+|----------|------|-------------|
+| location | Boolean | Location permission |
+| camera | Boolean | Camera permission |
+| album | Boolean | Photo album permission |
+| userInfo | Boolean | User info permission |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.openSetting({
+  success(res) {
+    console.log('Current settings:', res.authSetting);
+  }
+});
+```
+
+### Check and Request Permission
+
+```javascript
+Page({
+  async requestLocation() {
+    my.getLocation({
+      success: (res) => {
+        this.handleLocationSuccess(res);
+      },
+      fail: (err) => {
+        // Permission denied, guide user to settings
+        my.confirm({
+          title: 'Permission Required',
+          content: 'Location permission is needed. Would you like to enable it in settings?',
+          confirmButtonText: 'Open Settings',
+          success: (result) => {
+            if (result.confirm) {
+              my.openSetting({
+                success: (settingRes) => {
+                  if (settingRes.authSetting.location) {
+                    // Permission granted, try again
+                    this.requestLocation();
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+    });
+  }
+});
+```
+
+### Permission Management Page
+
+```javascript
+Page({
+  data: {
+    permissions: {}
+  },
+
+  onShow() {
+    this.loadPermissions();
+  },
+
+  loadPermissions() {
+    my.openSetting({
+      success: (res) => {
+        this.setData({ permissions: res.authSetting });
+      }
+    });
+  },
+
+  managePermissions() {
+    my.openSetting({
+      success: (res) => {
+        this.setData({ permissions: res.authSetting });
+        my.showToast({ content: 'Settings updated' });
+      }
+    });
+  }
+});
+```
+
+<Tip>
+Use this API to guide users to re-enable permissions they previously denied. Always explain why the permission is needed before opening settings.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getLocation" icon="location-dot" href="/jsapi/location/my.getLocation">
+    Get location
+  </Card>
+  <Card title="my.chooseImage" icon="image" href="/jsapi/media/image/my.chooseImage">
+    Choose image
+  </Card>
+</CardGroup>

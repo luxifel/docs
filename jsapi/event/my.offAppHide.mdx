@@ -1,0 +1,56 @@
+---
+title: my.offAppHide
+description: Stop listening for events when the Mini Program switches to background.
+---
+
+Use this API to stop listening for background transition events that were registered with `my.onAppHide()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    // Register listener
+    my.onAppHide(this.onAppHideHandler);
+  },
+
+  onUnload() {
+    // Remove specific listener
+    my.offAppHide(this.onAppHideHandler);
+  },
+
+  onAppHideHandler() {
+    console.log('App moved to background');
+  }
+});
+```
+
+### Remove All Listeners
+
+```javascript
+// Remove all onAppHide listeners
+my.offAppHide();
+```
+
+<Tip>
+Pass the same callback function reference to `my.offAppHide()` that was used with `my.onAppHide()` to remove only that specific listener.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onAppHide" icon="eye-slash" href="/jsapi/event/my.onAppHide">
+    Listen for background events
+  </Card>
+  <Card title="my.offAppShow" icon="xmark" href="/jsapi/event/my.offAppShow">
+    Stop listening for foreground events
+  </Card>
+</CardGroup>

@@ -1,0 +1,37 @@
+---
+title: my.chooseVideo
+description: Choose a video from album or record using camera.
+---
+
+Use this API to select a video from the device album or record a new video.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| sourceType | Array | No | Sources: `['album']`, `['camera']`, or both |
+| maxDuration | Number | No | Maximum recording duration in seconds |
+| camera | String | No | Default camera: `front` or `back` |
+| success | Function | No | Callback with video data |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| apFilePath | String | Local path to video |
+| duration | Number | Video duration in seconds |
+| size | Number | File size in bytes |
+
+## Code Example
+
+```javascript
+my.chooseVideo({
+  sourceType: ['album', 'camera'],
+  maxDuration: 60,
+  success: (res) => {
+    console.log('Video:', res.apFilePath);
+  }
+});
+```

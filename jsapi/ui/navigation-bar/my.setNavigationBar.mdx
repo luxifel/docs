@@ -1,0 +1,106 @@
+---
+title: my.setNavigationBar
+description: Set the navigation bar text and style for the current page.
+---
+
+Use this API to customize the navigation bar appearance including title, background color, and border.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| title | String | No | Text displayed in the navigation bar |
+| image | String | No | Image URL (HTTPS only); replaces title when set |
+| backgroundColor | String | No | Background color in hex format (e.g., `#ffffff`) |
+| borderBottomColor | String | No | Bottom border color in hex format |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Set Title and Background Color
+
+```javascript
+my.setNavigationBar({
+  title: 'My Page',
+  backgroundColor: '#108ee9',
+  success() {
+    console.log('Navigation bar updated');
+  },
+  fail() {
+    console.log('Failed to update navigation bar');
+  }
+});
+```
+
+### Set Title with Border
+
+```javascript
+my.setNavigationBar({
+  title: 'Settings',
+  backgroundColor: '#ffffff',
+  borderBottomColor: '#eeeeee'
+});
+```
+
+### Use Image Instead of Title
+
+```javascript
+my.setNavigationBar({
+  image: 'https://example.com/logo@3x.png',
+  backgroundColor: '#ffffff'
+});
+```
+
+## Notes
+
+<Warning>
+- When `image` is provided, the `title` parameter is ignored
+- Images must use HTTPS URLs
+- Use 3x resolution images for best display quality
+- SVG format is not supported for images
+- `backgroundColor` takes precedence over `borderBottomColor`
+</Warning>
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Dynamic Title Based on Data">
+    ```javascript
+    Page({
+      onLoad(query) {
+        // Set title based on page data
+        my.setNavigationBar({
+          title: query.name || 'Details'
+        });
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Theme-Aware Navigation">
+    ```javascript
+    Page({
+      setTheme(isDark) {
+        my.setNavigationBar({
+          title: 'Settings',
+          backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
+          borderBottomColor: isDark ? '#333333' : '#eeeeee'
+        });
+      }
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.showNavigationBarLoading" icon="spinner" href="/jsapi/ui/navigation-bar/my.showNavigationBarLoading">
+    Show loading indicator
+  </Card>
+  <Card title="my.hideBackHome" icon="house" href="/jsapi/ui/navigation-bar/my.hideBackHome">
+    Hide back to home button
+  </Card>
+</CardGroup>

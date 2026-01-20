@@ -1,0 +1,35 @@
+---
+title: my.chooseLocation
+description: Choose a location from the map.
+---
+
+Open a map interface for the user to select a location.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback with selected location |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| name | String | Location name |
+| address | String | Full address |
+| latitude | Number | Latitude |
+| longitude | Number | Longitude |
+
+## Code Example
+
+```javascript
+my.chooseLocation({
+  success: (res) => {
+    console.log('Selected:', res.name);
+    console.log('Address:', res.address);
+    console.log('Coordinates:', res.latitude, res.longitude);
+  }
+});
+```

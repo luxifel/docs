@@ -1,0 +1,45 @@
+---
+title: my.getUpdateManager
+description: Get the update manager for handling app updates.
+---
+
+Get an UpdateManager instance to manage Mini Program updates.
+
+## Return Value
+
+Returns an UpdateManager object.
+
+## UpdateManager Methods
+
+| Method | Description |
+|--------|-------------|
+| onCheckForUpdate(callback) | Called when update check completes |
+| onUpdateReady(callback) | Called when new version is downloaded |
+| onUpdateFailed(callback) | Called when update download fails |
+| applyUpdate() | Force apply and restart with new version |
+
+## Code Example
+
+```javascript
+const updateManager = my.getUpdateManager();
+
+updateManager.onCheckForUpdate((res) => {
+  console.log('Has update:', res.hasUpdate);
+});
+
+updateManager.onUpdateReady(() => {
+  my.confirm({
+    title: 'Update Available',
+    content: 'Restart to apply the new version?',
+    success: (res) => {
+      if (res.confirm) {
+        updateManager.applyUpdate();
+      }
+    }
+  });
+});
+
+updateManager.onUpdateFailed(() => {
+  console.log('Update download failed');
+});
+```

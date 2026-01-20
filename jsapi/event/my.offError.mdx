@@ -1,0 +1,74 @@
+---
+title: my.offError
+description: Stop listening for JavaScript error events.
+---
+
+Use this API to stop listening for JavaScript error events that were registered with `my.onError()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove Specific Listener
+
+```javascript
+App({
+  onLaunch() {
+    my.onError(this.errorHandler);
+  },
+
+  errorHandler(error) {
+    console.error('Error:', error);
+  },
+
+  // Call this to remove the listener
+  removeErrorListener() {
+    my.offError(this.errorHandler);
+  }
+});
+```
+
+### Remove All Listeners
+
+```javascript
+// Remove all error listeners
+my.offError();
+```
+
+### Page Lifecycle Management
+
+```javascript
+Page({
+  onShow() {
+    my.onError(this.handleError);
+  },
+
+  onHide() {
+    // Clean up when page is hidden
+    my.offError(this.handleError);
+  },
+
+  handleError(error) {
+    console.error('Page error:', error);
+  }
+});
+```
+
+<Tip>
+Pass the same callback function reference to `my.offError()` that was used with `my.onError()` to remove only that specific listener.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onError" icon="exclamation-circle" href="/jsapi/event/my.onError">
+    Listen for error events
+  </Card>
+  <Card title="my.offUnhandledRejection" icon="xmark" href="/jsapi/event/my.offUnhandledRejection">
+    Stop listening for unhandled rejections
+  </Card>
+</CardGroup>

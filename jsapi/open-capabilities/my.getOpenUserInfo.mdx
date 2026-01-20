@@ -1,0 +1,39 @@
+---
+title: my.getOpenUserInfo
+description: Get basic user information with user consent.
+---
+
+Request access to the user's basic profile information.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback with user info |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| response | String | JSON string with user info |
+
+## Code Example
+
+```javascript
+my.getOpenUserInfo({
+  success: (res) => {
+    const userInfo = JSON.parse(res.response).response;
+    console.log('Nickname:', userInfo.nickName);
+    console.log('Avatar:', userInfo.avatar);
+  },
+  fail: (err) => {
+    console.error('Failed to get user info:', err);
+  }
+});
+```
+
+<Info>
+User must grant permission for their profile information. Always handle the case where the user denies access.
+</Info>

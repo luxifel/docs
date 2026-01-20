@@ -1,0 +1,24 @@
+---
+title: my.showSharePanel
+description: Display the share panel for content sharing.
+---
+
+Show a native share panel with sharing options.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.showSharePanel({
+  success: () => {
+    console.log('Share panel shown');
+  }
+});
+```

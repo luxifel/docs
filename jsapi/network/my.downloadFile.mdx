@@ -1,0 +1,33 @@
+---
+title: my.downloadFile
+description: Download a file from a remote server.
+---
+
+Download a file and save it locally.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| url | String | Yes | File URL to download |
+| header | Object | No | Request headers |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| apFilePath | String | Local temporary file path |
+
+## Code Example
+
+```javascript
+my.downloadFile({
+  url: 'https://example.com/file.pdf',
+  success: (res) => {
+    console.log('Downloaded to:', res.apFilePath);
+  }
+});
+```

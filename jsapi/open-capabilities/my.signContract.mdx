@@ -1,0 +1,38 @@
+---
+title: my.signContract
+description: Trigger the contract signing flow.
+---
+
+Invoke the contract signing UI for recurring payments or agreements.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| signStr | String | Yes | Signed contract string from backend |
+| success | Function | No | Callback with sign result |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| resultCode | String | Signing result code |
+| resultStatus | String | Status description |
+
+## Code Example
+
+```javascript
+my.signContract({
+  signStr: signStrFromBackend,
+  success: (res) => {
+    if (res.resultCode === '7000') {
+      console.log('Contract signed successfully');
+    }
+  },
+  fail: (err) => {
+    console.error('Signing failed:', err);
+  }
+});
+```

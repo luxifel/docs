@@ -1,0 +1,53 @@
+---
+title: my.prompt
+description: Display a dialog with a text input field.
+---
+
+Use this API to show a modal dialog that allows users to enter text input.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| title | String | No | Dialog title |
+| message | String | No | Dialog message |
+| placeholder | String | No | Input placeholder text |
+| align | String | No | Text alignment: `left`, `center`, `right` |
+| okButtonText | String | No | OK button text |
+| cancelButtonText | String | No | Cancel button text |
+| success | Function | No | Callback with result |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| ok | Boolean | `true` if user tapped OK |
+| inputValue | String | The text entered by user |
+
+## Code Example
+
+```javascript
+my.prompt({
+  title: 'Enter Name',
+  message: 'Please enter your name',
+  placeholder: 'Your name',
+  okButtonText: 'Submit',
+  cancelButtonText: 'Cancel',
+  success: (result) => {
+    if (result.ok) {
+      console.log('Name:', result.inputValue);
+    }
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.confirm" icon="circle-question" href="/jsapi/ui/feedback/my.confirm">
+    Show confirmation dialog
+  </Card>
+  <Card title="my.alert" icon="circle-exclamation" href="/jsapi/ui/feedback/my.alert">
+    Show alert dialog
+  </Card>
+</CardGroup>

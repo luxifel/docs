@@ -1,0 +1,46 @@
+---
+title: my.getStorage
+description: Retrieve data from local cache asynchronously.
+---
+
+Use this API to get data stored with a specified key from local cache.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| key | String | Yes | Storage key identifier |
+| success | Function | No | Callback with data |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| data | Object/String | Stored data |
+
+## Code Example
+
+```javascript
+my.getStorage({
+  key: 'userSettings',
+  success: (res) => {
+    console.log('Data:', res.data);
+  },
+  fail: () => {
+    console.log('Key not found');
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.setStorage" icon="upload" href="/jsapi/storage/my.setStorage">
+    Store data
+  </Card>
+  <Card title="my.getStorageSync" icon="bolt" href="/jsapi/storage/my.getStorageSync">
+    Get data synchronously
+  </Card>
+</CardGroup>

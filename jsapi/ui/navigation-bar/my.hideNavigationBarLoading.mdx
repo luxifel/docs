@@ -1,0 +1,50 @@
+---
+title: my.hideNavigationBarLoading
+description: Hide the loading animation in the navigation bar.
+---
+
+Use this API to hide the loading indicator that was shown with `my.showNavigationBarLoading()`.
+
+## Parameters
+
+This API does not require any parameters.
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.hideNavigationBarLoading();
+```
+
+### Complete Loading Pattern
+
+```javascript
+Page({
+  loadData() {
+    my.showNavigationBarLoading();
+
+    my.request({
+      url: 'https://api.example.com/data',
+      success: (res) => {
+        this.setData({ data: res.data });
+      },
+      complete: () => {
+        // Always hide loading, whether success or failure
+        my.hideNavigationBarLoading();
+      }
+    });
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.showNavigationBarLoading" icon="spinner" href="/jsapi/ui/navigation-bar/my.showNavigationBarLoading">
+    Show the loading indicator
+  </Card>
+  <Card title="my.hideLoading" icon="xmark" href="/jsapi/ui/feedback/my.hideLoading">
+    Hide fullscreen loading
+  </Card>
+</CardGroup>

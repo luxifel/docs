@@ -1,0 +1,41 @@
+---
+title: my.alert
+description: Display an alert dialog box.
+---
+
+Use this API to show a modal alert dialog with a message and an action button.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| title | String | No | Alert title |
+| content | String | No | Alert message content |
+| buttonText | String | No | Button label (default: "OK") |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.alert({
+  title: 'Notice',
+  content: 'Your order has been placed successfully',
+  buttonText: 'Got it',
+  success: () => {
+    console.log('Alert dismissed');
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.confirm" icon="circle-question" href="/jsapi/ui/feedback/my.confirm">
+    Show confirmation dialog
+  </Card>
+  <Card title="my.showToast" icon="message" href="/jsapi/ui/feedback/my.showToast">
+    Show toast message
+  </Card>
+</CardGroup>

@@ -1,0 +1,34 @@
+---
+title: my.calculateRoute
+description: Calculate a route between two points.
+---
+
+Calculate navigation route between origin and destination.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| searchType | String | No | Route type: `walk`, `bus`, `drive`, `ride` |
+| startLat | Number | Yes | Start latitude |
+| startLng | Number | Yes | Start longitude |
+| endLat | Number | Yes | End latitude |
+| endLng | Number | Yes | End longitude |
+| success | Function | No | Callback with route |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.calculateRoute({
+  searchType: 'drive',
+  startLat: 40.7128,
+  startLng: -74.0060,
+  endLat: 40.7580,
+  endLng: -73.9855,
+  success: (res) => {
+    console.log('Route:', res);
+  }
+});
+```

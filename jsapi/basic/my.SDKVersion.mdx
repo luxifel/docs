@@ -1,0 +1,55 @@
+---
+title: my.SDKVersion
+description: Get the version of the Mini Program basic library.
+---
+
+Use this property to retrieve the current SDK version of the Mini Program basic library.
+
+<Warning>
+Do not rely on this value for code logic. This property is for reference and debugging purposes only.
+</Warning>
+
+## Return Value
+
+| Type | Description |
+|------|-------------|
+| String | The version number of the basic library |
+
+## Code Example
+
+```javascript
+Page({
+  onLoad() {
+    // Get SDK version
+    const version = my.SDKVersion;
+    console.log('SDK Version:', version);
+  },
+
+  showVersion() {
+    my.alert({
+      content: `SDK Version: ${my.SDKVersion}`
+    });
+  }
+});
+```
+
+## Notes
+
+- This is a synchronous property access, not a function call
+- The version format follows semantic versioning (e.g., "1.2.3")
+- Use [my.canIUse](/jsapi/basic/my.canIUse) instead for feature detection
+
+<Tip>
+For determining feature availability, always use `my.canIUse()` rather than checking the SDK version directly. This provides more reliable and maintainable code.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.canIUse" icon="check" href="/jsapi/basic/my.canIUse">
+    Check if a feature is supported
+  </Card>
+  <Card title="my.getRunScene" icon="code-branch" href="/jsapi/basic/my.getRunScene">
+    Get the running environment
+  </Card>
+</CardGroup>

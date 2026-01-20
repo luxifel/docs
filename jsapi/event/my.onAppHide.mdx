@@ -1,0 +1,145 @@
+---
+title: my.onAppHide
+description: Listen for events when the Mini Program switches from foreground to background.
+---
+
+Use this API to listen for events when the Mini Program transitions from foreground to background. The callback triggers at the same time as the `onHide()` lifecycle method in the app registration.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Handler executed when the app moves to background |
+
+## Code Example
+
+```javascript
+Page({
+  onLoad() {
+    // Register listener when page loads
+    my.onAppHide(this.onAppHideHandler);
+  },
+
+  onUnload() {
+    // Clean up listener when page unloads
+    my.offAppHide(this.onAppHideHandler);
+  },
+
+  onAppHideHandler() {
+    console.log('App moved to background');
+    // Save state, pause operations, etc.
+    this.saveCurrentState();
+  },
+
+  saveCurrentState() {
+    my.setStorage({
+      key: 'appState',
+      data: this.data
+    });
+  }
+});
+```
+
+### AXML with Button
+
+```xml
+<button size="default" onTap="removeListener" type="primary">
+  Stop listening for background events
+</button>
+```
+
+```javascript
+Page({
+  onLoad() {
+    my.onAppHide(this.onAppHideHandler);
+  },
+
+  onAppHideHandler() {
+    console.log('App moved to background');
+  },
+
+  removeListener() {
+    my.offAppHide(this.onAppHideHandler);
+    my.showToast({ content: 'Listener removed' });
+  }
+});
+```
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Save App State">
+    ```javascript
+    Page({
+      data: {
+        formData: {}
+      },
+
+      onLoad() {
+        my.onAppHide(() => {
+          // Save form data when app goes to background
+          my.setStorage({
+            key: 'savedFormData',
+            data: this.data.formData
+          });
+        });
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Pause Media">
+    ```javascript
+    Page({
+      onLoad() {
+        my.onAppHide(() => {
+          // Pause video when app goes to background
+          const videoContext = my.createVideoContext('myVideo');
+          videoContext.pause();
+        });
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Stop Timers">
+    ```javascript
+    Page({
+      data: {
+        intervalId: null
+      },
+
+      onLoad() {
+        this.data.intervalId = setInterval(() => {
+          // Periodic task
+        }, 1000);
+
+        my.onAppHide(() => {
+          clearInterval(this.data.intervalId);
+        });
+
+        my.onAppShow(() => {
+          this.data.intervalId = setInterval(() => {
+            // Resume periodic task
+          }, 1000);
+        });
+      }
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+Always remove event listeners when they're no longer needed using `my.offAppHide()` to prevent memory leaks.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offAppHide" icon="xmark" href="/jsapi/event/my.offAppHide">
+    Stop listening for background events
+  </Card>
+  <Card title="my.onAppShow" icon="eye" href="/jsapi/event/my.onAppShow">
+    Listen for foreground events
+  </Card>
+</CardGroup>

@@ -1,0 +1,40 @@
+---
+title: my.saveImage
+description: Save an image to the device album.
+---
+
+Use this API to save an image file to the user's photo album.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| url | String | Yes | Image URL or local path |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.saveImage({
+  url: 'https://example.com/image.jpg',
+  success: () => {
+    my.showToast({ content: 'Saved to album', type: 'success' });
+  },
+  fail: () => {
+    my.showToast({ content: 'Save failed', type: 'fail' });
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.chooseImage" icon="images" href="/jsapi/media/image/my.chooseImage">
+    Choose images
+  </Card>
+  <Card title="my.downloadFile" icon="download" href="/jsapi/network/my.downloadFile">
+    Download file
+  </Card>
+</CardGroup>

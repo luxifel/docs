@@ -1,0 +1,98 @@
+---
+title: my.offWatchShake
+description: Stop watching for device shake events.
+---
+
+Use this API to stop watching for device shake events that were registered with `my.watchShake()`.
+
+## Parameters
+
+This API takes no parameters.
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+// Stop watching for shakes
+my.offWatchShake();
+```
+
+### Toggle Shake Detection
+
+```javascript
+Page({
+  data: {
+    shakeEnabled: false
+  },
+
+  toggleShake() {
+    if (this.data.shakeEnabled) {
+      my.offWatchShake();
+      this.setData({ shakeEnabled: false });
+    } else {
+      this.enableShake();
+      this.setData({ shakeEnabled: true });
+    }
+  },
+
+  enableShake() {
+    my.watchShake({
+      success: () => {
+        this.handleShake();
+        if (this.data.shakeEnabled) {
+          this.enableShake();
+        }
+      }
+    });
+  },
+
+  handleShake() {
+    my.vibrate();
+    console.log('Shake detected!');
+  }
+});
+```
+
+### Page Lifecycle Management
+
+```javascript
+Page({
+  onShow() {
+    this.startShakeWatch();
+  },
+
+  onHide() {
+    // Stop watching when page is hidden
+    my.offWatchShake();
+  },
+
+  startShakeWatch() {
+    my.watchShake({
+      success: () => {
+        this.onShake();
+        this.startShakeWatch();
+      }
+    });
+  },
+
+  onShake() {
+    // Handle shake event
+  }
+});
+```
+
+<Tip>
+Always call `my.offWatchShake()` when leaving a page or when shake detection is no longer needed to conserve battery and resources.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.watchShake" icon="hand" href="/jsapi/device/watch-shake/my.watchShake">
+    Watch for shake events
+  </Card>
+  <Card title="my.vibrate" icon="mobile" href="/jsapi/device/vibrate/my.vibrate">
+    Trigger device vibration
+  </Card>
+</CardGroup>

@@ -1,0 +1,26 @@
+---
+title: my.onSocketError
+description: Listen for WebSocket errors.
+---
+
+Register a callback for WebSocket errors.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Handler for errors |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| errorMessage | String | Error description |
+
+## Code Example
+
+```javascript
+my.onSocketError((err) => {
+  console.error('Socket error:', err.errorMessage);
+});
+```

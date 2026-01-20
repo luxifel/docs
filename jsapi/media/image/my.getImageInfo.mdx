@@ -1,0 +1,36 @@
+---
+title: my.getImageInfo
+description: Get information about an image file.
+---
+
+Use this API to retrieve width, height, and other metadata about an image.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| src | String | Yes | Image path (local or remote) |
+| success | Function | No | Callback with image info |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| width | Number | Image width in pixels |
+| height | Number | Image height in pixels |
+| path | String | Local path to image |
+| orientation | String | Image orientation |
+| type | String | Image format |
+
+## Code Example
+
+```javascript
+my.getImageInfo({
+  src: 'https://example.com/image.jpg',
+  success: (res) => {
+    console.log('Size:', res.width, 'x', res.height);
+  }
+});
+```

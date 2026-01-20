@@ -1,0 +1,35 @@
+---
+title: my.setBackgroundColor
+description: Set the page background color.
+---
+
+Use this API to dynamically set the background color of the page.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| backgroundColor | HexColor | No | Background color |
+| backgroundColorTop | HexColor | No | Top area background color (iOS) |
+| backgroundColorBottom | HexColor | No | Bottom area background color (iOS) |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.setBackgroundColor({
+  backgroundColor: '#ffffff',
+  backgroundColorTop: '#ffffff',
+  backgroundColorBottom: '#ffffff'
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.setNavigationBar" icon="bars" href="/jsapi/ui/navigation-bar/my.setNavigationBar">
+    Set navigation bar
+  </Card>
+</CardGroup>

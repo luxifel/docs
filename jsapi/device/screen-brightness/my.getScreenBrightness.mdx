@@ -1,0 +1,88 @@
+---
+title: my.getScreenBrightness
+description: Get the current screen brightness level.
+---
+
+Use this API to get the current screen brightness level.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| brightness | Number | Screen brightness value (0-1) |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.getScreenBrightness({
+  success(res) {
+    console.log('Current brightness:', res.brightness);
+  }
+});
+```
+
+### Display Brightness Percentage
+
+```javascript
+Page({
+  data: {
+    brightnessPercent: 0
+  },
+
+  onLoad() {
+    my.getScreenBrightness({
+      success: (res) => {
+        this.setData({
+          brightnessPercent: Math.round(res.brightness * 100)
+        });
+      }
+    });
+  }
+});
+```
+
+### Brightness Adjustment UI
+
+```javascript
+Page({
+  data: {
+    brightness: 0.5
+  },
+
+  onLoad() {
+    my.getScreenBrightness({
+      success: (res) => {
+        this.setData({ brightness: res.brightness });
+      }
+    });
+  },
+
+  onBrightnessChange(e) {
+    const value = e.detail.value / 100;
+    my.setScreenBrightness({
+      brightness: value,
+      success: () => {
+        this.setData({ brightness: value });
+      }
+    });
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.setScreenBrightness" icon="sun" href="/jsapi/device/screen-brightness/my.setScreenBrightness">
+    Set screen brightness
+  </Card>
+</CardGroup>

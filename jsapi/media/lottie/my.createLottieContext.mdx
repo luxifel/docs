@@ -1,0 +1,42 @@
+---
+title: my.createLottieContext
+description: Create a context for controlling Lottie animations.
+---
+
+Use this API to create a context object for controlling Lottie animation playback.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| lottieId | String | Yes | ID of the lottie component |
+
+## Return Value
+
+Returns a LottieContext object with playback control methods.
+
+## LottieContext Methods
+
+| Method | Description |
+|--------|-------------|
+| play() | Start animation |
+| pause() | Pause animation |
+| stop() | Stop animation |
+| setSpeed(speed) | Set playback speed |
+
+## Code Example
+
+```javascript
+const lottieContext = my.createLottieContext('myLottie');
+
+lottieContext.play();
+
+// Pause after 2 seconds
+setTimeout(() => {
+  lottieContext.pause();
+}, 2000);
+```
+
+```xml
+<lottie id="myLottie" path="animation.json" autoplay="{{false}}" />
+```

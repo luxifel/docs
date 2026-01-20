@@ -1,0 +1,36 @@
+---
+title: my.getStorageSync
+description: Retrieve data from local cache synchronously.
+---
+
+Synchronous version of `my.getStorage`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| key | String | Yes | Storage key identifier |
+
+## Return Value
+
+Returns the stored data or undefined if key doesn't exist.
+
+## Code Example
+
+```javascript
+const data = my.getStorageSync({ key: 'token' });
+if (data) {
+  console.log('Token:', data.data);
+}
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getStorage" icon="download" href="/jsapi/storage/my.getStorage">
+    Get data asynchronously
+  </Card>
+  <Card title="my.setStorageSync" icon="bolt" href="/jsapi/storage/my.setStorageSync">
+    Store data synchronously
+  </Card>
+</CardGroup>

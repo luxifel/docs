@@ -1,0 +1,146 @@
+---
+title: my.startBioMetricVerify
+description: Start biometric authentication (fingerprint or face recognition).
+---
+
+Use this API to authenticate the user using biometric methods such as fingerprint or face recognition.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| type | String | Yes | Biometric type: `fingerPrint` or `facial` |
+| title | String | No | Custom title for the authentication dialog |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Whether authentication was successful |
+
+## Code Example
+
+### Basic Fingerprint Authentication
+
+```javascript
+my.startBioMetricVerify({
+  type: 'fingerPrint',
+  success(res) {
+    if (res.success) {
+      console.log('Fingerprint verified');
+    }
+  },
+  fail(err) {
+    console.error('Authentication failed:', err);
+  }
+});
+```
+
+### Face Recognition
+
+```javascript
+my.startBioMetricVerify({
+  type: 'facial',
+  title: 'Verify your identity',
+  success(res) {
+    if (res.success) {
+      console.log('Face verified');
+    }
+  }
+});
+```
+
+### Secure Payment Flow
+
+```javascript
+Page({
+  async confirmPayment() {
+    // First verify user identity
+    my.startBioMetricVerify({
+      type: 'fingerPrint',
+      title: 'Confirm payment',
+      success: (res) => {
+        if (res.success) {
+          this.processPayment();
+        } else {
+          my.showToast({
+            content: 'Verification failed',
+            type: 'fail'
+          });
+        }
+      },
+      fail: (err) => {
+        // Biometric not available, fall back to PIN
+        this.showPinEntry();
+      }
+    });
+  },
+
+  processPayment() {
+    // Proceed with payment
+  },
+
+  showPinEntry() {
+    // Show PIN input as fallback
+  }
+});
+```
+
+### Check Biometric Availability First
+
+```javascript
+Page({
+  async authenticateUser() {
+    // Check if biometric is available
+    my.checkBioMetricAvailable({
+      success: (res) => {
+        if (res.available) {
+          my.startBioMetricVerify({
+            type: res.type, // Use available type
+            success: (verifyRes) => {
+              if (verifyRes.success) {
+                this.onAuthSuccess();
+              }
+            }
+          });
+        } else {
+          // Biometric not available
+          this.useFallbackAuth();
+        }
+      }
+    });
+  },
+
+  onAuthSuccess() {
+    my.showToast({ content: 'Authenticated' });
+  },
+
+  useFallbackAuth() {
+    // Use password or PIN
+  }
+});
+```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 10001 | Biometric not supported on device |
+| 10002 | Biometric not enrolled |
+| 10003 | User cancelled authentication |
+| 10004 | Authentication failed |
+
+<Warning>
+Biometric authentication may not be available on all devices. Always provide a fallback authentication method.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.checkBioMetricAvailable" icon="fingerprint" href="/jsapi/device/biometric/my.checkBioMetricAvailable">
+    Check availability
+  </Card>
+</CardGroup>

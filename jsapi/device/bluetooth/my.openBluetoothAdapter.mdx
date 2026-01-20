@@ -1,0 +1,82 @@
+---
+title: my.openBluetoothAdapter
+description: Initialize the Bluetooth adapter.
+---
+
+Use this API to initialize the Bluetooth adapter. This must be called before using any other Bluetooth APIs.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.openBluetoothAdapter({
+  success() {
+    console.log('Bluetooth adapter initialized');
+  },
+  fail(err) {
+    console.error('Failed to initialize Bluetooth:', err);
+  }
+});
+```
+
+### Check Bluetooth Before Operations
+
+```javascript
+Page({
+  onLoad() {
+    this.initBluetooth();
+  },
+
+  initBluetooth() {
+    my.openBluetoothAdapter({
+      success: () => {
+        console.log('Bluetooth ready');
+        this.setData({ bluetoothReady: true });
+      },
+      fail: (err) => {
+        if (err.error === 10001) {
+          my.alert({
+            title: 'Bluetooth Required',
+            content: 'Please enable Bluetooth to use this feature.'
+          });
+        }
+      }
+    });
+  },
+
+  onUnload() {
+    my.closeBluetoothAdapter();
+  }
+});
+```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 10001 | Bluetooth is not enabled on the device |
+| 10000 | Bluetooth adapter not initialized |
+
+<Warning>
+Always call `my.closeBluetoothAdapter` when you're done using Bluetooth to release system resources.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.closeBluetoothAdapter" icon="xmark" href="/jsapi/device/bluetooth/my.closeBluetoothAdapter">
+    Close Bluetooth adapter
+  </Card>
+  <Card title="my.startBluetoothDevicesDiscovery" icon="magnifying-glass" href="/jsapi/device/bluetooth/my.startBluetoothDevicesDiscovery">
+    Start device discovery
+  </Card>
+</CardGroup>

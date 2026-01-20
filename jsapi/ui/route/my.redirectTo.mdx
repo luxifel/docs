@@ -1,0 +1,131 @@
+---
+title: my.redirectTo
+description: Close the current page and navigate to a new page.
+---
+
+Use this API to close the current page and open a new page. Unlike `my.navigateTo`, the current page is removed from the page stack, so users cannot navigate back to it.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| url | String | Yes | Page path with optional query parameters (format: `path?key=value`) |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.redirectTo({
+  url: 'pages/result/result'
+});
+```
+
+### With Query Parameters
+
+```javascript
+my.redirectTo({
+  url: 'pages/result/result?status=success&orderId=12345'
+});
+```
+
+### With Callbacks
+
+```javascript
+my.redirectTo({
+  url: 'pages/home/home',
+  success() {
+    console.log('Redirected successfully');
+  },
+  fail(err) {
+    console.error('Redirect failed:', err);
+  }
+});
+```
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Replace Login Page After Success">
+    ```javascript
+    Page({
+      async handleLogin() {
+        try {
+          await this.login();
+          // Replace login page with home - user can't go back to login
+          my.redirectTo({
+            url: 'pages/home/home'
+          });
+        } catch (err) {
+          my.showToast({ content: 'Login failed', type: 'fail' });
+        }
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Wizard Flow">
+    ```javascript
+    // Step pages that shouldn't be revisited
+    Page({
+      completeStep() {
+        const nextStep = this.data.currentStep + 1;
+        if (nextStep <= 3) {
+          my.redirectTo({
+            url: `pages/wizard/step${nextStep}`
+          });
+        } else {
+          my.redirectTo({
+            url: 'pages/wizard/complete'
+          });
+        }
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Error to Home Redirect">
+    ```javascript
+    Page({
+      onLoad() {
+        if (!this.data.isValid) {
+          my.showToast({ content: 'Invalid access', type: 'fail' });
+          setTimeout(() => {
+            my.redirectTo({ url: 'pages/home/home' });
+          }, 1500);
+        }
+      }
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Important Notes
+
+<Warning>
+- Cannot redirect to tab bar pages (use `my.switchTab` instead)
+- The current page is closed and removed from the page stack
+- Users cannot navigate back to the closed page
+</Warning>
+
+## Differences from Other Navigation APIs
+
+| API | Current Page | Can Go Back |
+|-----|--------------|-------------|
+| `my.navigateTo` | Kept in stack | Yes |
+| `my.redirectTo` | Closed | No |
+| `my.reLaunch` | All pages closed | No |
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.navigateTo" icon="arrow-right" href="/jsapi/ui/route/my.navigateTo">
+    Navigate keeping current page
+  </Card>
+  <Card title="my.reLaunch" icon="rotate" href="/jsapi/ui/route/my.reLaunch">
+    Close all and open new page
+  </Card>
+</CardGroup>

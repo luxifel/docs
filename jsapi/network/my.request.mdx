@@ -1,0 +1,59 @@
+---
+title: my.request
+description: Make an HTTP network request.
+---
+
+Make HTTP/HTTPS requests to remote servers.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| url | String | Yes | Request URL (HTTPS required in production) |
+| method | String | No | HTTP method: `GET`, `POST`, `PUT`, `DELETE` (default: `GET`) |
+| data | Object | No | Request data |
+| headers | Object | No | Request headers |
+| timeout | Number | No | Timeout in ms (default: 30000) |
+| dataType | String | No | Response type: `json`, `text`, `base64` |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| data | Object/String | Response data |
+| status | Number | HTTP status code |
+| headers | Object | Response headers |
+
+## Code Example
+
+```javascript
+my.request({
+  url: 'https://api.example.com/data',
+  method: 'POST',
+  data: { id: 123 },
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  success: (res) => {
+    console.log('Status:', res.status);
+    console.log('Data:', res.data);
+  },
+  fail: (err) => {
+    console.error('Error:', err);
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.uploadFile" icon="upload" href="/jsapi/network/my.uploadFile">
+    Upload file
+  </Card>
+  <Card title="my.downloadFile" icon="download" href="/jsapi/network/my.downloadFile">
+    Download file
+  </Card>
+</CardGroup>

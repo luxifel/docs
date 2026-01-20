@@ -1,0 +1,160 @@
+---
+title: "JSAPI Overview"
+description: "Introduction to the JavaScript APIs available for Mini Program development."
+---
+
+The framework provides developers with **JSAPI and OpenAPI capabilities** to launch diversified convenient services to users. This section covers the client-side JavaScript APIs (JSAPI) that Mini Apps can use to interact with the platform and device features.
+
+## API Patterns
+
+Mini Program JSAPIs follow two main patterns:
+
+### Event Listening APIs
+
+APIs prefixed with `my.on` listen to system events and accept callback functions. When the event is triggered, the callback is executed.
+
+```javascript
+// Register event listener
+my.onAppShow((res) => {
+  console.log('App became visible', res);
+});
+
+// Unregister specific listener
+my.offAppShow(callback);
+
+// Unregister all listeners for an event
+my.offAppShow();
+```
+
+<Tip>
+Always clean up event listeners when they're no longer needed, such as in page `onUnload` lifecycle hooks, to prevent memory leaks.
+</Tip>
+
+### Standard Interface APIs
+
+Most other APIs accept an object as a parameter and support three callback types:
+
+| Callback | Description |
+|----------|-------------|
+| `success` | Called when the operation completes successfully |
+| `fail` | Called when the operation fails |
+| `complete` | Always called after success or fail |
+
+```javascript
+my.getLocation({
+  success: (res) => {
+    console.log('Location:', res.latitude, res.longitude);
+  },
+  fail: (err) => {
+    console.error('Failed:', err.errorMessage);
+  },
+  complete: () => {
+    console.log('Operation finished');
+  }
+});
+```
+
+### Promise Support
+
+APIs also return Promise objects, allowing both callback and async/await patterns:
+
+```javascript
+// Using Promise .then()
+my.request({
+  url: 'https://api.example.com/data'
+}).then((res) => {
+  console.log('Success:', res.data);
+}).catch((err) => {
+  console.error('Error:', err.errorMessage);
+});
+
+// Using async/await
+async function fetchData() {
+  try {
+    const res = await my.request({
+      url: 'https://api.example.com/data'
+    });
+    console.log('Success:', res.data);
+  } catch (err) {
+    console.error('Error:', err.errorMessage);
+  }
+}
+```
+
+## API Categories
+
+<CardGroup cols={2}>
+  <Card title="Basic" icon="cube" href="/jsapi/basic/my.canIUse">
+    Core APIs for version checking and feature detection
+  </Card>
+  <Card title="In-App Event" icon="bell" href="/jsapi/event/my.onAppShow">
+    App lifecycle and error event handling
+  </Card>
+  <Card title="UI" icon="window-maximize" href="/jsapi/ui/navigation-bar/my.setNavigationBar">
+    Navigation, feedback, dialogs, and UI controls
+  </Card>
+  <Card title="Media" icon="image" href="/jsapi/media/image/my.chooseImage">
+    Image, video, and animation handling
+  </Card>
+  <Card title="Storage" icon="database" href="/jsapi/storage/my.setStorage">
+    Local data persistence
+  </Card>
+  <Card title="File" icon="file" href="/jsapi/file/my.saveFile">
+    File system operations
+  </Card>
+  <Card title="Location" icon="location-dot" href="/jsapi/location/my.getLocation">
+    Geolocation services
+  </Card>
+  <Card title="Map" icon="map" href="/jsapi/map/my.createMapContext">
+    Map integration and routing
+  </Card>
+  <Card title="Network" icon="wifi" href="/jsapi/network/my.request">
+    HTTP requests and WebSocket connections
+  </Card>
+  <Card title="Device" icon="mobile-screen" href="/jsapi/device/system/my.getSystemInfo">
+    Hardware and system information
+  </Card>
+  <Card title="Sharing" icon="share" href="/jsapi/sharing/my.showSharePanel">
+    Content sharing capabilities
+  </Card>
+  <Card title="Update" icon="rotate" href="/jsapi/update/my.getUpdateManager">
+    App update management
+  </Card>
+  <Card title="web-view" icon="globe" href="/jsapi/web-view/my.createWebViewContext">
+    WebView integration
+  </Card>
+  <Card title="Open Capabilities" icon="unlock" href="/jsapi/open-capabilities/my.getAuthCode">
+    Authentication, payments, and cross-app navigation
+  </Card>
+</CardGroup>
+
+## Feature Detection
+
+Before using an API, you can check if it's supported in the current environment:
+
+```javascript
+if (my.canIUse('getLocation')) {
+  my.getLocation({
+    success: (res) => {
+      console.log(res);
+    }
+  });
+} else {
+  console.log('getLocation is not supported');
+}
+```
+
+<Warning>
+Always use feature detection for APIs that may not be available on all platform versions. This ensures your Mini App degrades gracefully on older versions.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="JSAPI Reference" icon="book" href="/jsapi/reference">
+    Complete API reference by category
+  </Card>
+  <Card title="JS Bridge Guide" icon="bridge" href="/jsapi/jsbridge-guide">
+    Cross-app launch integration
+  </Card>
+</CardGroup>

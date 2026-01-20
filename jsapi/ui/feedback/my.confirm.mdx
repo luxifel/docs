@@ -1,0 +1,51 @@
+---
+title: my.confirm
+description: Display a confirmation dialog with confirm and cancel buttons.
+---
+
+Use this API to show a modal dialog with two buttons for user confirmation.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| title | String | No | Dialog title |
+| content | String | No | Dialog message |
+| confirmButtonText | String | No | Confirm button text (default: "OK") |
+| cancelButtonText | String | No | Cancel button text (default: "Cancel") |
+| success | Function | No | Callback with result |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| confirm | Boolean | `true` if user tapped confirm button |
+
+## Code Example
+
+```javascript
+my.confirm({
+  title: 'Confirm',
+  content: 'Are you sure you want to delete this item?',
+  confirmButtonText: 'Delete',
+  cancelButtonText: 'Cancel',
+  success: (result) => {
+    if (result.confirm) {
+      this.deleteItem();
+    }
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.alert" icon="circle-exclamation" href="/jsapi/ui/feedback/my.alert">
+    Show alert dialog
+  </Card>
+  <Card title="my.prompt" icon="keyboard" href="/jsapi/ui/feedback/my.prompt">
+    Show input dialog
+  </Card>
+</CardGroup>

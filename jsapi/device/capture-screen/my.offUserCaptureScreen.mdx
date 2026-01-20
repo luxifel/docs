@@ -1,0 +1,75 @@
+---
+title: my.offUserCaptureScreen
+description: Stop listening for user screenshot events.
+---
+
+Use this API to stop listening for screenshot events that were registered with `my.onUserCaptureScreen()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove All Listeners
+
+```javascript
+// Remove all screenshot listeners
+my.offUserCaptureScreen();
+```
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    my.onUserCaptureScreen(this.handleScreenshot);
+  },
+
+  handleScreenshot() {
+    console.log('Screenshot taken');
+  },
+
+  onUnload() {
+    my.offUserCaptureScreen(this.handleScreenshot);
+  }
+});
+```
+
+### Conditional Screenshot Handling
+
+```javascript
+Page({
+  data: {
+    screenshotHandlerActive: false
+  },
+
+  enableScreenshotHandler() {
+    my.onUserCaptureScreen(this.onScreenshot);
+    this.setData({ screenshotHandlerActive: true });
+  },
+
+  disableScreenshotHandler() {
+    my.offUserCaptureScreen(this.onScreenshot);
+    this.setData({ screenshotHandlerActive: false });
+  },
+
+  onScreenshot() {
+    my.showSharePanel();
+  }
+});
+```
+
+<Tip>
+Always clean up screenshot listeners in `onUnload` to prevent memory leaks and unexpected behavior.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onUserCaptureScreen" icon="camera" href="/jsapi/device/capture-screen/my.onUserCaptureScreen">
+    Listen for screenshots
+  </Card>
+</CardGroup>

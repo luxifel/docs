@@ -1,0 +1,47 @@
+---
+title: my.connectSocket
+description: Create a WebSocket connection.
+---
+
+Create a WebSocket connection to a server.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| url | String | Yes | WebSocket URL (wss:// required in production) |
+| header | Object | No | Request headers |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.connectSocket({
+  url: 'wss://example.com/socket',
+  success: () => {
+    console.log('Connection initiated');
+  }
+});
+
+my.onSocketOpen(() => {
+  console.log('WebSocket connected');
+  my.sendSocketMessage({ data: 'Hello' });
+});
+
+my.onSocketMessage((res) => {
+  console.log('Received:', res.data);
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.sendSocketMessage" icon="paper-plane" href="/jsapi/network/my.sendSocketMessage">
+    Send message
+  </Card>
+  <Card title="my.closeSocket" icon="xmark" href="/jsapi/network/my.closeSocket">
+    Close connection
+  </Card>
+</CardGroup>

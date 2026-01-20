@@ -1,0 +1,74 @@
+---
+title: my.offUnhandledRejection
+description: Stop listening for unhandled Promise rejection events.
+---
+
+Use this API to stop listening for unhandled Promise rejection events that were registered with `my.onUnhandledRejection()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove Specific Listener
+
+```javascript
+App({
+  onLaunch() {
+    my.onUnhandledRejection(this.rejectionHandler);
+  },
+
+  rejectionHandler(res) {
+    console.error('Unhandled rejection:', res.reason);
+  },
+
+  // Call this to remove the listener
+  removeRejectionListener() {
+    my.offUnhandledRejection(this.rejectionHandler);
+  }
+});
+```
+
+### Remove All Listeners
+
+```javascript
+// Remove all unhandled rejection listeners
+my.offUnhandledRejection();
+```
+
+### Page Lifecycle Management
+
+```javascript
+Page({
+  onShow() {
+    my.onUnhandledRejection(this.handleRejection);
+  },
+
+  onHide() {
+    // Clean up when page is hidden
+    my.offUnhandledRejection(this.handleRejection);
+  },
+
+  handleRejection(res) {
+    console.error('Rejection on page:', res.reason);
+  }
+});
+```
+
+<Tip>
+Pass the same callback function reference to `my.offUnhandledRejection()` that was used with `my.onUnhandledRejection()` to remove only that specific listener.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onUnhandledRejection" icon="exclamation-triangle" href="/jsapi/event/my.onUnhandledRejection">
+    Listen for unhandled rejections
+  </Card>
+  <Card title="my.offError" icon="xmark" href="/jsapi/event/my.offError">
+    Stop listening for error events
+  </Card>
+</CardGroup>

@@ -1,0 +1,21 @@
+---
+title: my.onSocketOpen
+description: Listen for WebSocket connection open events.
+---
+
+Register a callback for when the WebSocket connection is established.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Handler for connection open |
+
+## Code Example
+
+```javascript
+my.onSocketOpen(() => {
+  console.log('WebSocket connected');
+  my.sendSocketMessage({ data: 'Hello server' });
+});
+```

@@ -1,0 +1,117 @@
+---
+title: my.setScreenBrightness
+description: Set the screen brightness level.
+---
+
+Use this API to set the screen brightness level. This is useful for QR code display screens or reading modes.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| brightness | Number | Yes | Brightness value (0-1), where 0 is darkest and 1 is brightest |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.setScreenBrightness({
+  brightness: 1.0, // Maximum brightness
+  success() {
+    console.log('Brightness set');
+  }
+});
+```
+
+### QR Code Display
+
+```javascript
+Page({
+  data: {
+    originalBrightness: 0.5
+  },
+
+  onLoad() {
+    // Save original brightness
+    my.getScreenBrightness({
+      success: (res) => {
+        this.setData({ originalBrightness: res.brightness });
+        // Set to max for QR code
+        my.setScreenBrightness({ brightness: 1.0 });
+      }
+    });
+  },
+
+  onUnload() {
+    // Restore original brightness
+    my.setScreenBrightness({
+      brightness: this.data.originalBrightness
+    });
+  }
+});
+```
+
+### Reading Mode Toggle
+
+```javascript
+Page({
+  data: {
+    readingMode: false,
+    savedBrightness: 0.5
+  },
+
+  toggleReadingMode() {
+    if (this.data.readingMode) {
+      // Exit reading mode
+      my.setScreenBrightness({
+        brightness: this.data.savedBrightness,
+        success: () => {
+          this.setData({ readingMode: false });
+        }
+      });
+    } else {
+      // Enter reading mode (dim screen)
+      my.getScreenBrightness({
+        success: (res) => {
+          this.setData({ savedBrightness: res.brightness });
+          my.setScreenBrightness({
+            brightness: 0.3,
+            success: () => {
+              this.setData({ readingMode: true });
+            }
+          });
+        }
+      });
+    }
+  }
+});
+```
+
+### Brightness Slider
+
+```javascript
+Page({
+  onSliderChange(e) {
+    const brightness = e.detail.value / 100;
+    my.setScreenBrightness({
+      brightness: brightness
+    });
+  }
+});
+```
+
+<Warning>
+Always restore the original brightness when leaving a page that modified it. Users may find it disruptive if brightness changes persist unexpectedly.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getScreenBrightness" icon="sun" href="/jsapi/device/screen-brightness/my.getScreenBrightness">
+    Get current brightness
+  </Card>
+</CardGroup>

@@ -1,0 +1,74 @@
+---
+title: my.offAccelerometerChange
+description: Stop listening for accelerometer data changes.
+---
+
+Use this API to stop listening for accelerometer data changes that were registered with `my.onAccelerometerChange()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    my.onAccelerometerChange(this.handleAccelerometer);
+  },
+
+  handleAccelerometer(res) {
+    console.log('Acceleration:', res.x, res.y, res.z);
+  },
+
+  onUnload() {
+    my.offAccelerometerChange(this.handleAccelerometer);
+  }
+});
+```
+
+### Remove All Listeners
+
+```javascript
+// Remove all accelerometer listeners
+my.offAccelerometerChange();
+```
+
+### Game Pause/Resume
+
+```javascript
+Page({
+  onShow() {
+    my.startAccelerometer();
+    my.onAccelerometerChange(this.handleTilt);
+  },
+
+  onHide() {
+    // Stop listening when page is hidden
+    my.offAccelerometerChange(this.handleTilt);
+  },
+
+  handleTilt(res) {
+    this.updateGameControls(res.x, res.y);
+  }
+});
+```
+
+<Tip>
+Pass the same callback function reference to `my.offAccelerometerChange()` that was used with `my.onAccelerometerChange()` to remove only that specific listener.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onAccelerometerChange" icon="gauge" href="/jsapi/device/accelerometer/my.onAccelerometerChange">
+    Listen for accelerometer changes
+  </Card>
+  <Card title="my.startAccelerometer" icon="play" href="/jsapi/device/accelerometer/my.startAccelerometer">
+    Start accelerometer
+  </Card>
+</CardGroup>

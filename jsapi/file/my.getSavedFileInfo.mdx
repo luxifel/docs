@@ -1,0 +1,34 @@
+---
+title: my.getSavedFileInfo
+description: Get information about a saved file.
+---
+
+Get information about a file saved with `my.saveFile`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| apFilePath | String | Yes | Saved file path |
+| success | Function | No | Callback with info |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| size | Number | File size in bytes |
+| createTime | Number | Creation timestamp |
+
+## Code Example
+
+```javascript
+my.getSavedFileInfo({
+  apFilePath: savedPath,
+  success: (res) => {
+    console.log('Size:', res.size);
+    console.log('Created:', new Date(res.createTime));
+  }
+});
+```

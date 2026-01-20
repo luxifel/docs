@@ -1,0 +1,51 @@
+---
+title: my.multiLevelSelect
+description: Display a multi-level cascading selector.
+---
+
+Use this API to show a cascading picker for hierarchical data selection.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| title | String | No | Selector title |
+| list | Array | Yes | Hierarchical data array |
+| success | Function | No | Callback with selection |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Whether selection was successful |
+| result | Array | Selected items array |
+
+## Code Example
+
+```javascript
+my.multiLevelSelect({
+  title: 'Select Location',
+  list: [
+    {
+      name: 'USA',
+      subList: [
+        { name: 'California' },
+        { name: 'New York' }
+      ]
+    }
+  ],
+  success: (res) => {
+    console.log('Selected:', res.result);
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.datePicker" icon="calendar" href="/jsapi/ui/choose-date/my.datePicker">
+    Date picker
+  </Card>
+</CardGroup>

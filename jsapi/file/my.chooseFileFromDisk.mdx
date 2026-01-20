@@ -1,0 +1,32 @@
+---
+title: my.chooseFileFromDisk
+description: Choose a file from device storage.
+---
+
+Open file picker to select a file from device storage.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| count | Number | No | Maximum files to select |
+| success | Function | No | Callback with file paths |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| apFilePaths | Array | Selected file paths |
+
+## Code Example
+
+```javascript
+my.chooseFileFromDisk({
+  count: 1,
+  success: (res) => {
+    console.log('Selected:', res.apFilePaths);
+  }
+});
+```

@@ -1,0 +1,81 @@
+---
+title: my.offAppShow
+description: Stop listening for events when the Mini Program switches to foreground.
+---
+
+Use this API to stop listening for foreground transition events that were registered with `my.onAppShow()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    // Register listener
+    my.onAppShow(this.onAppShowHandler);
+  },
+
+  onUnload() {
+    // Remove specific listener
+    my.offAppShow(this.onAppShowHandler);
+  },
+
+  onAppShowHandler() {
+    console.log('App moved to foreground');
+  }
+});
+```
+
+### Remove All Listeners
+
+```javascript
+// Remove all onAppShow listeners
+my.offAppShow();
+```
+
+### AXML with Button
+
+```xml
+<button size="default" onTap="removeListener" type="primary">
+  Stop listening for foreground events
+</button>
+```
+
+```javascript
+Page({
+  onLoad() {
+    my.onAppShow(this.onAppShowHandler);
+  },
+
+  onAppShowHandler() {
+    console.log('App is now in foreground');
+  },
+
+  removeListener() {
+    my.offAppShow(this.onAppShowHandler);
+    my.showToast({ content: 'Listener removed' });
+  }
+});
+```
+
+<Tip>
+Pass the same callback function reference to `my.offAppShow()` that was used with `my.onAppShow()` to remove only that specific listener.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onAppShow" icon="eye" href="/jsapi/event/my.onAppShow">
+    Listen for foreground events
+  </Card>
+  <Card title="my.offAppHide" icon="xmark" href="/jsapi/event/my.offAppHide">
+    Stop listening for background events
+  </Card>
+</CardGroup>

@@ -1,0 +1,114 @@
+---
+title: my.connectBLEDevice
+description: Connect to a Bluetooth Low Energy device.
+---
+
+Use this API to establish a connection to a Bluetooth Low Energy (BLE) device.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| deviceId | String | Yes | Device identifier from discovery |
+| timeout | Number | No | Connection timeout in milliseconds |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.connectBLEDevice({
+  deviceId: 'XX:XX:XX:XX:XX:XX',
+  success() {
+    console.log('Connected to device');
+  },
+  fail(err) {
+    console.error('Connection failed:', err);
+  }
+});
+```
+
+### Connect with Timeout
+
+```javascript
+my.connectBLEDevice({
+  deviceId: 'XX:XX:XX:XX:XX:XX',
+  timeout: 5000, // 5 second timeout
+  success() {
+    console.log('Connected');
+  },
+  fail(err) {
+    if (err.error === 10012) {
+      my.showToast({ content: 'Connection timeout', type: 'fail' });
+    }
+  }
+});
+```
+
+### Complete Connection Flow
+
+```javascript
+Page({
+  data: {
+    connectedDevice: null
+  },
+
+  connectToDevice(device) {
+    my.showLoading({ content: 'Connecting...' });
+
+    my.connectBLEDevice({
+      deviceId: device.deviceId,
+      timeout: 10000,
+      success: () => {
+        my.hideLoading();
+        this.setData({ connectedDevice: device });
+        my.showToast({ content: `Connected to ${device.name}` });
+        this.discoverServices(device.deviceId);
+      },
+      fail: (err) => {
+        my.hideLoading();
+        my.alert({
+          title: 'Connection Failed',
+          content: 'Could not connect to device. Please try again.'
+        });
+      }
+    });
+  },
+
+  discoverServices(deviceId) {
+    my.getBLEDeviceServices({
+      deviceId: deviceId,
+      success: (res) => {
+        console.log('Services:', res.services);
+      }
+    });
+  }
+});
+```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 10000 | Bluetooth adapter not initialized |
+| 10001 | Bluetooth not enabled |
+| 10012 | Connection timeout |
+| 10013 | Device not found |
+
+<Warning>
+Ensure the device is in range and advertising before attempting to connect. Use discovery to verify the device is available.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.disconnectBLEDevice" icon="link-slash" href="/jsapi/device/bluetooth/my.disconnectBLEDevice">
+    Disconnect from device
+  </Card>
+  <Card title="my.onBluetoothDeviceFound" icon="magnifying-glass" href="/jsapi/device/bluetooth/my.onBluetoothDeviceFound">
+    Discover devices
+  </Card>
+</CardGroup>

@@ -1,0 +1,92 @@
+---
+title: my.onCompassChange
+description: Listen for compass heading changes.
+---
+
+Use this API to listen for compass heading changes. The callback provides the device's current heading direction.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Callback function when compass heading changes |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| direction | Number | Heading in degrees (0-360), where 0 is North |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.onCompassChange((res) => {
+  console.log('Direction:', res.direction);
+});
+```
+
+### Compass Display
+
+```javascript
+Page({
+  data: {
+    direction: 0,
+    cardinalDirection: 'N'
+  },
+
+  onLoad() {
+    my.onCompassChange((res) => {
+      this.setData({
+        direction: Math.round(res.direction),
+        cardinalDirection: this.getCardinalDirection(res.direction)
+      });
+    });
+  },
+
+  getCardinalDirection(degrees) {
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    const index = Math.round(degrees / 45) % 8;
+    return directions[index];
+  },
+
+  onUnload() {
+    my.offCompassChange();
+  }
+});
+```
+
+### Navigation Arrow
+
+```javascript
+Page({
+  data: {
+    targetBearing: 45, // Target is NE
+    arrowRotation: 0
+  },
+
+  onLoad() {
+    my.onCompassChange((res) => {
+      // Calculate rotation to point at target
+      const rotation = this.data.targetBearing - res.direction;
+      this.setData({ arrowRotation: rotation });
+    });
+  }
+});
+```
+
+<Tip>
+Call `my.startCompass` before using this API to begin receiving compass data.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offCompassChange" icon="xmark" href="/jsapi/device/compass/my.offCompassChange">
+    Stop listening for changes
+  </Card>
+  <Card title="my.startCompass" icon="play" href="/jsapi/device/compass/my.startCompass">
+    Start compass
+  </Card>
+</CardGroup>

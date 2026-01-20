@@ -1,0 +1,104 @@
+---
+title: my.watchShake
+description: Listen for device shake events.
+---
+
+Use this API to listen for device shake events. This is useful for implementing "shake to refresh" or similar shake-triggered features.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback when shake is detected |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.watchShake({
+  success() {
+    console.log('Device was shaken!');
+  }
+});
+```
+
+### Shake to Refresh
+
+```javascript
+Page({
+  onLoad() {
+    this.enableShakeRefresh();
+  },
+
+  enableShakeRefresh() {
+    my.watchShake({
+      success: () => {
+        my.vibrate();
+        this.refreshData();
+        // Re-enable shake detection
+        this.enableShakeRefresh();
+      }
+    });
+  },
+
+  refreshData() {
+    my.showLoading({ content: 'Refreshing...' });
+    my.request({
+      url: 'https://api.example.com/data',
+      success: (res) => {
+        this.setData({ items: res.data });
+        my.hideLoading();
+      }
+    });
+  }
+});
+```
+
+### Shake for Random Selection
+
+```javascript
+Page({
+  data: {
+    options: ['Option A', 'Option B', 'Option C', 'Option D'],
+    selected: null
+  },
+
+  onLoad() {
+    this.startShakeDetection();
+  },
+
+  startShakeDetection() {
+    my.watchShake({
+      success: () => {
+        my.vibrate();
+        this.selectRandom();
+        this.startShakeDetection();
+      }
+    });
+  },
+
+  selectRandom() {
+    const { options } = this.data;
+    const randomIndex = Math.floor(Math.random() * options.length);
+    this.setData({ selected: options[randomIndex] });
+  }
+});
+```
+
+<Tip>
+`my.watchShake` only triggers once per call. To continuously detect shakes, call it again in the success callback.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offWatchShake" icon="xmark" href="/jsapi/device/watch-shake/my.offWatchShake">
+    Stop watching for shakes
+  </Card>
+  <Card title="my.vibrate" icon="mobile" href="/jsapi/device/vibrate/my.vibrate">
+    Trigger device vibration
+  </Card>
+</CardGroup>

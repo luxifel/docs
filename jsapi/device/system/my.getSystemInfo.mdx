@@ -1,0 +1,42 @@
+---
+title: my.getSystemInfo
+description: Get system and device information.
+---
+
+Get detailed information about the device, system, and Mini Program environment.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback with system info |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| brand | String | Device brand |
+| model | String | Device model |
+| system | String | OS version |
+| platform | String | Platform (iOS/Android) |
+| version | String | Mini Program version |
+| screenWidth | Number | Screen width in px |
+| screenHeight | Number | Screen height in px |
+| windowWidth | Number | Window width in px |
+| windowHeight | Number | Window height in px |
+| statusBarHeight | Number | Status bar height in px |
+| language | String | System language |
+
+## Code Example
+
+```javascript
+my.getSystemInfo({
+  success: (res) => {
+    console.log('Device:', res.brand, res.model);
+    console.log('System:', res.system);
+    console.log('Screen:', res.screenWidth, 'x', res.screenHeight);
+  }
+});
+```

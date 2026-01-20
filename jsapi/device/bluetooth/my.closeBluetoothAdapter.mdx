@@ -1,0 +1,76 @@
+---
+title: my.closeBluetoothAdapter
+description: Close the Bluetooth adapter.
+---
+
+Use this API to close the Bluetooth adapter and release system resources. Call this when you're done using Bluetooth.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.closeBluetoothAdapter({
+  success() {
+    console.log('Bluetooth adapter closed');
+  }
+});
+```
+
+### Complete Bluetooth Lifecycle
+
+```javascript
+Page({
+  onLoad() {
+    my.openBluetoothAdapter({
+      success: () => {
+        this.startScanning();
+      }
+    });
+  },
+
+  startScanning() {
+    my.startBluetoothDevicesDiscovery({
+      success: () => {
+        console.log('Scanning for devices...');
+      }
+    });
+  },
+
+  stopAndCleanup() {
+    my.stopBluetoothDevicesDiscovery();
+    my.closeBluetoothAdapter({
+      success: () => {
+        console.log('Bluetooth cleanup complete');
+      }
+    });
+  },
+
+  onUnload() {
+    this.stopAndCleanup();
+  }
+});
+```
+
+<Tip>
+Always close the Bluetooth adapter in `onUnload` to ensure resources are properly released when leaving the page.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.openBluetoothAdapter" icon="bluetooth-b" href="/jsapi/device/bluetooth/my.openBluetoothAdapter">
+    Initialize Bluetooth
+  </Card>
+  <Card title="my.getBluetoothAdapterState" icon="info" href="/jsapi/device/bluetooth/my.getBluetoothAdapterState">
+    Get adapter state
+  </Card>
+</CardGroup>

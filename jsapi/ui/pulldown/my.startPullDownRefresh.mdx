@@ -1,0 +1,32 @@
+---
+title: my.startPullDownRefresh
+description: Trigger pull-down refresh programmatically.
+---
+
+Use this API to start the pull-down refresh animation and trigger the `onPullDownRefresh` event.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.startPullDownRefresh({
+  success() {
+    console.log('Pull down refresh started');
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.stopPullDownRefresh" icon="xmark" href="/jsapi/ui/pulldown/my.stopPullDownRefresh">
+    Stop pull-down refresh
+  </Card>
+</CardGroup>

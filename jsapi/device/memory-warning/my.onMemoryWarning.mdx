@@ -1,0 +1,116 @@
+---
+title: my.onMemoryWarning
+description: Listen for system memory warning events.
+---
+
+Use this API to listen for system memory warning events. When the system is running low on memory, you can release unnecessary resources to prevent your Mini Program from being terminated.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Callback function when memory warning occurs |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| level | Number | Memory warning level (higher means more critical) |
+
+## Memory Warning Levels
+
+| Level | Description |
+|-------|-------------|
+| 10 | Low memory warning (iOS only) |
+| 15 | Critical memory warning (iOS only) |
+| 5 | Low memory warning (Android) |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.onMemoryWarning((res) => {
+  console.log('Memory warning level:', res.level);
+});
+```
+
+### Release Resources on Warning
+
+```javascript
+App({
+  globalData: {
+    cache: {},
+    images: []
+  },
+
+  onLaunch() {
+    my.onMemoryWarning((res) => {
+      console.log('Memory warning:', res.level);
+      this.releaseMemory(res.level);
+    });
+  },
+
+  releaseMemory(level) {
+    if (level >= 10) {
+      // Clear cached data
+      this.globalData.cache = {};
+
+      // Clear large image arrays
+      this.globalData.images = [];
+
+      console.log('Memory released due to warning');
+    }
+  }
+});
+```
+
+### Page-Level Memory Management
+
+```javascript
+Page({
+  data: {
+    largeDataSet: [],
+    imageUrls: []
+  },
+
+  onLoad() {
+    my.onMemoryWarning(this.handleMemoryWarning);
+    this.loadData();
+  },
+
+  handleMemoryWarning(res) {
+    if (res.level >= 10) {
+      // Keep only essential data
+      const essentialData = this.data.largeDataSet.slice(0, 10);
+      this.setData({
+        largeDataSet: essentialData,
+        imageUrls: []
+      });
+
+      my.showToast({
+        content: 'Cleared cache to free memory'
+      });
+    }
+  },
+
+  onUnload() {
+    my.offMemoryWarning(this.handleMemoryWarning);
+  }
+});
+```
+
+<Warning>
+When you receive a memory warning, release unused resources immediately. Failure to do so may result in your Mini Program being terminated by the system.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offMemoryWarning" icon="xmark" href="/jsapi/device/memory-warning/my.offMemoryWarning">
+    Stop listening for warnings
+  </Card>
+  <Card title="my.getSystemInfo" icon="mobile" href="/jsapi/device/system/my.getSystemInfo">
+    Get system information
+  </Card>
+</CardGroup>

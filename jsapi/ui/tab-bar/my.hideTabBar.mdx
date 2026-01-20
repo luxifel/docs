@@ -1,0 +1,90 @@
+---
+title: my.hideTabBar
+description: Hide the tab bar in the Mini Program.
+---
+
+Use this API to hide the tab bar, optionally with an animation effect.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| animation | Boolean | No | Whether to animate the hiding. Default: `false` |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.hideTabBar();
+```
+
+### With Animation
+
+```javascript
+my.hideTabBar({
+  animation: true
+});
+```
+
+### With Callbacks
+
+```javascript
+my.hideTabBar({
+  animation: true,
+  success() {
+    console.log('Tab bar hidden');
+  },
+  fail(err) {
+    console.error('Failed to hide tab bar:', err);
+  }
+});
+```
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Fullscreen Content">
+    Hide the tab bar when displaying fullscreen content like videos or images.
+
+    ```javascript
+    Page({
+      enterFullscreen() {
+        my.hideTabBar({ animation: true });
+      },
+
+      exitFullscreen() {
+        my.showTabBar({ animation: true });
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Conditional Display">
+    Hide tab bar based on user role or state.
+
+    ```javascript
+    Page({
+      onLoad() {
+        if (this.data.isGuest) {
+          my.hideTabBar();
+        }
+      }
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.setTabBarStyle" icon="palette" href="/jsapi/ui/tab-bar/my.setTabBarStyle">
+    Customize tab bar style
+  </Card>
+  <Card title="my.switchTab" icon="arrows-left-right" href="/jsapi/ui/route/my.switchTab">
+    Navigate to a tab page
+  </Card>
+</CardGroup>

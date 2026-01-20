@@ -1,0 +1,32 @@
+---
+title: my.getSavedFileList
+description: Get the list of all saved files.
+---
+
+Get a list of all locally saved files.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback with file list |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| fileList | Array | Array of file objects with `apFilePath`, `size`, `createTime` |
+
+## Code Example
+
+```javascript
+my.getSavedFileList({
+  success: (res) => {
+    res.fileList.forEach(file => {
+      console.log(file.apFilePath, file.size);
+    });
+  }
+});
+```

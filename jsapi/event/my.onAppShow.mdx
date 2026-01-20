@@ -1,0 +1,138 @@
+---
+title: my.onAppShow
+description: Listen for events when the Mini Program switches from background to foreground.
+---
+
+Use this API to listen for events when the Mini Program transitions from background to foreground. The callback triggers at the same time as the `onShow()` lifecycle method in the app registration.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Handler executed when the app moves to foreground |
+
+## Callback Parameters
+
+The callback receives the same parameters as the `onShow()` lifecycle method:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| path | String | Path of the page that was opened |
+| query | Object | Query parameters from the launch URL |
+| referrerInfo | Object | Information about the source app |
+
+## Code Example
+
+```javascript
+Page({
+  onLoad() {
+    // Register listener when page loads
+    my.onAppShow(this.onAppShowHandler);
+  },
+
+  onUnload() {
+    // Clean up listener when page unloads
+    my.offAppShow(this.onAppShowHandler);
+  },
+
+  onAppShowHandler(res) {
+    console.log('App moved to foreground');
+    console.log('Path:', res.path);
+    console.log('Query:', res.query);
+
+    // Refresh data when app becomes visible
+    this.refreshData();
+  },
+
+  refreshData() {
+    // Fetch latest data
+  }
+});
+```
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Refresh Data on Resume">
+    ```javascript
+    Page({
+      onLoad() {
+        my.onAppShow(() => {
+          // Refresh data when user returns to app
+          this.fetchLatestData();
+        });
+      },
+
+      fetchLatestData() {
+        my.request({
+          url: 'https://api.example.com/data',
+          success: (res) => {
+            this.setData({ items: res.data });
+          }
+        });
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Resume Paused Operations">
+    ```javascript
+    Page({
+      data: {
+        timer: null
+      },
+
+      onLoad() {
+        my.onAppShow(this.resumeTimer.bind(this));
+        my.onAppHide(this.pauseTimer.bind(this));
+        this.startTimer();
+      },
+
+      startTimer() {
+        this.data.timer = setInterval(() => {
+          // Timer logic
+        }, 1000);
+      },
+
+      pauseTimer() {
+        clearInterval(this.data.timer);
+      },
+
+      resumeTimer() {
+        this.startTimer();
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Analytics Tracking">
+    ```javascript
+    App({
+      onLaunch() {
+        my.onAppShow((res) => {
+          // Track app resume events
+          this.trackEvent('app_resume', {
+            path: res.path,
+            timestamp: Date.now()
+          });
+        });
+      }
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+Always remove event listeners when they're no longer needed using `my.offAppShow()` to prevent memory leaks.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offAppShow" icon="xmark" href="/jsapi/event/my.offAppShow">
+    Stop listening for foreground events
+  </Card>
+  <Card title="my.onAppHide" icon="eye-slash" href="/jsapi/event/my.onAppHide">
+    Listen for background events
+  </Card>
+</CardGroup>

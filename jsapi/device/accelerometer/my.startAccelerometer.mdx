@@ -1,0 +1,104 @@
+---
+title: my.startAccelerometer
+description: Start listening for accelerometer data.
+---
+
+Use this API to start the accelerometer sensor. After calling this, you can use `my.onAccelerometerChange` to receive accelerometer data.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| interval | String | No | Data reporting interval: `game` (20ms), `ui` (60ms), `normal` (200ms). Default: `normal` |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.startAccelerometer({
+  success() {
+    console.log('Accelerometer started');
+  }
+});
+```
+
+### High Frequency for Games
+
+```javascript
+my.startAccelerometer({
+  interval: 'game', // 20ms updates
+  success() {
+    my.onAccelerometerChange((res) => {
+      this.updatePlayerPosition(res.x, res.y);
+    });
+  }
+});
+```
+
+### Motion Tracking App
+
+```javascript
+Page({
+  data: {
+    isTracking: false
+  },
+
+  startTracking() {
+    my.startAccelerometer({
+      interval: 'ui',
+      success: () => {
+        this.setData({ isTracking: true });
+        my.onAccelerometerChange(this.recordMotion);
+      },
+      fail(err) {
+        my.showToast({
+          content: 'Failed to start accelerometer',
+          type: 'fail'
+        });
+      }
+    });
+  },
+
+  stopTracking() {
+    my.offAccelerometerChange(this.recordMotion);
+    this.setData({ isTracking: false });
+  },
+
+  recordMotion(res) {
+    // Store motion data
+    this.motionData.push({
+      x: res.x,
+      y: res.y,
+      z: res.z,
+      timestamp: Date.now()
+    });
+  }
+});
+```
+
+## Interval Options
+
+| Value | Update Frequency | Use Case |
+|-------|------------------|----------|
+| `game` | ~50 times/sec (20ms) | Games requiring real-time response |
+| `ui` | ~16 times/sec (60ms) | UI animations and interactions |
+| `normal` | ~5 times/sec (200ms) | General motion detection |
+
+<Warning>
+Higher frequency intervals consume more battery. Use `normal` or `ui` unless you specifically need `game` frequency for real-time applications.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onAccelerometerChange" icon="gauge" href="/jsapi/device/accelerometer/my.onAccelerometerChange">
+    Listen for accelerometer data
+  </Card>
+  <Card title="my.offAccelerometerChange" icon="xmark" href="/jsapi/device/accelerometer/my.offAccelerometerChange">
+    Stop listening
+  </Card>
+</CardGroup>

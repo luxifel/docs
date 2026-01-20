@@ -1,0 +1,115 @@
+---
+title: my.getServerTime
+description: Get the current server time.
+---
+
+Use this API to get the current server time. This is useful when you need accurate time that cannot be manipulated by the user changing their device time.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| time | Number | Server timestamp in milliseconds |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.getServerTime({
+  success(res) {
+    console.log('Server time:', res.time);
+    console.log('Date:', new Date(res.time));
+  }
+});
+```
+
+### Time-Sensitive Operations
+
+```javascript
+Page({
+  data: {
+    saleEndTime: 1735689600000, // Sale end timestamp
+    timeRemaining: null
+  },
+
+  onLoad() {
+    this.updateCountdown();
+    setInterval(() => this.updateCountdown(), 1000);
+  },
+
+  updateCountdown() {
+    my.getServerTime({
+      success: (res) => {
+        const remaining = this.data.saleEndTime - res.time;
+        if (remaining > 0) {
+          this.setData({
+            timeRemaining: this.formatTime(remaining)
+          });
+        } else {
+          this.setData({ timeRemaining: 'Sale ended' });
+        }
+      }
+    });
+  },
+
+  formatTime(ms) {
+    const hours = Math.floor(ms / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+});
+```
+
+### Preventing Time Manipulation
+
+```javascript
+async function validateAction() {
+  return new Promise((resolve, reject) => {
+    my.getServerTime({
+      success(res) {
+        const serverTime = res.time;
+        const actionDeadline = 1735689600000;
+
+        if (serverTime > actionDeadline) {
+          reject(new Error('Action deadline has passed'));
+        } else {
+          resolve(serverTime);
+        }
+      },
+      fail(err) {
+        reject(err);
+      }
+    });
+  });
+}
+
+// Usage
+try {
+  const time = await validateAction();
+  // Proceed with time-sensitive action
+} catch (err) {
+  my.showToast({ content: err.message, type: 'fail' });
+}
+```
+
+<Warning>
+Always use server time for time-sensitive operations like flash sales, limited offers, or time-based verification to prevent users from manipulating results by changing device time.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getSystemInfo" icon="mobile" href="/jsapi/device/system/my.getSystemInfo">
+    Get system information
+  </Card>
+</CardGroup>

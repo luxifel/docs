@@ -1,0 +1,93 @@
+---
+title: my.onBluetoothAdapterStateChange
+description: Listen for Bluetooth adapter state changes.
+---
+
+Use this API to listen for changes in the Bluetooth adapter state, such as when Bluetooth is turned on or off.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Callback when adapter state changes |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| available | Boolean | Whether Bluetooth is available |
+| discovering | Boolean | Whether currently discovering devices |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.onBluetoothAdapterStateChange((res) => {
+  console.log('Bluetooth available:', res.available);
+  console.log('Discovering:', res.discovering);
+});
+```
+
+### Handle Bluetooth Toggle
+
+```javascript
+Page({
+  onLoad() {
+    my.onBluetoothAdapterStateChange(this.handleStateChange);
+    my.openBluetoothAdapter();
+  },
+
+  handleStateChange(res) {
+    if (!res.available) {
+      my.alert({
+        title: 'Bluetooth Disabled',
+        content: 'Please enable Bluetooth to continue using this feature.'
+      });
+      this.setData({ bluetoothEnabled: false });
+    } else {
+      this.setData({ bluetoothEnabled: true });
+    }
+  },
+
+  onUnload() {
+    my.offBluetoothAdapterStateChange(this.handleStateChange);
+    my.closeBluetoothAdapter();
+  }
+});
+```
+
+### Auto-Resume Discovery
+
+```javascript
+Page({
+  data: {
+    shouldBeDiscovering: false
+  },
+
+  onLoad() {
+    my.onBluetoothAdapterStateChange((res) => {
+      if (res.available && this.data.shouldBeDiscovering && !res.discovering) {
+        // Bluetooth came back, resume discovery
+        my.startBluetoothDevicesDiscovery();
+      }
+    });
+  },
+
+  startScan() {
+    this.setData({ shouldBeDiscovering: true });
+    my.startBluetoothDevicesDiscovery();
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offBluetoothAdapterStateChange" icon="xmark" href="/jsapi/device/bluetooth/my.offBluetoothAdapterStateChange">
+    Stop listening
+  </Card>
+  <Card title="my.getBluetoothAdapterState" icon="info" href="/jsapi/device/bluetooth/my.getBluetoothAdapterState">
+    Get current state
+  </Card>
+</CardGroup>

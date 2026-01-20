@@ -1,0 +1,28 @@
+---
+title: my.closeSocket
+description: Close a WebSocket connection.
+---
+
+Close an active WebSocket connection.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| code | Number | No | Close status code |
+| reason | String | No | Close reason |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.closeSocket({
+  code: 1000,
+  reason: 'Normal closure',
+  success: () => {
+    console.log('Socket closed');
+  }
+});
+```

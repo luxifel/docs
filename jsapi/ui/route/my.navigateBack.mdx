@@ -1,0 +1,128 @@
+---
+title: my.navigateBack
+description: Navigate back to a previous page in the page stack.
+---
+
+Use this API to close the current page and return to a previous page in the page stack.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| delta | Number | No | Number of pages to go back. Default: `1` |
+
+## Code Example
+
+### Go Back One Page
+
+```javascript
+my.navigateBack();
+```
+
+### Go Back Multiple Pages
+
+```javascript
+// Go back 2 pages
+my.navigateBack({
+  delta: 2
+});
+```
+
+### With Validation
+
+```javascript
+Page({
+  goBack() {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+      my.navigateBack();
+    } else {
+      // Already at first page, go to home
+      my.switchTab({
+        url: 'pages/home/home'
+      });
+    }
+  }
+});
+```
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Custom Back Button">
+    ```xml
+    <!-- AXML -->
+    <view class="header">
+      <view class="back-btn" onTap="goBack">
+        <text>Back</text>
+      </view>
+      <text class="title">Detail</text>
+    </view>
+    ```
+
+    ```javascript
+    Page({
+      goBack() {
+        my.navigateBack();
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Return After Form Submit">
+    ```javascript
+    Page({
+      async submitForm() {
+        try {
+          await this.saveData();
+          my.showToast({
+            content: 'Saved successfully',
+            type: 'success'
+          });
+
+          // Return to previous page after delay
+          setTimeout(() => {
+            my.navigateBack();
+          }, 1500);
+        } catch (err) {
+          my.showToast({
+            content: 'Save failed',
+            type: 'fail'
+          });
+        }
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Skip Intermediate Pages">
+    ```javascript
+    // If page stack is: Home > List > Detail > Edit
+    // Go directly back to List (skip Detail)
+    Page({
+      onSaveAndReturn() {
+        my.navigateBack({
+          delta: 2
+        });
+      }
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Notes
+
+- If `delta` is greater than the number of pages in the stack, it navigates to the first page
+- You cannot navigate back from the first page in the stack
+- Use `getCurrentPages()` to check the current page stack
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.navigateTo" icon="arrow-right" href="/jsapi/ui/route/my.navigateTo">
+    Navigate to a new page
+  </Card>
+  <Card title="my.reLaunch" icon="rotate" href="/jsapi/ui/route/my.reLaunch">
+    Relaunch to a page
+  </Card>
+</CardGroup>

@@ -1,0 +1,96 @@
+---
+title: my.onScreenOrientationChange
+description: Listen for screen orientation changes.
+---
+
+Use this API to listen for screen orientation changes. The callback triggers whenever the device orientation changes.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Callback function when orientation changes |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| orientation | String | New orientation: `portrait`, `landscape`, `portraitUpsideDown`, `landscapeLeft`, `landscapeRight` |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.onScreenOrientationChange((res) => {
+  console.log('Orientation changed to:', res.orientation);
+});
+```
+
+### Responsive Layout
+
+```javascript
+Page({
+  data: {
+    layout: 'portrait'
+  },
+
+  onLoad() {
+    my.onScreenOrientationChange(this.handleOrientationChange);
+  },
+
+  handleOrientationChange(res) {
+    const layout = res.orientation.includes('landscape')
+      ? 'landscape'
+      : 'portrait';
+
+    this.setData({ layout });
+    this.adjustLayout(layout);
+  },
+
+  adjustLayout(layout) {
+    if (layout === 'landscape') {
+      // Show expanded view
+      this.setData({ columns: 4, showSidebar: true });
+    } else {
+      // Show compact view
+      this.setData({ columns: 2, showSidebar: false });
+    }
+  },
+
+  onUnload() {
+    my.offScreenOrientationChange(this.handleOrientationChange);
+  }
+});
+```
+
+### Video Player Auto-Fullscreen
+
+```javascript
+Page({
+  onLoad() {
+    my.onScreenOrientationChange((res) => {
+      if (res.orientation.includes('landscape')) {
+        this.videoContext.requestFullScreen();
+      } else {
+        this.videoContext.exitFullScreen();
+      }
+    });
+  }
+});
+```
+
+<Tip>
+Remember to remove the listener with `my.offScreenOrientationChange` when the page unloads to prevent memory leaks.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offScreenOrientationChange" icon="xmark" href="/jsapi/device/screen-orientation/my.offScreenOrientationChange">
+    Stop listening
+  </Card>
+  <Card title="my.setScreenOrientation" icon="rotate" href="/jsapi/device/screen-orientation/my.setScreenOrientation">
+    Set orientation
+  </Card>
+</CardGroup>

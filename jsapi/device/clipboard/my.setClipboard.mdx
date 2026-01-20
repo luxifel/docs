@@ -1,0 +1,26 @@
+---
+title: my.setClipboard
+description: Copy content to the clipboard.
+---
+
+Copy text to the device clipboard.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| text | String | Yes | Text to copy |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.setClipboard({
+  text: 'Hello, world!',
+  success: () => {
+    my.showToast({ content: 'Copied!' });
+  }
+});
+```

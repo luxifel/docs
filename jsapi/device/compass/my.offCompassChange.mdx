@@ -1,0 +1,79 @@
+---
+title: my.offCompassChange
+description: Stop listening for compass heading changes.
+---
+
+Use this API to stop listening for compass heading changes that were registered with `my.onCompassChange()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    my.onCompassChange(this.handleCompass);
+  },
+
+  handleCompass(res) {
+    console.log('Heading:', res.direction);
+  },
+
+  onUnload() {
+    my.offCompassChange(this.handleCompass);
+  }
+});
+```
+
+### Remove All Listeners
+
+```javascript
+// Remove all compass listeners
+my.offCompassChange();
+```
+
+### Toggle Compass
+
+```javascript
+Page({
+  data: {
+    compassActive: false
+  },
+
+  toggleCompass() {
+    if (this.data.compassActive) {
+      my.offCompassChange(this.updateHeading);
+      this.setData({ compassActive: false });
+    } else {
+      my.startCompass();
+      my.onCompassChange(this.updateHeading);
+      this.setData({ compassActive: true });
+    }
+  },
+
+  updateHeading(res) {
+    this.setData({ heading: res.direction });
+  }
+});
+```
+
+<Tip>
+Pass the same callback function reference to `my.offCompassChange()` that was used with `my.onCompassChange()` to remove only that specific listener.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onCompassChange" icon="compass" href="/jsapi/device/compass/my.onCompassChange">
+    Listen for compass changes
+  </Card>
+  <Card title="my.startCompass" icon="play" href="/jsapi/device/compass/my.startCompass">
+    Start compass
+  </Card>
+</CardGroup>

@@ -1,0 +1,31 @@
+---
+title: my.openLocation
+description: Open a location in the built-in map viewer.
+---
+
+Display a location on the built-in map with navigation options.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| latitude | Number | Yes | Latitude |
+| longitude | Number | Yes | Longitude |
+| name | String | No | Location name |
+| address | String | No | Location address |
+| scale | Number | No | Map zoom level (5-18) |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.openLocation({
+  latitude: 40.7128,
+  longitude: -74.0060,
+  name: 'New York',
+  address: 'New York, NY, USA',
+  scale: 15
+});
+```

@@ -1,0 +1,35 @@
+---
+title: my.clearStorage
+description: Clear all data from local cache asynchronously.
+---
+
+Use this API to remove all data stored in local cache.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.clearStorage({
+  success: () => {
+    console.log('Storage cleared');
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.removeStorage" icon="minus" href="/jsapi/storage/my.removeStorage">
+    Remove specific key
+  </Card>
+  <Card title="my.clearStorageSync" icon="bolt" href="/jsapi/storage/my.clearStorageSync">
+    Clear synchronously
+  </Card>
+</CardGroup>

@@ -1,0 +1,30 @@
+---
+title: my.stopPullDownRefresh
+description: Stop the pull-down refresh animation.
+---
+
+Use this API to stop the pull-down refresh animation.
+
+## Parameters
+
+This API does not require any parameters.
+
+## Code Example
+
+```javascript
+Page({
+  onPullDownRefresh() {
+    this.fetchData().then(() => {
+      my.stopPullDownRefresh();
+    });
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.startPullDownRefresh" icon="rotate" href="/jsapi/ui/pulldown/my.startPullDownRefresh">
+    Start pull-down refresh
+  </Card>
+</CardGroup>

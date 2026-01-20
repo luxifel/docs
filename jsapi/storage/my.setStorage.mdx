@@ -1,0 +1,44 @@
+---
+title: my.setStorage
+description: Store data in local cache asynchronously.
+---
+
+Use this API to store data with a specified key in local cache. Overwrites existing data with the same key.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| key | String | Yes | Storage key identifier |
+| data | Object/String | Yes | Data to store |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Limits
+
+- Single data item: max 200KB
+- Total storage per Mini Program: max 10MB
+
+## Code Example
+
+```javascript
+my.setStorage({
+  key: 'userSettings',
+  data: { theme: 'dark', language: 'en' },
+  success: () => {
+    console.log('Data saved');
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getStorage" icon="download" href="/jsapi/storage/my.getStorage">
+    Get stored data
+  </Card>
+  <Card title="my.setStorageSync" icon="bolt" href="/jsapi/storage/my.setStorageSync">
+    Store data synchronously
+  </Card>
+</CardGroup>

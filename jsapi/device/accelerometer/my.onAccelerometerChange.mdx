@@ -1,0 +1,94 @@
+---
+title: my.onAccelerometerChange
+description: Listen for accelerometer data changes.
+---
+
+Use this API to listen for accelerometer data changes. The callback provides x, y, and z axis acceleration values.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Callback function when accelerometer data changes |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| x | Number | Acceleration along X axis |
+| y | Number | Acceleration along Y axis |
+| z | Number | Acceleration along Z axis |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.onAccelerometerChange((res) => {
+  console.log('X:', res.x);
+  console.log('Y:', res.y);
+  console.log('Z:', res.z);
+});
+```
+
+### Motion Detection
+
+```javascript
+Page({
+  data: {
+    lastShake: 0
+  },
+
+  onLoad() {
+    my.onAccelerometerChange((res) => {
+      const acceleration = Math.sqrt(
+        res.x * res.x + res.y * res.y + res.z * res.z
+      );
+
+      if (acceleration > 1.5) {
+        const now = Date.now();
+        if (now - this.data.lastShake > 1000) {
+          this.setData({ lastShake: now });
+          this.handleShake();
+        }
+      }
+    });
+  },
+
+  handleShake() {
+    my.vibrate();
+    console.log('Device shaken!');
+  }
+});
+```
+
+### Tilt Detection for Games
+
+```javascript
+Page({
+  onLoad() {
+    my.onAccelerometerChange((res) => {
+      // Use x/y for tilt-based controls
+      this.setData({
+        tiltX: res.x * 90, // Convert to degrees
+        tiltY: res.y * 90
+      });
+    });
+  }
+});
+```
+
+<Tip>
+Call `my.startAccelerometer` before using this API to begin receiving accelerometer data.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offAccelerometerChange" icon="xmark" href="/jsapi/device/accelerometer/my.offAccelerometerChange">
+    Stop listening for changes
+  </Card>
+  <Card title="my.startAccelerometer" icon="play" href="/jsapi/device/accelerometer/my.startAccelerometer">
+    Start accelerometer
+  </Card>
+</CardGroup>

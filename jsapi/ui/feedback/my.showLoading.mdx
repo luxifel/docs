@@ -1,0 +1,40 @@
+---
+title: my.showLoading
+description: Display a loading indicator.
+---
+
+Use this API to show a loading indicator during asynchronous operations.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| content | String | No | Loading text message |
+| delay | Number | No | Delay before showing (ms) |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.showLoading({ content: 'Loading...' });
+
+my.request({
+  url: 'https://api.example.com/data',
+  complete: () => {
+    my.hideLoading();
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.hideLoading" icon="xmark" href="/jsapi/ui/feedback/my.hideLoading">
+    Hide loading
+  </Card>
+  <Card title="my.showToast" icon="message" href="/jsapi/ui/feedback/my.showToast">
+    Show toast
+  </Card>
+</CardGroup>

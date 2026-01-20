@@ -1,0 +1,26 @@
+---
+title: my.makePhoneCall
+description: Make a phone call.
+---
+
+Initiate a phone call to the specified number.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| number | String | Yes | Phone number to call |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.makePhoneCall({
+  number: '+1234567890',
+  success: () => {
+    console.log('Call initiated');
+  }
+});
+```

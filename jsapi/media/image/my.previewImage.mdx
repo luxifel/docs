@@ -1,0 +1,39 @@
+---
+title: my.previewImage
+description: Preview images in fullscreen mode.
+---
+
+Use this API to display images in a fullscreen gallery viewer.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| urls | Array | Yes | Array of image URLs to preview |
+| current | Number | No | Index of initial image (default: 0) |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.previewImage({
+  urls: [
+    'https://example.com/image1.jpg',
+    'https://example.com/image2.jpg'
+  ],
+  current: 0
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.chooseImage" icon="images" href="/jsapi/media/image/my.chooseImage">
+    Choose images
+  </Card>
+  <Card title="my.getImageInfo" icon="circle-info" href="/jsapi/media/image/my.getImageInfo">
+    Get image info
+  </Card>
+</CardGroup>

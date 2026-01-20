@@ -1,0 +1,88 @@
+---
+title: my.disconnectBLEDevice
+description: Disconnect from a Bluetooth Low Energy device.
+---
+
+Use this API to disconnect from a connected Bluetooth Low Energy (BLE) device.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| deviceId | String | Yes | Device identifier |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.disconnectBLEDevice({
+  deviceId: 'XX:XX:XX:XX:XX:XX',
+  success() {
+    console.log('Disconnected from device');
+  }
+});
+```
+
+### Disconnect with UI Update
+
+```javascript
+Page({
+  data: {
+    connectedDevice: null
+  },
+
+  disconnect() {
+    const { connectedDevice } = this.data;
+    if (!connectedDevice) return;
+
+    my.disconnectBLEDevice({
+      deviceId: connectedDevice.deviceId,
+      success: () => {
+        this.setData({ connectedDevice: null });
+        my.showToast({ content: 'Disconnected' });
+      },
+      fail: (err) => {
+        my.showToast({ content: 'Failed to disconnect', type: 'fail' });
+      }
+    });
+  }
+});
+```
+
+### Cleanup on Page Exit
+
+```javascript
+Page({
+  data: {
+    deviceId: null
+  },
+
+  onUnload() {
+    if (this.data.deviceId) {
+      my.disconnectBLEDevice({
+        deviceId: this.data.deviceId
+      });
+    }
+    my.closeBluetoothAdapter();
+  }
+});
+```
+
+<Tip>
+Always disconnect from BLE devices when leaving a page to free up the connection slot for other apps.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.connectBLEDevice" icon="link" href="/jsapi/device/bluetooth/my.connectBLEDevice">
+    Connect to device
+  </Card>
+  <Card title="my.getConnectedBluetoothDevices" icon="list" href="/jsapi/device/bluetooth/my.getConnectedBluetoothDevices">
+    Get connected devices
+  </Card>
+</CardGroup>

@@ -1,0 +1,99 @@
+---
+title: my.getBluetoothAdapterState
+description: Get the current state of the Bluetooth adapter.
+---
+
+Use this API to get the current state of the Bluetooth adapter, including whether it's available and discovering devices.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| available | Boolean | Whether Bluetooth is available |
+| discovering | Boolean | Whether currently discovering devices |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.getBluetoothAdapterState({
+  success(res) {
+    console.log('Bluetooth available:', res.available);
+    console.log('Discovering:', res.discovering);
+  }
+});
+```
+
+### Check Before Operations
+
+```javascript
+Page({
+  async checkBluetoothState() {
+    my.getBluetoothAdapterState({
+      success: (res) => {
+        if (!res.available) {
+          my.alert({
+            title: 'Bluetooth Unavailable',
+            content: 'Please enable Bluetooth to continue.'
+          });
+          return;
+        }
+
+        if (res.discovering) {
+          console.log('Already scanning...');
+        } else {
+          this.startDiscovery();
+        }
+      }
+    });
+  },
+
+  startDiscovery() {
+    my.startBluetoothDevicesDiscovery({
+      success: () => console.log('Started scanning')
+    });
+  }
+});
+```
+
+### Status Display
+
+```javascript
+Page({
+  data: {
+    bluetoothStatus: 'unknown'
+  },
+
+  updateStatus() {
+    my.getBluetoothAdapterState({
+      success: (res) => {
+        let status = 'Off';
+        if (res.available) {
+          status = res.discovering ? 'Scanning' : 'Ready';
+        }
+        this.setData({ bluetoothStatus: status });
+      }
+    });
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.openBluetoothAdapter" icon="bluetooth-b" href="/jsapi/device/bluetooth/my.openBluetoothAdapter">
+    Initialize Bluetooth
+  </Card>
+  <Card title="my.onBluetoothAdapterStateChange" icon="rotate" href="/jsapi/device/bluetooth/my.onBluetoothAdapterStateChange">
+    Listen for state changes
+  </Card>
+</CardGroup>

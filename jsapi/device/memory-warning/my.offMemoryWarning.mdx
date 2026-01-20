@@ -1,0 +1,80 @@
+---
+title: my.offMemoryWarning
+description: Stop listening for system memory warning events.
+---
+
+Use this API to stop listening for memory warning events that were registered with `my.onMemoryWarning()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove All Listeners
+
+```javascript
+// Remove all memory warning listeners
+my.offMemoryWarning();
+```
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    my.onMemoryWarning(this.handleMemoryWarning);
+  },
+
+  handleMemoryWarning(res) {
+    console.log('Memory warning:', res.level);
+    this.releaseResources();
+  },
+
+  onUnload() {
+    my.offMemoryWarning(this.handleMemoryWarning);
+  },
+
+  releaseResources() {
+    this.setData({ cachedImages: [] });
+  }
+});
+```
+
+### Conditional Memory Monitoring
+
+```javascript
+Page({
+  data: {
+    monitoringMemory: false
+  },
+
+  startMemoryMonitoring() {
+    my.onMemoryWarning(this.onMemoryWarning);
+    this.setData({ monitoringMemory: true });
+  },
+
+  stopMemoryMonitoring() {
+    my.offMemoryWarning(this.onMemoryWarning);
+    this.setData({ monitoringMemory: false });
+  },
+
+  onMemoryWarning(res) {
+    console.log('Memory level:', res.level);
+  }
+});
+```
+
+<Tip>
+Pass the same callback function reference to `my.offMemoryWarning()` that was used with `my.onMemoryWarning()` to remove only that specific listener.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onMemoryWarning" icon="memory" href="/jsapi/device/memory-warning/my.onMemoryWarning">
+    Listen for memory warnings
+  </Card>
+</CardGroup>

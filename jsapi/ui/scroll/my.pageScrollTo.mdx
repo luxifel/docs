@@ -1,0 +1,40 @@
+---
+title: my.pageScrollTo
+description: Scroll the page to a specified position.
+---
+
+Use this API to scroll the page to a specific position.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| scrollTop | Number | No | Target scroll position in pixels |
+| duration | Number | No | Scroll animation duration in ms (default: 300) |
+| selector | String | No | CSS selector to scroll to |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+// Scroll to top
+my.pageScrollTo({
+  scrollTop: 0,
+  duration: 300
+});
+
+// Scroll to element
+my.pageScrollTo({
+  selector: '#target-element'
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.createSelectorQuery" icon="crosshairs" href="/jsapi/ui/selector-query/my.createSelectorQuery">
+    Query DOM elements
+  </Card>
+</CardGroup>

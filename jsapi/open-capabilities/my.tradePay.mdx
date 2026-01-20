@@ -1,0 +1,61 @@
+---
+title: my.tradePay
+description: Trigger the payment UI for a transaction.
+---
+
+Invoke the Rebell payment UI to complete a payment flow.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| tradeNO | String | Yes | Payment reference from backend |
+| success | Function | No | Callback with payment result |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| resultCode | String | Payment result code |
+
+## Result Codes
+
+| Code | Meaning | Action |
+|------|---------|--------|
+| `9000` | Payment appears successful | Poll backend for confirmation |
+| `6001` | User cancelled | Allow retry |
+| `6002` | Network error | Retry or poll status |
+| `4000` | Order paid or closed | Check backend status |
+
+## Code Example
+
+```javascript
+my.tradePay({
+  tradeNO: paymentIdFromBackend,
+  success: (res) => {
+    if (res.resultCode === '9000') {
+      // Show pending, poll backend for confirmation
+      this.pollPaymentStatus();
+    } else if (res.resultCode === '6001') {
+      my.showToast({ content: 'Payment cancelled' });
+    }
+  },
+  fail: (err) => {
+    console.error('Payment error:', err);
+  }
+});
+```
+
+<Warning>
+**Never trust the JSAPI result as final.** The `resultCode` is indicative only. Always confirm payment status via backend webhook before updating business state.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="Payments in Mini Apps" icon="credit-card" href="/mini-app/payments">
+    Complete payment guide
+  </Card>
+</CardGroup>

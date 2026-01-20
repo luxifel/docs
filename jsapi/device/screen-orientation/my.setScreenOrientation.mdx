@@ -1,0 +1,100 @@
+---
+title: my.setScreenOrientation
+description: Set the screen orientation.
+---
+
+Use this API to lock the screen to a specific orientation. This is useful for video players, games, or other content that requires a specific orientation.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| orientation | String | Yes | Target orientation: `auto`, `portrait`, `landscape` |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.setScreenOrientation({
+  orientation: 'landscape',
+  success() {
+    console.log('Orientation set to landscape');
+  }
+});
+```
+
+### Video Player Full Screen
+
+```javascript
+Page({
+  enterFullscreen() {
+    my.setScreenOrientation({
+      orientation: 'landscape',
+      success: () => {
+        this.setData({ isFullscreen: true });
+      }
+    });
+  },
+
+  exitFullscreen() {
+    my.setScreenOrientation({
+      orientation: 'portrait',
+      success: () => {
+        this.setData({ isFullscreen: false });
+      }
+    });
+  },
+
+  onUnload() {
+    // Ensure orientation is reset
+    my.setScreenOrientation({ orientation: 'auto' });
+  }
+});
+```
+
+### Game Orientation Lock
+
+```javascript
+Page({
+  onLoad() {
+    // Lock to landscape for game
+    my.setScreenOrientation({
+      orientation: 'landscape'
+    });
+  },
+
+  onUnload() {
+    // Allow auto rotation when leaving
+    my.setScreenOrientation({
+      orientation: 'auto'
+    });
+  }
+});
+```
+
+## Orientation Options
+
+| Value | Description |
+|-------|-------------|
+| `auto` | Allow automatic rotation based on device orientation |
+| `portrait` | Lock to portrait (vertical) mode |
+| `landscape` | Lock to landscape (horizontal) mode |
+
+<Warning>
+Always reset orientation to `auto` when leaving a page that locked the orientation, otherwise users may be stuck in an unexpected orientation.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getScreenOrientation" icon="mobile" href="/jsapi/device/screen-orientation/my.getScreenOrientation">
+    Get current orientation
+  </Card>
+  <Card title="my.onScreenOrientationChange" icon="rotate" href="/jsapi/device/screen-orientation/my.onScreenOrientationChange">
+    Listen for changes
+  </Card>
+</CardGroup>

@@ -44,6 +44,413 @@
               "mini-app/backend-authentication",
               "mini-app/payments"
             ]
+          },
+          {
+            "group": "JSAPI Reference",
+            "pages": [
+              "jsapi/overview",
+              "jsapi/reference",
+              "jsapi/jsbridge-guide",
+              {
+                "group": "Basic",
+                "pages": [
+                  "jsapi/basic/my.canIUse",
+                  "jsapi/basic/my.SDKVersion",
+                  "jsapi/basic/my.getAppIdSync",
+                  "jsapi/basic/my.getRunScene"
+                ]
+              },
+              {
+                "group": "In-App Events",
+                "pages": [
+                  "jsapi/event/my.onAppShow",
+                  "jsapi/event/my.offAppShow",
+                  "jsapi/event/my.onAppHide",
+                  "jsapi/event/my.offAppHide",
+                  "jsapi/event/my.onError",
+                  "jsapi/event/my.offError",
+                  "jsapi/event/my.onUnhandledRejection",
+                  "jsapi/event/my.offUnhandledRejection"
+                ]
+              },
+              {
+                "group": "UI",
+                "pages": [
+                  {
+                    "group": "Navigation Bar",
+                    "pages": [
+                      "jsapi/ui/navigation-bar/my.setNavigationBar",
+                      "jsapi/ui/navigation-bar/my.showNavigationBarLoading",
+                      "jsapi/ui/navigation-bar/my.hideNavigationBarLoading",
+                      "jsapi/ui/navigation-bar/my.hideBackHome"
+                    ]
+                  },
+                  {
+                    "group": "Tab Bar",
+                    "pages": [
+                      "jsapi/ui/tab-bar/my.hideTabBar",
+                      "jsapi/ui/tab-bar/my.setTabBarStyle"
+                    ]
+                  },
+                  {
+                    "group": "Route",
+                    "pages": [
+                      "jsapi/ui/route/my.switchTab",
+                      "jsapi/ui/route/my.navigateTo",
+                      "jsapi/ui/route/my.navigateBack",
+                      "jsapi/ui/route/my.redirectTo",
+                      "jsapi/ui/route/my.reLaunch"
+                    ]
+                  },
+                  {
+                    "group": "Feedback",
+                    "pages": [
+                      "jsapi/ui/feedback/my.alert",
+                      "jsapi/ui/feedback/my.confirm",
+                      "jsapi/ui/feedback/my.prompt",
+                      "jsapi/ui/feedback/my.showToast",
+                      "jsapi/ui/feedback/my.hideToast",
+                      "jsapi/ui/feedback/my.showLoading",
+                      "jsapi/ui/feedback/my.hideLoading",
+                      "jsapi/ui/feedback/my.showActionSheet"
+                    ]
+                  },
+                  {
+                    "group": "Pull Down Refresh",
+                    "pages": [
+                      "jsapi/ui/pulldown/my.startPullDownRefresh",
+                      "jsapi/ui/pulldown/my.stopPullDownRefresh"
+                    ]
+                  },
+                  {
+                    "group": "Contact",
+                    "pages": [
+                      "jsapi/ui/contact/my.choosePhoneContact"
+                    ]
+                  },
+                  {
+                    "group": "Date Picker",
+                    "pages": [
+                      "jsapi/ui/choose-date/my.datePicker"
+                    ]
+                  },
+                  {
+                    "group": "Animation",
+                    "pages": [
+                      "jsapi/ui/animation/my.createAnimation"
+                    ]
+                  },
+                  {
+                    "group": "Canvas",
+                    "pages": [
+                      "jsapi/ui/canvas/my.createCanvasContext"
+                    ]
+                  },
+                  {
+                    "group": "Keyboard",
+                    "pages": [
+                      "jsapi/ui/keyboard/my.hideKeyboard"
+                    ]
+                  },
+                  {
+                    "group": "Scroll",
+                    "pages": [
+                      "jsapi/ui/scroll/my.pageScrollTo"
+                    ]
+                  },
+                  {
+                    "group": "Selector Query",
+                    "pages": [
+                      "jsapi/ui/selector-query/my.createSelectorQuery"
+                    ]
+                  },
+                  {
+                    "group": "Multi-Level Select",
+                    "pages": [
+                      "jsapi/ui/multi-level-select/my.multiLevelSelect"
+                    ]
+                  },
+                  {
+                    "group": "Background",
+                    "pages": [
+                      "jsapi/ui/set-background/my.setBackgroundColor",
+                      "jsapi/ui/set-pulldown/my.setCanPullDown"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Media",
+                "pages": [
+                  {
+                    "group": "Image",
+                    "pages": [
+                      "jsapi/media/image/my.chooseImage",
+                      "jsapi/media/image/my.previewImage",
+                      "jsapi/media/image/my.saveImage",
+                      "jsapi/media/image/my.getImageInfo",
+                      "jsapi/media/image/my.compressImage"
+                    ]
+                  },
+                  {
+                    "group": "Video",
+                    "pages": [
+                      "jsapi/media/video/my.chooseVideo"
+                    ]
+                  },
+                  {
+                    "group": "Lottie",
+                    "pages": [
+                      "jsapi/media/lottie/my.createLottieContext"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Storage",
+                "pages": [
+                  "jsapi/storage/my.setStorage",
+                  "jsapi/storage/my.setStorageSync",
+                  "jsapi/storage/my.getStorage",
+                  "jsapi/storage/my.getStorageSync",
+                  "jsapi/storage/my.removeStorage",
+                  "jsapi/storage/my.removeStorageSync",
+                  "jsapi/storage/my.clearStorage",
+                  "jsapi/storage/my.clearStorageSync"
+                ]
+              },
+              {
+                "group": "File",
+                "pages": [
+                  "jsapi/file/my.saveFile",
+                  "jsapi/file/my.getFileInfo",
+                  "jsapi/file/my.getSavedFileInfo",
+                  "jsapi/file/my.getSavedFileList",
+                  "jsapi/file/my.removeSavedFile",
+                  "jsapi/file/my.chooseFileFromDisk",
+                  "jsapi/file/my.openDocument"
+                ]
+              },
+              {
+                "group": "Location",
+                "pages": [
+                  "jsapi/location/my.getLocation",
+                  "jsapi/location/my.openLocation",
+                  "jsapi/location/my.chooseLocation"
+                ]
+              },
+              {
+                "group": "Map",
+                "pages": [
+                  "jsapi/map/my.createMapContext",
+                  "jsapi/map/my.calculateRoute"
+                ]
+              },
+              {
+                "group": "Network",
+                "pages": [
+                  "jsapi/network/my.request",
+                  "jsapi/network/my.uploadFile",
+                  "jsapi/network/my.downloadFile",
+                  "jsapi/network/my.connectSocket",
+                  "jsapi/network/my.sendSocketMessage",
+                  "jsapi/network/my.closeSocket",
+                  "jsapi/network/my.onSocketOpen",
+                  "jsapi/network/my.offSocketOpen",
+                  "jsapi/network/my.onSocketMessage",
+                  "jsapi/network/my.offSocketMessage",
+                  "jsapi/network/my.onSocketError",
+                  "jsapi/network/my.offSocketError",
+                  "jsapi/network/my.onSocketClose",
+                  "jsapi/network/my.offSocketClose"
+                ]
+              },
+              {
+                "group": "Device",
+                "pages": [
+                  {
+                    "group": "System",
+                    "pages": [
+                      "jsapi/device/system/my.getSystemInfo"
+                    ]
+                  },
+                  {
+                    "group": "Network Status",
+                    "pages": [
+                      "jsapi/device/network-status/my.getNetworkType"
+                    ]
+                  },
+                  {
+                    "group": "Clipboard",
+                    "pages": [
+                      "jsapi/device/clipboard/my.getClipboard",
+                      "jsapi/device/clipboard/my.setClipboard"
+                    ]
+                  },
+                  {
+                    "group": "Vibration",
+                    "pages": [
+                      "jsapi/device/vibrate/my.vibrate"
+                    ]
+                  },
+                  {
+                    "group": "Phone Call",
+                    "pages": [
+                      "jsapi/device/phone-call/my.makePhoneCall"
+                    ]
+                  },
+                  {
+                    "group": "Scan",
+                    "pages": [
+                      "jsapi/device/scan/my.scan"
+                    ]
+                  },
+                  {
+                    "group": "Accelerometer",
+                    "pages": [
+                      "jsapi/device/accelerometer/my.onAccelerometerChange",
+                      "jsapi/device/accelerometer/my.offAccelerometerChange",
+                      "jsapi/device/accelerometer/my.startAccelerometer"
+                    ]
+                  },
+                  {
+                    "group": "Compass",
+                    "pages": [
+                      "jsapi/device/compass/my.onCompassChange",
+                      "jsapi/device/compass/my.offCompassChange",
+                      "jsapi/device/compass/my.startCompass"
+                    ]
+                  },
+                  {
+                    "group": "Shake",
+                    "pages": [
+                      "jsapi/device/watch-shake/my.watchShake",
+                      "jsapi/device/watch-shake/my.offWatchShake"
+                    ]
+                  },
+                  {
+                    "group": "Server Time",
+                    "pages": [
+                      "jsapi/device/server-time/my.getServerTime"
+                    ]
+                  },
+                  {
+                    "group": "Screen Capture",
+                    "pages": [
+                      "jsapi/device/capture-screen/my.onUserCaptureScreen",
+                      "jsapi/device/capture-screen/my.offUserCaptureScreen"
+                    ]
+                  },
+                  {
+                    "group": "Screen Brightness",
+                    "pages": [
+                      "jsapi/device/screen-brightness/my.getScreenBrightness",
+                      "jsapi/device/screen-brightness/my.setScreenBrightness"
+                    ]
+                  },
+                  {
+                    "group": "Screen Orientation",
+                    "pages": [
+                      "jsapi/device/screen-orientation/my.getScreenOrientation",
+                      "jsapi/device/screen-orientation/my.setScreenOrientation",
+                      "jsapi/device/screen-orientation/my.onScreenOrientationChange",
+                      "jsapi/device/screen-orientation/my.offScreenOrientationChange"
+                    ]
+                  },
+                  {
+                    "group": "Settings",
+                    "pages": [
+                      "jsapi/device/setting/my.openSetting"
+                    ]
+                  },
+                  {
+                    "group": "Contact",
+                    "pages": [
+                      "jsapi/device/add-contact/my.addPhoneContact"
+                    ]
+                  },
+                  {
+                    "group": "Permission",
+                    "pages": [
+                      "jsapi/device/permission-guide/my.showAuthGuide"
+                    ]
+                  },
+                  {
+                    "group": "Memory",
+                    "pages": [
+                      "jsapi/device/memory-warning/my.onMemoryWarning",
+                      "jsapi/device/memory-warning/my.offMemoryWarning"
+                    ]
+                  },
+                  {
+                    "group": "Battery",
+                    "pages": [
+                      "jsapi/device/battery/my.getBatteryInfo"
+                    ]
+                  },
+                  {
+                    "group": "Bluetooth",
+                    "pages": [
+                      "jsapi/device/bluetooth/my.openBluetoothAdapter",
+                      "jsapi/device/bluetooth/my.closeBluetoothAdapter",
+                      "jsapi/device/bluetooth/my.getBluetoothAdapterState",
+                      "jsapi/device/bluetooth/my.startBluetoothDevicesDiscovery",
+                      "jsapi/device/bluetooth/my.stopBluetoothDevicesDiscovery",
+                      "jsapi/device/bluetooth/my.getBluetoothDevices",
+                      "jsapi/device/bluetooth/my.getConnectedBluetoothDevices",
+                      "jsapi/device/bluetooth/my.onBluetoothDeviceFound",
+                      "jsapi/device/bluetooth/my.offBluetoothDeviceFound",
+                      "jsapi/device/bluetooth/my.onBluetoothAdapterStateChange",
+                      "jsapi/device/bluetooth/my.offBluetoothAdapterStateChange",
+                      "jsapi/device/bluetooth/my.connectBLEDevice",
+                      "jsapi/device/bluetooth/my.disconnectBLEDevice"
+                    ]
+                  },
+                  {
+                    "group": "Biometric",
+                    "pages": [
+                      "jsapi/device/biometric/my.checkBioMetricAvailable",
+                      "jsapi/device/biometric/my.startBioMetricVerify"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Sharing",
+                "pages": [
+                  "jsapi/sharing/my.showSharePanel"
+                ]
+              },
+              {
+                "group": "Update",
+                "pages": [
+                  "jsapi/update/my.getUpdateManager"
+                ]
+              },
+              {
+                "group": "Web View",
+                "pages": [
+                  "jsapi/web-view/my.createWebViewContext"
+                ]
+              },
+              {
+                "group": "Alipay Connect",
+                "pages": [
+                  "jsapi/alipay-connect/my.getSiteInfo"
+                ]
+              },
+              {
+                "group": "Open Capabilities",
+                "pages": [
+                  "jsapi/open-capabilities/my.getAuthCode",
+                  "jsapi/open-capabilities/my.getOpenUserInfo",
+                  "jsapi/open-capabilities/my.tradePay",
+                  "jsapi/open-capabilities/my.signContract",
+                  "jsapi/open-capabilities/my.navigateToMiniProgram",
+                  "jsapi/open-capabilities/my.navigateBackMiniProgram"
+                ]
+              }
+            ]
           }
         ]
       },
@@ -57,12 +464,17 @@
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Payments",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/payments/createQROrder",
+              "api-reference/payments/retailPay",
+              "api-reference/payments/inquiryPayment"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "api-reference/webhooks/paymentNotify"
             ]
           }
         ]

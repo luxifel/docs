@@ -1,0 +1,49 @@
+---
+title: my.showActionSheet
+description: Display an action sheet with multiple options.
+---
+
+Use this API to show an action sheet menu that slides up from the bottom.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| title | String | No | Action sheet title |
+| items | Array | Yes | Array of option strings |
+| cancelButtonText | String | No | Cancel button text |
+| success | Function | No | Callback with selected index |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| index | Number | Index of selected item (-1 if cancelled) |
+
+## Code Example
+
+```javascript
+my.showActionSheet({
+  title: 'Choose action',
+  items: ['Edit', 'Share', 'Delete'],
+  cancelButtonText: 'Cancel',
+  success: (res) => {
+    if (res.index !== -1) {
+      console.log('Selected:', res.index);
+    }
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.confirm" icon="circle-question" href="/jsapi/ui/feedback/my.confirm">
+    Show confirmation dialog
+  </Card>
+  <Card title="my.alert" icon="circle-exclamation" href="/jsapi/ui/feedback/my.alert">
+    Show alert dialog
+  </Card>
+</CardGroup>

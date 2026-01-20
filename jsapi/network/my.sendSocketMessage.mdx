@@ -1,0 +1,26 @@
+---
+title: my.sendSocketMessage
+description: Send data through a WebSocket connection.
+---
+
+Send a message through an active WebSocket connection.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| data | String/ArrayBuffer | Yes | Data to send |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.sendSocketMessage({
+  data: JSON.stringify({ action: 'ping' }),
+  success: () => {
+    console.log('Message sent');
+  }
+});
+```

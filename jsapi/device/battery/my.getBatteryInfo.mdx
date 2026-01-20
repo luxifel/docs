@@ -1,0 +1,135 @@
+---
+title: my.getBatteryInfo
+description: Get the device battery status.
+---
+
+Use this API to get the current battery level and charging status of the device.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| level | Number | Battery level (1-100) |
+| isCharging | Boolean | Whether the device is currently charging |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.getBatteryInfo({
+  success(res) {
+    console.log('Battery level:', res.level);
+    console.log('Is charging:', res.isCharging);
+  }
+});
+```
+
+### Display Battery Status
+
+```javascript
+Page({
+  data: {
+    batteryLevel: 0,
+    isCharging: false,
+    batteryIcon: 'battery-full'
+  },
+
+  onLoad() {
+    this.updateBatteryStatus();
+  },
+
+  updateBatteryStatus() {
+    my.getBatteryInfo({
+      success: (res) => {
+        let icon = 'battery-full';
+        if (res.level <= 20) icon = 'battery-empty';
+        else if (res.level <= 50) icon = 'battery-half';
+
+        this.setData({
+          batteryLevel: res.level,
+          isCharging: res.isCharging,
+          batteryIcon: res.isCharging ? 'battery-bolt' : icon
+        });
+      }
+    });
+  }
+});
+```
+
+### Low Battery Warning
+
+```javascript
+Page({
+  onShow() {
+    this.checkBattery();
+  },
+
+  checkBattery() {
+    my.getBatteryInfo({
+      success: (res) => {
+        if (res.level <= 15 && !res.isCharging) {
+          my.alert({
+            title: 'Low Battery',
+            content: `Your battery is at ${res.level}%. Some features may be limited to save power.`
+          });
+        }
+      }
+    });
+  }
+});
+```
+
+### Power-Aware Features
+
+```javascript
+Page({
+  data: {
+    powerSaveMode: false
+  },
+
+  onLoad() {
+    my.getBatteryInfo({
+      success: (res) => {
+        // Enable power save mode if battery is low
+        if (res.level <= 20 && !res.isCharging) {
+          this.setData({ powerSaveMode: true });
+          this.disableAnimations();
+          this.reducePollingFrequency();
+        }
+      }
+    });
+  },
+
+  disableAnimations() {
+    // Disable non-essential animations
+  },
+
+  reducePollingFrequency() {
+    // Reduce background refresh rate
+  }
+});
+```
+
+<Tip>
+Consider reducing resource-intensive operations when battery is low to provide a better user experience and help conserve battery life.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getSystemInfo" icon="mobile" href="/jsapi/device/system/my.getSystemInfo">
+    Get system information
+  </Card>
+  <Card title="my.getNetworkType" icon="wifi" href="/jsapi/device/network-status/my.getNetworkType">
+    Get network type
+  </Card>
+</CardGroup>

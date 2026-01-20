@@ -1,0 +1,35 @@
+---
+title: my.hideToast
+description: Hide the currently displayed toast.
+---
+
+Use this API to manually hide a toast before its duration expires.
+
+## Parameters
+
+This API does not require any parameters.
+
+## Code Example
+
+```javascript
+my.showToast({
+  content: 'Processing...',
+  duration: 10000
+});
+
+// Hide early when done
+setTimeout(() => {
+  my.hideToast();
+}, 2000);
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.showToast" icon="message" href="/jsapi/ui/feedback/my.showToast">
+    Show toast
+  </Card>
+  <Card title="my.hideLoading" icon="xmark" href="/jsapi/ui/feedback/my.hideLoading">
+    Hide loading
+  </Card>
+</CardGroup>

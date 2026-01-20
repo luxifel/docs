@@ -1,0 +1,107 @@
+---
+title: my.setTabBarStyle
+description: Set the overall style of the tab bar including colors and border.
+---
+
+Use this API to customize the tab bar appearance including text colors, background color, and border style.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| color | HexColor | Yes | Default text color on tabs |
+| selectedColor | HexColor | Yes | Selected tab text color |
+| backgroundColor | HexColor | Yes | Tab bar background color |
+| borderStyle | String | Yes | Border color: `black` or `white` only |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.setTabBarStyle({
+  color: '#7A7E83',
+  selectedColor: '#3CC51F',
+  backgroundColor: '#FFFFFF',
+  borderStyle: 'black'
+});
+```
+
+### Dark Theme
+
+```javascript
+my.setTabBarStyle({
+  color: '#8E8E93',
+  selectedColor: '#FFFFFF',
+  backgroundColor: '#1C1C1E',
+  borderStyle: 'black'
+});
+```
+
+### Brand Colors
+
+```javascript
+my.setTabBarStyle({
+  color: '#666666',
+  selectedColor: '#108ee9',
+  backgroundColor: '#FFFFFF',
+  borderStyle: 'white'
+});
+```
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Theme Switching">
+    ```javascript
+    Page({
+      data: {
+        isDarkMode: false
+      },
+
+      toggleTheme() {
+        const isDark = !this.data.isDarkMode;
+        this.setData({ isDarkMode: isDark });
+
+        my.setTabBarStyle({
+          color: isDark ? '#8E8E93' : '#7A7E83',
+          selectedColor: isDark ? '#FFFFFF' : '#108ee9',
+          backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+          borderStyle: isDark ? 'black' : 'white'
+        });
+      }
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Seasonal Themes">
+    ```javascript
+    function applyHolidayTheme() {
+      my.setTabBarStyle({
+        color: '#666666',
+        selectedColor: '#C41E3A',
+        backgroundColor: '#FFF8F0',
+        borderStyle: 'white'
+      });
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+IDE simulation is not supported for this API. Please test in the production environment.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.hideTabBar" icon="eye-slash" href="/jsapi/ui/tab-bar/my.hideTabBar">
+    Hide the tab bar
+  </Card>
+  <Card title="my.switchTab" icon="arrows-left-right" href="/jsapi/ui/route/my.switchTab">
+    Navigate to a tab page
+  </Card>
+</CardGroup>

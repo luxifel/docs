@@ -1,0 +1,20 @@
+---
+title: my.onSocketClose
+description: Listen for WebSocket connection close events.
+---
+
+Register a callback for when the WebSocket connection closes.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Handler for close events |
+
+## Code Example
+
+```javascript
+my.onSocketClose(() => {
+  console.log('WebSocket disconnected');
+});
+```

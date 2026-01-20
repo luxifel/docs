@@ -1,0 +1,93 @@
+---
+title: my.getAppIdSync
+description: Get the Mini Program App ID synchronously.
+---
+
+Use this API to obtain the Mini Program App ID synchronously without requiring callbacks or promises.
+
+## Return Value
+
+| Property | Type | Description |
+|----------|------|-------------|
+| appId | String | The identifier of the current Mini Program |
+
+<Info>
+The returned App ID depends on the deployment context:
+
+- **Deployed to AlipayCN**: Returns the ID assigned by AlipayCN
+- **Other deployments**: Returns the ID assigned by Mini Program Platform
+</Info>
+
+## Code Example
+
+```javascript
+// Get App ID synchronously
+const result = my.getAppIdSync();
+console.log('App ID:', result.appId);
+
+// Use in page
+Page({
+  onLoad() {
+    const { appId } = my.getAppIdSync();
+    this.setData({ appId });
+  },
+
+  data: {
+    appId: ''
+  }
+});
+```
+
+## Use Cases
+
+### Conditional Logic Based on App ID
+
+```javascript
+Page({
+  onLoad() {
+    const { appId } = my.getAppIdSync();
+
+    // Different behavior for different app versions
+    if (appId === 'your-production-app-id') {
+      this.initProductionFeatures();
+    } else {
+      this.initDevelopmentFeatures();
+    }
+  }
+});
+```
+
+### Logging and Analytics
+
+```javascript
+function logEvent(eventName, data) {
+  const { appId } = my.getAppIdSync();
+
+  my.request({
+    url: 'https://analytics.example.com/log',
+    method: 'POST',
+    data: {
+      appId,
+      event: eventName,
+      ...data
+    }
+  });
+}
+```
+
+## Notes
+
+- This is a synchronous operation that returns immediately
+- The App ID is stable and does not change during the Mini Program lifecycle
+- For AlipayCN deployments, cross-reference with the Mini Program Platform to find the official Mini Program ID
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getRunScene" icon="code-branch" href="/jsapi/basic/my.getRunScene">
+    Get the running environment
+  </Card>
+  <Card title="my.SDKVersion" icon="tag" href="/jsapi/basic/my.SDKVersion">
+    Get SDK version
+  </Card>
+</CardGroup>

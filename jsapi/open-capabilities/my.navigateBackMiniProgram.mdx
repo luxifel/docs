@@ -1,0 +1,37 @@
+---
+title: my.navigateBackMiniProgram
+description: Return to the previous Mini Program.
+---
+
+Navigate back to the Mini Program that opened the current one.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| extraData | Object | No | Data to pass back |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.navigateBackMiniProgram({
+  extraData: {
+    result: 'completed',
+    orderId: '12345'
+  },
+  success: () => {
+    console.log('Returned to previous Mini Program');
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.navigateToMiniProgram" icon="arrow-right" href="/jsapi/open-capabilities/my.navigateToMiniProgram">
+    Navigate to Mini Program
+  </Card>
+</CardGroup>

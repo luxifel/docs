@@ -1,0 +1,51 @@
+---
+title: my.showToast
+description: Display a toast notification that disappears after a specified duration.
+---
+
+Use this API to show a brief message that automatically disappears.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| content | String | No | Toast message (required if type is `exception`) |
+| type | String | No | Toast type: `success`, `fail`, `exception`, `none` (default: `none`) |
+| duration | Number | No | Display duration in ms (default: 2000) |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+// Success toast
+my.showToast({
+  type: 'success',
+  content: 'Saved successfully',
+  duration: 2000
+});
+
+// Error toast
+my.showToast({
+  type: 'fail',
+  content: 'Operation failed',
+  duration: 3000
+});
+
+// Plain text toast
+my.showToast({
+  content: 'Loading complete'
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.hideToast" icon="xmark" href="/jsapi/ui/feedback/my.hideToast">
+    Hide toast
+  </Card>
+  <Card title="my.showLoading" icon="spinner" href="/jsapi/ui/feedback/my.showLoading">
+    Show loading indicator
+  </Card>
+</CardGroup>

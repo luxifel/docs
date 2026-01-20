@@ -1,0 +1,32 @@
+---
+title: my.getSiteInfo
+description: Get site-specific information for Alipay Connect.
+---
+
+Retrieve site information for cross-platform compatibility.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback with site info |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| siteCode | String | Site identifier code |
+| siteName | String | Site name |
+
+## Code Example
+
+```javascript
+my.getSiteInfo({
+  success: (res) => {
+    console.log('Site:', res.siteName);
+    console.log('Code:', res.siteCode);
+  }
+});
+```

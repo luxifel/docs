@@ -1,0 +1,38 @@
+---
+title: my.setStorageSync
+description: Store data in local cache synchronously.
+---
+
+Synchronous version of `my.setStorage`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| key | String | Yes | Storage key identifier |
+| data | Object/String | Yes | Data to store |
+
+## Code Example
+
+```javascript
+try {
+  my.setStorageSync({
+    key: 'token',
+    data: 'abc123'
+  });
+  console.log('Saved');
+} catch (e) {
+  console.error('Save failed:', e);
+}
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.setStorage" icon="upload" href="/jsapi/storage/my.setStorage">
+    Store data asynchronously
+  </Card>
+  <Card title="my.getStorageSync" icon="bolt" href="/jsapi/storage/my.getStorageSync">
+    Get data synchronously
+  </Card>
+</CardGroup>

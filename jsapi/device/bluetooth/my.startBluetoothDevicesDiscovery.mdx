@@ -1,0 +1,93 @@
+---
+title: my.startBluetoothDevicesDiscovery
+description: Start discovering nearby Bluetooth devices.
+---
+
+Use this API to start discovering nearby Bluetooth devices. Use `my.onBluetoothDeviceFound` to receive discovered devices.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| services | Array | No | Filter by service UUIDs |
+| allowDuplicatesKey | Boolean | No | Allow duplicate device reports (default: false) |
+| interval | Number | No | Report interval in milliseconds |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.startBluetoothDevicesDiscovery({
+  success() {
+    console.log('Started scanning for devices');
+  }
+});
+```
+
+### Filter by Service UUID
+
+```javascript
+my.startBluetoothDevicesDiscovery({
+  services: ['FEE7'], // Only discover devices with this service
+  success() {
+    console.log('Scanning for specific devices...');
+  }
+});
+```
+
+### Complete Discovery Flow
+
+```javascript
+Page({
+  data: {
+    devices: []
+  },
+
+  startScan() {
+    my.onBluetoothDeviceFound((res) => {
+      const newDevices = res.devices.filter(
+        d => !this.data.devices.find(existing => existing.deviceId === d.deviceId)
+      );
+
+      if (newDevices.length > 0) {
+        this.setData({
+          devices: [...this.data.devices, ...newDevices]
+        });
+      }
+    });
+
+    my.startBluetoothDevicesDiscovery({
+      allowDuplicatesKey: false,
+      success: () => {
+        this.setData({ scanning: true });
+        // Stop after 10 seconds
+        setTimeout(() => this.stopScan(), 10000);
+      }
+    });
+  },
+
+  stopScan() {
+    my.stopBluetoothDevicesDiscovery();
+    this.setData({ scanning: false });
+  }
+});
+```
+
+<Warning>
+Bluetooth discovery is power-intensive. Stop discovery with `my.stopBluetoothDevicesDiscovery` when you've found the device you need.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.stopBluetoothDevicesDiscovery" icon="stop" href="/jsapi/device/bluetooth/my.stopBluetoothDevicesDiscovery">
+    Stop discovery
+  </Card>
+  <Card title="my.onBluetoothDeviceFound" icon="magnifying-glass" href="/jsapi/device/bluetooth/my.onBluetoothDeviceFound">
+    Listen for devices
+  </Card>
+</CardGroup>

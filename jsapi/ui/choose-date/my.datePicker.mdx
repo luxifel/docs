@@ -1,0 +1,46 @@
+---
+title: my.datePicker
+description: Display a date picker dialog.
+---
+
+Use this API to show a date/time picker for user selection.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| format | String | No | Format: `yyyy-MM-dd`, `HH:mm`, `yyyy-MM-dd HH:mm`, `yyyy-MM`, `yyyy` |
+| currentDate | String | No | Initial selected date |
+| startDate | String | No | Minimum selectable date |
+| endDate | String | No | Maximum selectable date |
+| success | Function | No | Callback with selected date |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| date | String | Selected date in specified format |
+
+## Code Example
+
+```javascript
+my.datePicker({
+  format: 'yyyy-MM-dd',
+  currentDate: '2024-01-15',
+  startDate: '2024-01-01',
+  endDate: '2024-12-31',
+  success: (res) => {
+    console.log('Selected:', res.date);
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.multiLevelSelect" icon="list" href="/jsapi/ui/multi-level-select/my.multiLevelSelect">
+    Multi-level selector
+  </Card>
+</CardGroup>

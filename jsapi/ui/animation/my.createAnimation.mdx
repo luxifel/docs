@@ -1,0 +1,46 @@
+---
+title: my.createAnimation
+description: Create an animation instance for element animations.
+---
+
+Use this API to create an animation instance that can be used to define and export animations.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| duration | Number | No | Animation duration in ms (default: 400) |
+| timeFunction | String | No | Timing function: `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out` |
+| delay | Number | No | Animation delay in ms |
+| transformOrigin | String | No | Transform origin (default: `50% 50% 0`) |
+
+## Return Value
+
+Returns an Animation object with chainable methods.
+
+## Code Example
+
+```javascript
+const animation = my.createAnimation({
+  duration: 1000,
+  timeFunction: 'ease'
+});
+
+animation.scale(2).rotate(45).step();
+
+this.setData({
+  animationData: animation.export()
+});
+```
+
+```xml
+<view animation="{{animationData}}">Animated content</view>
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.createLottieContext" icon="play" href="/jsapi/media/lottie/my.createLottieContext">
+    Create Lottie animation
+  </Card>
+</CardGroup>

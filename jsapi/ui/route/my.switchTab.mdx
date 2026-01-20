@@ -1,0 +1,96 @@
+---
+title: my.switchTab
+description: Navigate to a tab bar page and close all non-tab pages.
+---
+
+Use this API to navigate to a page defined in the tab bar configuration. All non-tab pages in the page stack will be closed.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| url | String | Yes | Path to the tab bar page (no query parameters allowed) |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.switchTab({
+  url: 'page/home/index'
+});
+```
+
+### With Callbacks
+
+```javascript
+my.switchTab({
+  url: 'page/user/index',
+  success() {
+    console.log('Switched to user tab');
+  },
+  fail(err) {
+    console.error('Failed to switch tab:', err);
+  }
+});
+```
+
+## Configuration
+
+The target page must be defined in `app.json`:
+
+```json
+{
+  "tabBar": {
+    "textColor": "#666666",
+    "selectedColor": "#108ee9",
+    "backgroundColor": "#FFFFFF",
+    "items": [
+      {
+        "pagePath": "page/home/index",
+        "name": "Home",
+        "icon": "images/home.png",
+        "activeIcon": "images/home-active.png"
+      },
+      {
+        "pagePath": "page/user/index",
+        "name": "User",
+        "icon": "images/user.png",
+        "activeIcon": "images/user-active.png"
+      }
+    ]
+  }
+}
+```
+
+## Important Notes
+
+<Warning>
+- The URL cannot include query parameters
+- The first page in tabBar must be the homepage
+- Pages opened via `my.navigateTo` or `my.redirectTo` won't display the tab bar even if defined in tabBar configuration
+- Tab icons should be 60×60px for optimal display
+</Warning>
+
+## Differences from Other Navigation APIs
+
+| API | Behavior |
+|-----|----------|
+| `my.switchTab` | Navigates to tab page, closes non-tab pages |
+| `my.navigateTo` | Opens new page, keeps current page |
+| `my.redirectTo` | Replaces current page |
+| `my.reLaunch` | Closes all pages, opens target page |
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.navigateTo" icon="arrow-right" href="/jsapi/ui/route/my.navigateTo">
+    Navigate to a new page
+  </Card>
+  <Card title="my.setTabBarStyle" icon="palette" href="/jsapi/ui/tab-bar/my.setTabBarStyle">
+    Customize tab bar style
+  </Card>
+</CardGroup>

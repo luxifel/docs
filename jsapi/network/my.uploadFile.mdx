@@ -1,0 +1,42 @@
+---
+title: my.uploadFile
+description: Upload a local file to a server.
+---
+
+Upload a file to a remote server.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| url | String | Yes | Upload endpoint URL |
+| filePath | String | Yes | Local file path |
+| fileName | String | Yes | File name |
+| fileType | String | Yes | File type: `image`, `video`, `audio` |
+| formData | Object | No | Additional form data |
+| header | Object | No | Request headers |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| data | String | Server response |
+| statusCode | Number | HTTP status code |
+
+## Code Example
+
+```javascript
+my.uploadFile({
+  url: 'https://api.example.com/upload',
+  filePath: localPath,
+  fileName: 'image',
+  fileType: 'image',
+  formData: { userId: '123' },
+  success: (res) => {
+    console.log('Uploaded:', res.data);
+  }
+});
+```

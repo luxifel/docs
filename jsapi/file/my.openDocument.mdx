@@ -1,0 +1,28 @@
+---
+title: my.openDocument
+description: Open and preview a document file.
+---
+
+Open a document for viewing (PDF, Word, etc.).
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| filePath | String | Yes | Document file path |
+| fileType | String | No | File type hint |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.openDocument({
+  filePath: documentPath,
+  fileType: 'pdf',
+  success: () => {
+    console.log('Document opened');
+  }
+});
+```

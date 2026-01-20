@@ -1,0 +1,53 @@
+---
+title: my.getAuthCode
+description: Get an authorization code for user authentication.
+---
+
+Request user authorization and get an authorization code for backend token exchange.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| scopes | Array | Yes | Authorization scopes to request (e.g., `['auth_user']`) |
+| success | Function | No | Callback with auth code |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| authCode | String | Short-lived authorization code |
+| authSuccessScopes | Array | Successfully authorized scopes |
+
+## Code Example
+
+```javascript
+my.getAuthCode({
+  scopes: ['auth_user'],
+  success: (res) => {
+    console.log('Auth code:', res.authCode);
+    // Send to backend for token exchange
+    this.sendToBackend(res.authCode);
+  },
+  fail: (err) => {
+    console.error('Authorization failed:', err);
+  }
+});
+```
+
+<Warning>
+The `authCode` is short-lived and single-use. It must be exchanged server-side via the Rebell OpenAPI for a user context. Never validate the authCode client-side.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getOpenUserInfo" icon="user" href="/jsapi/open-capabilities/my.getOpenUserInfo">
+    Get user information
+  </Card>
+  <Card title="Backend Authentication" icon="shield" href="/mini-app/backend-authentication">
+    Auth code exchange guide
+  </Card>
+</CardGroup>

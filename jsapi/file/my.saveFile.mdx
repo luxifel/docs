@@ -1,0 +1,32 @@
+---
+title: my.saveFile
+description: Save a temporary file to local storage.
+---
+
+Save a temporary file permanently to the local file system.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| apFilePath | String | Yes | Temporary file path |
+| success | Function | No | Callback with saved path |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| apFilePath | String | Saved file path |
+
+## Code Example
+
+```javascript
+my.saveFile({
+  apFilePath: tempFilePath,
+  success: (res) => {
+    console.log('Saved to:', res.apFilePath);
+  }
+});
+```

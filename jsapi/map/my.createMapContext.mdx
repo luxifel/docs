@@ -1,0 +1,42 @@
+---
+title: my.createMapContext
+description: Create a map context for controlling map components.
+---
+
+Create a context object to control a map component.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| mapId | String | Yes | Map component ID |
+
+## Return Value
+
+Returns a MapContext object with control methods.
+
+## MapContext Methods
+
+| Method | Description |
+|--------|-------------|
+| getCenterLocation() | Get map center coordinates |
+| moveToLocation() | Move to current location |
+| includePoints() | Adjust view to include points |
+| getRegion() | Get visible region |
+| getScale() | Get current zoom level |
+
+## Code Example
+
+```javascript
+const mapCtx = my.createMapContext('myMap');
+
+mapCtx.getCenterLocation({
+  success: (res) => {
+    console.log('Center:', res.latitude, res.longitude);
+  }
+});
+```
+
+```xml
+<map id="myMap" latitude="{{lat}}" longitude="{{lng}}" />
+```

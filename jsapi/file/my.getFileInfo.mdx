@@ -1,0 +1,36 @@
+---
+title: my.getFileInfo
+description: Get information about a file.
+---
+
+Get file size and digest information.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| apFilePath | String | Yes | File path |
+| digestAlgorithm | String | No | Hash algorithm: `md5` or `sha1` |
+| success | Function | No | Callback with file info |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| size | Number | File size in bytes |
+| digest | String | File hash digest |
+
+## Code Example
+
+```javascript
+my.getFileInfo({
+  apFilePath: filePath,
+  digestAlgorithm: 'md5',
+  success: (res) => {
+    console.log('Size:', res.size);
+    console.log('MD5:', res.digest);
+  }
+});
+```

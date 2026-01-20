@@ -1,0 +1,108 @@
+---
+title: my.onUserCaptureScreen
+description: Listen for user screenshot events.
+---
+
+Use this API to listen for when the user takes a screenshot. This can be used to show sharing prompts or track screenshot events.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Callback function when user takes a screenshot |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.onUserCaptureScreen(() => {
+  console.log('User took a screenshot');
+});
+```
+
+### Show Share Prompt
+
+```javascript
+Page({
+  onLoad() {
+    my.onUserCaptureScreen(() => {
+      my.confirm({
+        title: 'Screenshot Captured',
+        content: 'Would you like to share this screenshot?',
+        confirmButtonText: 'Share',
+        cancelButtonText: 'Cancel',
+        success: (res) => {
+          if (res.confirm) {
+            my.showSharePanel();
+          }
+        }
+      });
+    });
+  },
+
+  onUnload() {
+    my.offUserCaptureScreen();
+  }
+});
+```
+
+### Track Screenshot Events
+
+```javascript
+App({
+  onLaunch() {
+    my.onUserCaptureScreen(() => {
+      // Log screenshot event for analytics
+      this.logEvent('screenshot_taken', {
+        page: getCurrentPages().pop()?.route,
+        timestamp: Date.now()
+      });
+    });
+  },
+
+  logEvent(name, data) {
+    my.request({
+      url: 'https://api.example.com/analytics',
+      method: 'POST',
+      data: { event: name, ...data }
+    });
+  }
+});
+```
+
+### Sensitive Content Warning
+
+```javascript
+Page({
+  onLoad() {
+    if (this.data.containsSensitiveInfo) {
+      my.onUserCaptureScreen(() => {
+        my.alert({
+          title: 'Privacy Notice',
+          content: 'This page contains sensitive information. Please be careful when sharing screenshots.'
+        });
+      });
+    }
+  },
+
+  onUnload() {
+    my.offUserCaptureScreen();
+  }
+});
+```
+
+<Tip>
+Use this API to provide helpful sharing options or remind users about sensitive content when they take screenshots.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offUserCaptureScreen" icon="xmark" href="/jsapi/device/capture-screen/my.offUserCaptureScreen">
+    Stop listening for screenshots
+  </Card>
+  <Card title="my.showSharePanel" icon="share" href="/jsapi/sharing/my.showSharePanel">
+    Show share panel
+  </Card>
+</CardGroup>

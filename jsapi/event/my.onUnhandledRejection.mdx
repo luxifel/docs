@@ -1,0 +1,162 @@
+---
+title: my.onUnhandledRejection
+description: Listen for unhandled Promise rejections in the Mini Program.
+---
+
+Use this API to listen for unhandled Promise rejections. The callback triggers when a Promise without a rejection handler is rejected.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Handler executed when an unhandled rejection occurs |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| reason | String | The rejection reason (typically an error object) |
+| promise | Promise | The rejected Promise instance |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+App({
+  onShow() {
+    my.onUnhandledRejection((res) => {
+      console.log('Unhandled rejection reason:', res.reason);
+      console.log('Rejected promise:', res.promise);
+    });
+  }
+});
+```
+
+### Error Logging
+
+```javascript
+App({
+  onLaunch() {
+    my.onUnhandledRejection((res) => {
+      // Log unhandled rejections
+      this.logRejection({
+        reason: res.reason,
+        timestamp: Date.now()
+      });
+    });
+  },
+
+  logRejection(data) {
+    my.request({
+      url: 'https://api.example.com/errors/rejections',
+      method: 'POST',
+      data: data
+    });
+  }
+});
+```
+
+### Development Debugging
+
+```javascript
+App({
+  onLaunch() {
+    my.getRunScene({
+      success: ({ envVersion }) => {
+        if (envVersion === 'develop') {
+          my.onUnhandledRejection((res) => {
+            // Show detailed info in development
+            my.alert({
+              title: 'Unhandled Promise Rejection',
+              content: String(res.reason)
+            });
+          });
+        }
+      }
+    });
+  }
+});
+```
+
+## Common Causes
+
+Unhandled Promise rejections typically occur when:
+
+<AccordionGroup>
+  <Accordion title="Missing .catch() Handler">
+    ```javascript
+    // This will trigger onUnhandledRejection
+    my.request({
+      url: 'https://api.example.com/data'
+    }).then((res) => {
+      console.log(res);
+    });
+    // Missing .catch()
+
+    // Correct approach
+    my.request({
+      url: 'https://api.example.com/data'
+    }).then((res) => {
+      console.log(res);
+    }).catch((err) => {
+      console.error('Request failed:', err);
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Missing try/catch with async/await">
+    ```javascript
+    // This will trigger onUnhandledRejection
+    async function fetchData() {
+      const res = await my.request({ url: '...' });
+      return res.data;
+    }
+
+    // Correct approach
+    async function fetchData() {
+      try {
+        const res = await my.request({ url: '...' });
+        return res.data;
+      } catch (err) {
+        console.error('Failed:', err);
+        return null;
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Errors in Promise Chains">
+    ```javascript
+    // Error in .then() without .catch()
+    fetchData()
+      .then((data) => {
+        throw new Error('Processing failed');
+      });
+
+    // Correct approach
+    fetchData()
+      .then((data) => {
+        throw new Error('Processing failed');
+      })
+      .catch((err) => {
+        console.error('Chain error:', err);
+      });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+Always add `.catch()` handlers to your Promises or use `try/catch` with `async/await` to prevent unhandled rejections.
+</Tip>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offUnhandledRejection" icon="xmark" href="/jsapi/event/my.offUnhandledRejection">
+    Stop listening for unhandled rejections
+  </Card>
+  <Card title="my.onError" icon="exclamation-circle" href="/jsapi/event/my.onError">
+    Listen for JS errors
+  </Card>
+</CardGroup>

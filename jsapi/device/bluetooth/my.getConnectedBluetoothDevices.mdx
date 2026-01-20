@@ -1,0 +1,115 @@
+---
+title: my.getConnectedBluetoothDevices
+description: Get currently connected Bluetooth devices.
+---
+
+Use this API to get the list of Bluetooth devices that are currently connected.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| services | Array | No | Filter by service UUIDs |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| devices | Array | List of connected devices |
+
+## Device Object Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| deviceId | String | Device identifier |
+| name | String | Device name |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.getConnectedBluetoothDevices({
+  success(res) {
+    console.log('Connected devices:', res.devices);
+  }
+});
+```
+
+### Filter by Service
+
+```javascript
+my.getConnectedBluetoothDevices({
+  services: ['FEE7'],
+  success(res) {
+    console.log('Connected devices with service FEE7:', res.devices);
+  }
+});
+```
+
+### Check Connection Status
+
+```javascript
+Page({
+  data: {
+    connectedDevices: []
+  },
+
+  checkConnections() {
+    my.getConnectedBluetoothDevices({
+      success: (res) => {
+        this.setData({ connectedDevices: res.devices });
+
+        if (res.devices.length === 0) {
+          my.showToast({ content: 'No devices connected' });
+        }
+      }
+    });
+  }
+});
+```
+
+### Reconnection Logic
+
+```javascript
+Page({
+  targetDeviceId: 'XX:XX:XX:XX:XX:XX',
+
+  checkAndReconnect() {
+    my.getConnectedBluetoothDevices({
+      success: (res) => {
+        const isConnected = res.devices.some(
+          d => d.deviceId === this.targetDeviceId
+        );
+
+        if (!isConnected) {
+          this.reconnectDevice();
+        }
+      }
+    });
+  },
+
+  reconnectDevice() {
+    my.connectBLEDevice({
+      deviceId: this.targetDeviceId,
+      success: () => {
+        my.showToast({ content: 'Reconnected' });
+      }
+    });
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getBluetoothDevices" icon="list" href="/jsapi/device/bluetooth/my.getBluetoothDevices">
+    Get discovered devices
+  </Card>
+  <Card title="my.connectBLEDevice" icon="link" href="/jsapi/device/bluetooth/my.connectBLEDevice">
+    Connect to device
+  </Card>
+</CardGroup>
