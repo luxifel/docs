@@ -1,65 +1,62 @@
 ---
-title: "JS Bridge Guide for Cross-App Launch"
-description: "Implement cross-app launch functionality using the JavaScript bridge for Mini Programs."
+title: "JS Bridge Guide"
+description: "Use hylid-bridge to call JSAPIs in Native Mini Programs launched via cross-app mechanisms."
 ---
 
-This guide explains how Mini Programs launched across different native apps can call standardized JSAPIs through a JavaScript bridge that creates bidirectional communication between JavaScript and native code.
+`hylid-bridge` is an npm package for **Native Mini Programs** that are launched from a foreign native app container (cross-app launch). It provides a normalized `my.*` API layer that works consistently regardless of which host app is running the Mini Program.
+
+<Info>
+This package is **only needed for cross-app launch scenarios** — when your Native Mini Program is opened from a different native app. Standard Mini Apps running inside the Rebell SuperApp do not require `hylid-bridge`: the `my` object is injected automatically by the SuperApp runtime.
+</Info>
+
+## When to Use hylid-bridge
+
+| Scenario | Use hylid-bridge? |
+|---|---|
+| Native Mini App in Rebell SuperApp | No — `my.*` available natively |
+| H5 Mini App in Rebell SuperApp | Via CDN `<script>` tag (not this npm package) |
+| Native Mini App launched cross-app (from a partner app) | **Yes — install via npm** |
 
 ## Installation
-
-Install the `hylid-bridge` package in your project:
 
 ```bash
 npm install hylid-bridge --save
 ```
 
-## Implementation
+## Usage
 
-<Tabs>
-  <Tab title="Native Mini Programs">
-    Import the `hylid-bridge` package and call the exported JSAPIs directly:
+Import the specific APIs you need directly from the package:
 
-    ```javascript
-    import { alert } from 'hylid-bridge'
+```javascript
+import { alert, appEnv, getAppIdSync } from 'hylid-bridge'
 
-    Page({
-      onLoad() {
-        alert({ content: 'Hello from Mini Program!' })
-      }
-    })
-    ```
-  </Tab>
-
-  <Tab title="H5 Mini Programs">
-    For HTML5-based Mini Programs, refer to the H5 transformation documentation for specific integration steps.
-  </Tab>
-</Tabs>
+Page({
+  onLoad() {
+    alert({ content: 'Hello from Mini Program!' })
+  }
+})
+```
 
 ## Handling Platform Differences
 
-Not all JSAPIs are supported on every platform. Use the `appEnv` object to check the runtime environment and conditionally execute platform-specific code:
+When running cross-app, not all JSAPIs are available on every host platform. Use `appEnv` to detect the runtime and branch accordingly:
 
 ```javascript
 import { appEnv, getAppIdSync, alert } from 'hylid-bridge'
 
 Page({
   onLoad() {
-    // Check platform before using platform-specific APIs
     if (appEnv.platform === 'alipay') {
-      // Alipay-specific code
       const { appId } = getAppIdSync();
       console.log('Running on Alipay, App ID:', appId);
     } else {
-      // Fallback for other platforms
-      alert({ content: 'Some features may not be available' });
+      alert({ content: 'Some features may not be available on this platform' });
     }
   }
 })
 ```
 
 ## Supported APIs
-
-The JS bridge supports a wide range of operations across multiple categories:
 
 <AccordionGroup>
   <Accordion title="Navigation">
@@ -113,25 +110,14 @@ The JS bridge supports a wide range of operations across multiple categories:
 ## Requirements
 
 <Warning>
-Applications using the JS bridge may need to:
+Applications using the JS bridge in cross-app scenarios may need to:
 
 - Request specific permissions from host platforms
 - Whitelist domains for API calls
-- Handle cases where certain APIs are not available
+- Handle cases where certain APIs are not available on the host platform
 </Warning>
 
-### Permission Requirements
-
-| Feature | Required Permission |
-|---------|---------------------|
-| Location | Location access |
-| Camera | Camera access |
-| Storage | File system access |
-| Contacts | Contact list access |
-
 ### Domain Whitelisting
-
-Ensure your API endpoints are whitelisted in the Mini Program configuration:
 
 ```json
 {
@@ -149,7 +135,7 @@ Ensure your API endpoints are whitelisted in the Mini Program configuration:
 
 ## Error Handling
 
-Always implement error handling when using bridge APIs:
+Always implement error handling — cross-app environments may not support every API:
 
 ```javascript
 import { request } from 'hylid-bridge'
@@ -163,25 +149,12 @@ async function fetchData() {
     return res.data;
   } catch (error) {
     console.error('Bridge API error:', error);
-    // Handle platform-specific errors
     if (error.code === 'NOT_SUPPORTED') {
-      // API not supported on this platform
+      // API not available on this host platform
     }
   }
 }
 ```
-
-## Best Practices
-
-<Tip>
-**Recommended practices for cross-app development:**
-
-1. Always check API availability before use
-2. Implement fallbacks for unsupported features
-3. Test on all target platforms
-4. Handle network errors gracefully
-5. Use async/await for cleaner code
-</Tip>
 
 ## Next Steps
 

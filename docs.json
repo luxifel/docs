@@ -20,27 +20,34 @@
             ]
           },
           {
+            "group": "Quick Start",
+            "pages": [
+              "quick-start/overview",
+              "quick-start/native",
+              "quick-start/h5"
+            ]
+          },
+          {
             "group": "Payment Integration",
             "pages": [
               "payment-integration/quick-integration-guide",
-               {
+              {
                 "group": "Authentication",
                 "expanded": false,
                 "pages": [
                   "payment-integration/authentication-environments",
                   "payment-integration/authentication-deep-dive"
-
                 ]
               },
               {
                 "group": "Payments",
                 "expanded": false,
                 "pages": [
-                   "payment-integration/retail-pay",
-                "payment-integration/qr-order-pay",
-                "payment-integration/link-pay",
-                "payment-integration/inquiring-payment-api",
-                "payment-integration/webhooks"
+                  "payment-integration/retail-pay",
+                  "payment-integration/qr-order-pay",
+                  "payment-integration/link-pay",
+                  "payment-integration/inquiring-payment-api",
+                  "payment-integration/webhooks"
                 ]
               },
               "payment-integration/error-handling"
@@ -580,9 +587,7 @@
       }
     ],
     "global": {
-      "anchors": [
-        
-      ]
+      "anchors": []
     }
   },
   "logo": {
@@ -604,15 +609,15 @@
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
