@@ -3,7 +3,7 @@ title: Apply Token
 description: Exchange authorization codes for access tokens or refresh expired tokens.
 ---
 
-`POST /v1/authorizations/applyToken`
+`POST /v2/authorizations/applyToken`
 
 The `applyToken` endpoint is used to obtain access tokens. It supports two use cases:
 
@@ -166,7 +166,7 @@ accessToken expires → Call applyToken with refreshToken → Receive new access
 ```javascript Node.js
 class TokenManager {
   async exchangeAuthCode(authCode, referenceClientId) {
-    const response = await rebellAPI.call('/v1/authorizations/applyToken', {
+    const response = await rebellAPI.call('/v2/authorizations/applyToken', {
       grantType: 'AUTHORIZATION_CODE',
       authCode,
       referenceClientId
@@ -197,7 +197,7 @@ class TokenManager {
       throw new Error('Refresh token expired, re-authorization required');
     }
 
-    const response = await rebellAPI.call('/v1/authorizations/applyToken', {
+    const response = await rebellAPI.call('/v2/authorizations/applyToken', {
       grantType: 'REFRESH_TOKEN',
       refreshToken: stored.refreshToken,
       referenceClientId
@@ -235,7 +235,7 @@ class TokenManager {
 ```python Python
 class TokenManager:
     async def exchange_auth_code(self, auth_code: str, reference_client_id: str):
-        response = await rebell_api.call('/v1/authorizations/applyToken', {
+        response = await rebell_api.call('/v2/authorizations/applyToken', {
             'grantType': 'AUTHORIZATION_CODE',
             'authCode': auth_code,
             'referenceClientId': reference_client_id
@@ -262,7 +262,7 @@ class TokenManager:
         if datetime.now() > stored['refresh_token_expiry']:
             raise Exception('Refresh token expired, re-authorization required')
 
-        response = await rebell_api.call('/v1/authorizations/applyToken', {
+        response = await rebell_api.call('/v2/authorizations/applyToken', {
             'grantType': 'REFRESH_TOKEN',
             'refreshToken': stored['refresh_token'],
             'referenceClientId': reference_client_id

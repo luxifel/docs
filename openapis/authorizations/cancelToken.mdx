@@ -3,7 +3,7 @@ title: Cancel Token
 description: Revoke access tokens and terminate user authorization.
 ---
 
-`POST /v1/authorizations/cancelToken`
+`POST /v2/authorizations/cancelToken`
 
 The `cancelToken` endpoint is used to revoke an access token, effectively terminating the user's authorization. Use this when a user wants to disconnect their account or when you need to invalidate tokens for security reasons.
 
@@ -92,7 +92,7 @@ async function disconnectUser(userId) {
   }
 
   try {
-    const response = await rebellAPI.call('/v1/authorizations/cancelToken', {
+    const response = await rebellAPI.call('/v2/authorizations/cancelToken', {
       accessToken: stored.accessToken
     });
 
@@ -134,7 +134,7 @@ async def disconnect_user(user_id: str) -> dict:
         return {'success': True, 'message': 'User not connected'}
 
     try:
-        response = await rebell_api.call('/v1/authorizations/cancelToken', {
+        response = await rebell_api.call('/v2/authorizations/cancelToken', {
             'accessToken': stored['access_token']
         })
 
@@ -185,7 +185,7 @@ async function cancelSubscription(subscriptionId) {
   // 2. Revoke the token
   if (subscription.accessToken) {
     try {
-      await rebellAPI.call('/v1/authorizations/cancelToken', {
+      await rebellAPI.call('/v2/authorizations/cancelToken', {
         accessToken: subscription.accessToken
       });
     } catch (error) {

@@ -1,0 +1,54 @@
+---
+title: my.readBLECharacteristicValue
+description: Read the value of a BLE device characteristic.
+---
+
+Reads the current value of a characteristic on a connected BLE device. The result is delivered via `my.onBLECharacteristicValueChange`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| deviceId | String | Yes | Device identifier |
+| serviceId | String | Yes | Service UUID |
+| characteristicId | String | Yes | Characteristic UUID |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+// Register listener first
+my.onBLECharacteristicValueChange((res) => {
+  console.log('Value changed:', res.characteristicId, res.value);
+});
+
+// Then trigger a read
+my.readBLECharacteristicValue({
+  deviceId: 'XX:XX:XX:XX:XX:XX',
+  serviceId: '0000FFF0-0000-1000-8000-00805F9B34FB',
+  characteristicId: '0000FFF1-0000-1000-8000-00805F9B34FB',
+  success: () => {
+    console.log('Read request sent');
+  },
+  fail: (err) => {
+    console.error('Read failed:', err);
+  }
+});
+```
+
+<Info>
+The characteristic value is not returned directly in the success callback. Listen for `my.onBLECharacteristicValueChange` to receive the result.
+</Info>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.writeBLECharacteristicValue" icon="arrow-up" href="/jsapi/device/bluetooth/my.writeBLECharacteristicValue">
+    Write a characteristic value
+  </Card>
+  <Card title="my.onBLECharacteristicValueChange" icon="bell" href="/jsapi/device/bluetooth/my.onBLECharacteristicValueChange">
+    Listen for value changes
+  </Card>
+</CardGroup>

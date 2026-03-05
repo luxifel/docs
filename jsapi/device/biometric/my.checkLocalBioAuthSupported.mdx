@@ -1,5 +1,5 @@
 ---
-title: my.checkBioMetricAvailable
+title: my.checkLocalBioAuthSupported
 description: Check if biometric authentication is available.
 ---
 
@@ -25,7 +25,7 @@ Use this API to check if biometric authentication (fingerprint or face recogniti
 ### Basic Usage
 
 ```javascript
-my.checkBioMetricAvailable({
+my.checkLocalBioAuthSupported({
   success(res) {
     console.log('Biometric available:', res.available);
     console.log('Type:', res.type);
@@ -43,7 +43,7 @@ Page({
   },
 
   onLoad() {
-    my.checkBioMetricAvailable({
+    my.checkLocalBioAuthSupported({
       success: (res) => {
         this.setData({
           biometricAvailable: res.available,
@@ -60,7 +60,7 @@ Page({
 ```javascript
 Page({
   authenticate() {
-    my.checkBioMetricAvailable({
+    my.checkLocalBioAuthSupported({
       success: (res) => {
         if (res.available) {
           this.useBiometric(res.type);
@@ -76,7 +76,7 @@ Page({
       ? 'Look at your device'
       : 'Touch the fingerprint sensor';
 
-    my.startBioMetricVerify({
+    my.startLocalBioAuth({
       type: type,
       title: title,
       success: (res) => {
@@ -112,7 +112,7 @@ Page({
   onLoad() {
     const methods = [{ name: 'Password', type: 'password' }];
 
-    my.checkBioMetricAvailable({
+    my.checkLocalBioAuthSupported({
       success: (res) => {
         if (res.available) {
           if (res.type === 'fingerPrint') {
@@ -135,7 +135,7 @@ Always check biometric availability before showing biometric options in your UI 
 ## Related APIs
 
 <CardGroup cols={2}>
-  <Card title="my.startBioMetricVerify" icon="fingerprint" href="/jsapi/device/biometric/my.startBioMetricVerify">
+  <Card title="my.startLocalBioAuth" icon="fingerprint" href="/jsapi/device/biometric/my.startLocalBioAuth">
     Start biometric verification
   </Card>
 </CardGroup>

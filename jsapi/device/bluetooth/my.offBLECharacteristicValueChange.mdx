@@ -1,0 +1,61 @@
+---
+title: my.offBLECharacteristicValueChange
+description: Stop listening for BLE characteristic value changes.
+---
+
+Use this API to remove a listener registered with `my.onBLECharacteristicValueChange`. If no callback is provided, all listeners are removed.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove All Listeners
+
+```javascript
+my.offBLECharacteristicValueChange();
+```
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    my.onBLECharacteristicValueChange(this.handleValueChange);
+  },
+
+  handleValueChange(res) {
+    console.log('Value changed:', res.value);
+  },
+
+  onUnload() {
+    my.offBLECharacteristicValueChange(this.handleValueChange);
+  }
+});
+```
+
+### Complete BLE Cleanup
+
+```javascript
+function cleanupBLE() {
+  my.offBLECharacteristicValueChange();
+  my.offBluetoothDeviceFound();
+  my.offBluetoothAdapterStateChange();
+  my.disconnectBLEDevice({ deviceId: currentDeviceId });
+  my.closeBluetoothAdapter();
+}
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onBLECharacteristicValueChange" icon="bell" href="/jsapi/device/bluetooth/my.onBLECharacteristicValueChange">
+    Listen for value changes
+  </Card>
+  <Card title="my.readBLECharacteristicValue" icon="arrow-down" href="/jsapi/device/bluetooth/my.readBLECharacteristicValue">
+    Trigger a read on a characteristic
+  </Card>
+</CardGroup>

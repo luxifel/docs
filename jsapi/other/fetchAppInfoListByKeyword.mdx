@@ -1,0 +1,103 @@
+---
+title: fetchAppInfoListByKeyword
+description: Query and fetch a paginated list of Mini Apps deployed in the SuperApp by keyword.
+---
+
+Queries Mini Apps by keyword and returns a paginated list of matches deployed to the SuperApp. Invoked via `my.call()`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| keyword | String | Yes | Search term to filter Mini Apps |
+| queryStartIndex | Int | Yes | Starting index for pagination (default: `0`) |
+| querySize | Int | Yes | Number of results to return per request (max: 50) |
+| category | String | No | Category ID from the Mini Program Platform console to filter results |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Whether the query succeeded |
+| errorCode | String | Error identifier, present on failure |
+| errorMessage | String | Human-readable error description, present on failure |
+| totalCount | Int | Total number of matching Mini Apps |
+| appInfoList | Array | List of Mini App objects (max 50 items) |
+
+### appInfoList Item
+
+| Property | Type | Description |
+|----------|------|-------------|
+| appId | String | Unique Mini App identifier |
+| appName | String | Display name |
+| developerVersion | String | Release version (`major.minor.patch`) |
+| deployVersion | String | Version with timestamp (`major.minor.patch.timestamp`) |
+| appSlogan | String | Short tagline |
+| appDesc | String | Detailed description |
+| iconUrl | String | Logo image URL |
+| status | String | Release status: `GRAY` (grayscale rollout) or `ONLINE` |
+| packageSize | Number | App package size in bytes |
+| createTime | Number | Creation timestamp |
+| publishTime | Number | Publication timestamp |
+| relatedClientId | String | SuperApp identifier |
+| relatedWorkspace | String | Workspace identifier |
+| category | String | Primary category name |
+| categoryId | String | Primary category ID |
+| categoryInfos | Array | Full category hierarchy (see below) |
+| extendInfoMap | Object | Additional metadata key-value pairs |
+
+### categoryInfos Item
+
+| Property | Type | Description |
+|----------|------|-------------|
+| category | String | Primary category name |
+| categoryId | String | Primary category ID |
+| category2 | String | Secondary category name |
+| categoryCode2 | String | Secondary category ID |
+| category3 | String | Tertiary category name |
+| categoryCode3 | String | Tertiary category ID |
+
+### extendInfoMap Fields
+
+| Key | Type | Description |
+|-----|------|-------------|
+| firstPublishTime | String | Initial release date (`yyyy-MM-dd HH:mm`) |
+| tagList | String | Tags as a JSON array string |
+
+## Error Codes
+
+| Code | Description | Resolution |
+|------|-------------|-----------|
+| 2 / 10102 | `INVALID_PARAMETER` | Check that all required fields are provided with correct types |
+| 3 | `UNKNOWN_ERROR` | Retry; contact support if persistent |
+| 10104 | `NETWORK_ERROR` | Check network connectivity and retry |
+
+## Code Example
+
+```javascript
+my.call('fetchAppInfoListByKeyword', {
+  keyword: 'coffee',
+  queryStartIndex: 0,
+  querySize: 20,
+  success: (res) => {
+    if (res.success) {
+      console.log('Total results:', res.totalCount);
+      res.appInfoList.forEach((app) => {
+        console.log(app.appId, app.appName, app.status);
+      });
+    } else {
+      console.error('Query failed:', res.errorCode, res.errorMessage);
+    }
+  },
+  fail: (err) => {
+    console.error('API call failed:', err);
+  }
+});
+```
+
+<Info>
+This API uses `my.call()` rather than the standard `my.apiName()` pattern.
+</Info>

@@ -1,0 +1,43 @@
+---
+title: my.setKeepScreenOn
+description: Prevent the screen from turning off while the Mini App is running.
+---
+
+Control whether the device screen stays on while the Mini App is active. Only affects the current Mini App instance — screen behavior returns to normal when the user exits.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| keepScreenOn | Boolean | Yes | `true` keeps screen on, `false` restores default behavior |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+// Keep screen on (e.g. during a QR code display or navigation view)
+my.setKeepScreenOn({
+  keepScreenOn: true,
+  success: () => {
+    console.log('Screen will stay on');
+  }
+});
+
+// Restore default behavior
+my.setKeepScreenOn({
+  keepScreenOn: false,
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getScreenBrightness" icon="sun" href="/jsapi/device/screen-brightness/my.getScreenBrightness">
+    Get current brightness
+  </Card>
+  <Card title="my.setScreenBrightness" icon="sun" href="/jsapi/device/screen-brightness/my.setScreenBrightness">
+    Set brightness level
+  </Card>
+</CardGroup>

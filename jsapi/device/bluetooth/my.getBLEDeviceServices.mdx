@@ -1,0 +1,56 @@
+---
+title: my.getBLEDeviceServices
+description: Get the service list of a connected BLE device.
+---
+
+Returns the list of services exposed by a connected Bluetooth Low Energy device.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| deviceId | String | Yes | Device identifier from discovery |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| services | Array | List of service objects |
+
+### Service Object
+
+| Property | Type | Description |
+|----------|------|-------------|
+| serviceId | String | Service UUID |
+| isPrimary | Boolean | Whether this is a primary service |
+
+## Code Example
+
+```javascript
+my.getBLEDeviceServices({
+  deviceId: 'XX:XX:XX:XX:XX:XX',
+  success: (res) => {
+    console.log('Services:', res.services);
+    res.services.forEach((service) => {
+      console.log('Service UUID:', service.serviceId);
+    });
+  },
+  fail: (err) => {
+    console.error('Failed to get services:', err);
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getBLEDeviceCharacteristics" icon="list" href="/jsapi/device/bluetooth/my.getBLEDeviceCharacteristics">
+    Get service characteristics
+  </Card>
+  <Card title="my.connectBLEDevice" icon="link" href="/jsapi/device/bluetooth/my.connectBLEDevice">
+    Connect to BLE device
+  </Card>
+</CardGroup>

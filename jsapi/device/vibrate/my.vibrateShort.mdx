@@ -1,0 +1,35 @@
+---
+title: my.vibrateShort
+description: Trigger a short device vibration.
+---
+
+Make the device vibrate briefly for lightweight haptic feedback.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.vibrateShort({
+  success: () => {
+    console.log('Short vibration triggered');
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.vibrate" icon="mobile" href="/jsapi/device/vibrate/my.vibrate">
+    General vibration
+  </Card>
+  <Card title="my.vibrateLong" icon="mobile" href="/jsapi/device/vibrate/my.vibrateLong">
+    Long vibration
+  </Card>
+</CardGroup>

@@ -111,7 +111,7 @@ When calculating signatures, the content to be signed must be properly encoded:
 // Complete signature flow
 const contentToSign = [
   'POST',
-  '/api/open/v1/payments/pay',
+  '/api/open/v2/payments/pay',
   clientId,
   requestTime,
   JSON.stringify(body)
