@@ -317,7 +317,9 @@
               {
                 "group": "Vibration",
                 "pages": [
-                  "jsapi/device/vibrate/my.vibrate"
+                  "jsapi/device/vibrate/my.vibrate",
+                  "jsapi/device/vibrate/my.vibrateShort",
+                  "jsapi/device/vibrate/my.vibrateLong"
                 ]
               },
               {
@@ -372,7 +374,8 @@
                 "group": "Screen Brightness",
                 "pages": [
                   "jsapi/device/screen-brightness/my.getScreenBrightness",
-                  "jsapi/device/screen-brightness/my.setScreenBrightness"
+                  "jsapi/device/screen-brightness/my.setScreenBrightness",
+                  "jsapi/device/screen-brightness/my.setKeepScreenOn"
                 ]
               },
               {
@@ -387,6 +390,7 @@
               {
                 "group": "Settings",
                 "pages": [
+                  "jsapi/device/setting/my.getSetting",
                   "jsapi/device/setting/my.openSetting"
                 ]
               },
@@ -430,14 +434,19 @@
                   "jsapi/device/bluetooth/my.onBluetoothAdapterStateChange",
                   "jsapi/device/bluetooth/my.offBluetoothAdapterStateChange",
                   "jsapi/device/bluetooth/my.connectBLEDevice",
-                  "jsapi/device/bluetooth/my.disconnectBLEDevice"
+                  "jsapi/device/bluetooth/my.disconnectBLEDevice",
+                  "jsapi/device/bluetooth/my.getBLEDeviceServices",
+                  "jsapi/device/bluetooth/my.getBLEDeviceCharacteristics",
+                  "jsapi/device/bluetooth/my.readBLECharacteristicValue",
+                  "jsapi/device/bluetooth/my.onBLECharacteristicValueChange",
+                  "jsapi/device/bluetooth/my.offBLECharacteristicValueChange"
                 ]
               },
               {
                 "group": "Biometric",
                 "pages": [
-                  "jsapi/device/biometric/my.checkBioMetricAvailable",
-                  "jsapi/device/biometric/my.startBioMetricVerify"
+                  "jsapi/device/biometric/my.checkLocalBioAuthSupported",
+                  "jsapi/device/biometric/my.startLocalBioAuth"
                 ]
               }
             ]
@@ -446,6 +455,12 @@
             "group": "Sharing",
             "pages": [
               "jsapi/sharing/my.showSharePanel"
+            ]
+          },
+          {
+            "group": "Collection",
+            "pages": [
+              "jsapi/collection/my.isCollected"
             ]
           },
           {
@@ -476,6 +491,12 @@
               "jsapi/open-capabilities/my.navigateToMiniProgram",
               "jsapi/open-capabilities/my.navigateBackMiniProgram"
             ]
+          },
+          {
+            "group": "Other",
+            "pages": [
+              "jsapi/other/fetchAppInfoListByKeyword"
+            ]
           }
         ]
       },
@@ -501,7 +522,7 @@
             "group": "OpenAPIs for Merchants",
             "pages": [
               {
-                "group": "Version /v1",
+                "group": "Version /v2",
                 "expanded": true,
                 "pages": [
                   "openapis/data-dictionary",

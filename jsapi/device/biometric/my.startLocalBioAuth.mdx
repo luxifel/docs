@@ -1,5 +1,5 @@
 ---
-title: my.startBioMetricVerify
+title: my.startLocalBioAuth
 description: Start biometric authentication (fingerprint or face recognition).
 ---
 
@@ -26,7 +26,7 @@ Use this API to authenticate the user using biometric methods such as fingerprin
 ### Basic Fingerprint Authentication
 
 ```javascript
-my.startBioMetricVerify({
+my.startLocalBioAuth({
   type: 'fingerPrint',
   success(res) {
     if (res.success) {
@@ -42,7 +42,7 @@ my.startBioMetricVerify({
 ### Face Recognition
 
 ```javascript
-my.startBioMetricVerify({
+my.startLocalBioAuth({
   type: 'facial',
   title: 'Verify your identity',
   success(res) {
@@ -59,7 +59,7 @@ my.startBioMetricVerify({
 Page({
   async confirmPayment() {
     // First verify user identity
-    my.startBioMetricVerify({
+    my.startLocalBioAuth({
       type: 'fingerPrint',
       title: 'Confirm payment',
       success: (res) => {
@@ -95,10 +95,10 @@ Page({
 Page({
   async authenticateUser() {
     // Check if biometric is available
-    my.checkBioMetricAvailable({
+    my.checkLocalBioAuthSupported({
       success: (res) => {
         if (res.available) {
-          my.startBioMetricVerify({
+          my.startLocalBioAuth({
             type: res.type, // Use available type
             success: (verifyRes) => {
               if (verifyRes.success) {
@@ -140,7 +140,7 @@ Biometric authentication may not be available on all devices. Always provide a f
 ## Related APIs
 
 <CardGroup cols={2}>
-  <Card title="my.checkBioMetricAvailable" icon="fingerprint" href="/jsapi/device/biometric/my.checkBioMetricAvailable">
+  <Card title="my.checkLocalBioAuthSupported" icon="fingerprint" href="/jsapi/device/biometric/my.checkLocalBioAuthSupported">
     Check availability
   </Card>
 </CardGroup>

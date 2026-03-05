@@ -3,7 +3,7 @@ title: Prepare Authorization
 description: Prepare contract information for agreement payment subscription flows.
 ---
 
-`POST /v1/authorizations/prepare`
+`POST /v2/authorizations/prepare`
 
 The `prepare` endpoint is used to set up contract information for agreement payment scenarios. It returns an authorization URL that the user visits to sign the payment agreement.
 
@@ -133,7 +133,7 @@ async function prepareAgreementPayment(userId, plan) {
     contractStatusNotifyUrl: `${process.env.BASE_URL}/webhooks/contract-status`
   };
 
-  const response = await rebellAPI.call('/v1/authorizations/prepare', {
+  const response = await rebellAPI.call('/v2/authorizations/prepare', {
     referenceClientId: userId,
     scopes: 'AGREEMENT_PAY',
     extendInfo: JSON.stringify(extendInfo)
@@ -162,7 +162,7 @@ def prepare_agreement_payment(user_id: str, plan: dict) -> str:
         'contractStatusNotifyUrl': f"{os.environ['BASE_URL']}/webhooks/contract-status"
     }
 
-    response = rebell_api.call('/v1/authorizations/prepare', {
+    response = rebell_api.call('/v2/authorizations/prepare', {
         'referenceClientId': user_id,
         'scopes': 'AGREEMENT_PAY',
         'extendInfo': json.dumps(extend_info)

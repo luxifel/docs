@@ -31,13 +31,13 @@ Different APIs use different fields as idempotency keys:
 
 | API Endpoint | Idempotency Field | Purpose |
 |--------------|-------------------|---------|
-| `/v1/payments/pay` | `paymentRequestId` | Prevents duplicate charges |
-| `/v1/payments/refund` | `refundRequestId` | Ensures single refund processing |
-| `/v1/payments/retailPay` | `paymentRequestId` | Prevents duplicate retail payments |
-| `/v1/payments/linkPayCreate` | `paymentRequestId` | Prevents duplicate link pay orders |
-| `/v1/payments/createQrOrder` | `paymentRequestId` | Prevents duplicate QR orders |
-| `/v1/messages/sendPush` | `requestId` | Returns same `messageId` for duplicates |
-| `/v1/messages/sendInbox` | `requestId` | Returns same `messageId` for duplicates |
+| `/v2/payments/pay` | `paymentRequestId` | Prevents duplicate charges |
+| `/v2/payments/refund` | `refundRequestId` | Ensures single refund processing |
+| `/v2/payments/retailPay` | `paymentRequestId` | Prevents duplicate retail payments |
+| `/v2/payments/linkPayCreate` | `paymentRequestId` | Prevents duplicate link pay orders |
+| `/v2/payments/createQrOrder` | `paymentRequestId` | Prevents duplicate QR orders |
+| `/v2/messages/sendPush` | `requestId` | Returns same `messageId` for duplicates |
+| `/v2/messages/sendInbox` | `requestId` | Returns same `messageId` for duplicates |
 
 ## Implementation Guidelines
 

@@ -1,0 +1,93 @@
+---
+title: my.onBLECharacteristicValueChange
+description: Listen for BLE characteristic value changes.
+---
+
+Use this API to listen for changes in the value of a BLE device characteristic. It is triggered when you call `my.readBLECharacteristicValue` or when a characteristic with `notify` or `indicate` enabled pushes a new value.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Callback when a characteristic value changes |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| deviceId | String | Device identifier |
+| serviceId | String | Service UUID |
+| characteristicId | String | Characteristic UUID |
+| value | ArrayBuffer | The new characteristic value |
+
+## Code Example
+
+### Basic Usage
+
+```javascript
+my.onBLECharacteristicValueChange((res) => {
+  console.log('Device:', res.deviceId);
+  console.log('Characteristic:', res.characteristicId);
+  console.log('Value:', res.value);
+});
+```
+
+### Read and Handle Value
+
+```javascript
+Page({
+  onLoad() {
+    my.onBLECharacteristicValueChange(this.handleValueChange);
+  },
+
+  handleValueChange(res) {
+    // Convert ArrayBuffer to usable data
+    const dataView = new DataView(res.value);
+    const intValue = dataView.getUint8(0);
+    console.log('Received value:', intValue);
+    this.setData({ latestValue: intValue });
+  },
+
+  readValue() {
+    my.readBLECharacteristicValue({
+      deviceId: this.data.deviceId,
+      serviceId: this.data.serviceId,
+      characteristicId: this.data.characteristicId,
+    });
+  },
+
+  onUnload() {
+    my.offBLECharacteristicValueChange(this.handleValueChange);
+  }
+});
+```
+
+### Notify-Based Updates
+
+```javascript
+// When characteristic has notify enabled, updates arrive automatically
+my.onBLECharacteristicValueChange((res) => {
+  if (res.characteristicId === '0000FFF1-0000-1000-8000-00805F9B34FB') {
+    const buffer = new Uint8Array(res.value);
+    console.log('Sensor data:', Array.from(buffer));
+  }
+});
+```
+
+<Info>
+The value is delivered as an `ArrayBuffer`. Use `DataView` or `Uint8Array` to interpret the bytes according to the characteristic's GATT profile.
+</Info>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offBLECharacteristicValueChange" icon="xmark" href="/jsapi/device/bluetooth/my.offBLECharacteristicValueChange">
+    Stop listening for value changes
+  </Card>
+  <Card title="my.readBLECharacteristicValue" icon="arrow-down" href="/jsapi/device/bluetooth/my.readBLECharacteristicValue">
+    Trigger a read on a characteristic
+  </Card>
+  <Card title="my.getBLEDeviceCharacteristics" icon="list" href="/jsapi/device/bluetooth/my.getBLEDeviceCharacteristics">
+    Get device characteristics
+  </Card>
+</CardGroup>

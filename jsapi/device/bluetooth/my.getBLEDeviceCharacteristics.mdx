@@ -1,0 +1,60 @@
+---
+title: my.getBLEDeviceCharacteristics
+description: Get the characteristic list of a BLE device service.
+---
+
+Returns the list of characteristics for a given service on a connected Bluetooth Low Energy device.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| deviceId | String | Yes | Device identifier |
+| serviceId | String | Yes | Service UUID |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| characteristics | Array | List of characteristic objects |
+
+### Characteristic Object
+
+| Property | Type | Description |
+|----------|------|-------------|
+| characteristicId | String | Characteristic UUID |
+| serviceId | String | Parent service UUID |
+| properties | Object | Supported operations: `read`, `write`, `notify`, `indicate` |
+
+## Code Example
+
+```javascript
+my.getBLEDeviceCharacteristics({
+  deviceId: 'XX:XX:XX:XX:XX:XX',
+  serviceId: '0000FFF0-0000-1000-8000-00805F9B34FB',
+  success: (res) => {
+    res.characteristics.forEach((char) => {
+      console.log('Characteristic:', char.characteristicId);
+      console.log('Can read:', char.properties.read);
+      console.log('Can notify:', char.properties.notify);
+    });
+  },
+  fail: (err) => {
+    console.error('Failed:', err);
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getBLEDeviceServices" icon="list" href="/jsapi/device/bluetooth/my.getBLEDeviceServices">
+    Get device services
+  </Card>
+  <Card title="my.readBLECharacteristicValue" icon="arrow-down" href="/jsapi/device/bluetooth/my.readBLECharacteristicValue">
+    Read a characteristic value
+  </Card>
+</CardGroup>

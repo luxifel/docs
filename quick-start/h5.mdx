@@ -119,7 +119,6 @@ H5 Mini Apps support only a **subset** of the JSAPI available to Native Mini App
     | `my.showNavigationBarLoading` |
     | `my.hideNavigationBarLoading` |
     | `my.setNavigationBar` |
-    | `my.getMenuButtonBoundingClientRect` |
   </Accordion>
 
   <Accordion title="UI — Feedback & Dialogs">
@@ -208,26 +207,20 @@ H5 Mini Apps support only a **subset** of the JSAPI available to Native Mini App
     | `my.getClipboard` |
     | `my.setClipboard` |
     | `my.watchShake` |
-    | `my.watchAccelerometer` |
-    | `my.stopAccelerometer` |
-    | `my.watchCompass` |
-    | `my.stopCompass` |
+    | `my.onAccelerometerChange` |
+    | `my.offAccelerometerChange` |
+    | `my.onCompassChange` |
+    | `my.offCompassChange` |
     | `my.vibrateShort` |
     | `my.vibrateLong` |
-    | `my.watchGyroscope` |
-    | `my.stopGyroscope` |
-    | `my.watchDeviceMotion` |
-    | `my.stopDeviceMotion` |
     | `my.makePhoneCall` |
     | `my.setScreenBrightness` |
     | `my.getScreenBrightness` |
     | `my.setKeepScreenOn` |
     | `my.getScreenOrientation` |
     | `my.setScreenOrientation` |
-    | `my.requestAuthCode` |
     | `my.scan` |
     | `my.getBatteryInfo` |
-    | `my.startFacialRecognitionVerify` |
   </Accordion>
 
   <Accordion title="Sharing & Mini App Navigation">
@@ -245,12 +238,6 @@ H5 Mini Apps support only a **subset** of the JSAPI available to Native Mini App
     | `my.tradePay` |
   </Accordion>
 
-  <Accordion title="Other">
-    | API |
-    |-----|
-    | `my.fetchAppInfoListByKeyword` |
-    | `my.allowSystemSnapshot` |
-  </Accordion>
 </AccordionGroup>
 
 ### Usage Examples
@@ -290,9 +277,9 @@ H5 Mini Apps support only a **subset** of the JSAPI available to Native Mini App
 
   <Accordion title="Trigger a payment">
     ```javascript
-    // paymentString must come from your backend
+    // tradeNO must come from your backend
     my.tradePay({
-      paymentString: '<token from your backend>',
+      tradeNO: '<payment reference from your backend>',
       success: (res) => {
         if (res.resultCode === '9000') {
           window.location.href = '/success';
@@ -312,12 +299,6 @@ H5 Mini Apps support only a **subset** of the JSAPI available to Native Mini App
     });
     ```
   </Accordion>
-
-  <Accordion title="Navigate back">
-    ```javascript
-    my.navigateBack({ delta: 1 });
-    ```
-  </Accordion>
 </AccordionGroup>
 
 ## Step 5: Handle Payments
@@ -332,10 +313,10 @@ Payment flow in an H5 Mini App:
     Your page sends order details to your backend via `fetch` or `XMLHttpRequest`
   </Step>
   <Step title="Backend creates payment">
-    Your backend calls the Rebell Payment API and returns a `paymentString`
+    Your backend calls the Rebell Payment API and returns a `tradeNO`
   </Step>
   <Step title="Call my.tradePay">
-    Pass the `paymentString` to `my.tradePay` — Rebell handles the rest
+    Pass the `tradeNO` to `my.tradePay` — Rebell handles the rest
   </Step>
   <Step title="Handle result">
     On success, redirect or update the page. Your backend also receives a webhook.
@@ -350,11 +331,11 @@ async function initiatePayment(orderData) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(orderData),
   });
-  const { paymentString } = await response.json();
+  const { tradeNO } = await response.json();
 
   // 2. Open Rebell payment UI
   my.tradePay({
-    paymentString,
+    tradeNO,
     success: (res) => {
       if (res.resultCode === '9000') {
         window.location.href = '/order/success';

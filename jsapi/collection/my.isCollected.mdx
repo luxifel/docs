@@ -1,0 +1,47 @@
+---
+title: my.isCollected
+description: Check whether the current Mini App is in the user's favorites (collection).
+---
+
+Returns the collection status of the Mini App — whether the user has added it to their favorites.
+
+<Info>
+Requires Appx version **1.17.0** or higher.
+</Info>
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| isCollected | Boolean | `true` if the Mini App is in the user's favorites, `false` otherwise |
+
+## Error Codes
+
+| Code | Message | Resolution |
+|------|---------|-----------|
+| -1 | Unknown collection status | The Mini App has not been added to favorites yet. Add it first, then retry. |
+
+## Code Example
+
+```javascript
+my.isCollected({
+  success: (res) => {
+    if (res.isCollected) {
+      console.log('Mini App is in favorites');
+    } else {
+      console.log('Mini App is not in favorites');
+    }
+  },
+  fail: (err) => {
+    console.error('Failed to check collection status:', err);
+  }
+});
+```

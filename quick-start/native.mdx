@@ -118,7 +118,7 @@ Page({
   handlePay() {
     // Request payment token from your backend, then trigger payment
     my.tradePay({
-      paymentString: '<token from your backend>',
+      tradeNO: '<payment reference from your backend>',
       success: (res) => {
         if (res.resultCode === '9000') {
           my.alert({ title: 'Payment successful' });
@@ -201,8 +201,8 @@ my.request({
   headers: { 'Content-Type': 'application/json' },
   data: { amount: 1000, currency: 'EUR' },
   success: (res) => {
-    const { paymentString } = res.data;
-    // Use paymentString to trigger my.tradePay
+    const { tradeNO } = res.data;
+    // Use tradeNO to trigger my.tradePay
   },
   fail: (err) => my.alert({ title: 'Network error' }),
 });
@@ -242,10 +242,10 @@ Triggering a payment from a Native Mini App follows this flow:
     Send order details to your backend via `my.request`
   </Step>
   <Step title="Backend creates payment">
-    Your backend calls the Rebell Payment API (e.g. `tradePay`) and receives a `paymentString`
+    Your backend calls the Rebell Payment API and returns a `tradeNO`
   </Step>
   <Step title="Mini App opens payment UI">
-    Pass `paymentString` to `my.tradePay` — Rebell handles the payment UI
+    Pass `tradeNO` to `my.tradePay` — Rebell handles the payment UI
   </Step>
   <Step title="Backend receives webhook">
     Rebell notifies your backend of the final result

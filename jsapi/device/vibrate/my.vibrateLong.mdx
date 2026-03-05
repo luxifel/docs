@@ -1,0 +1,35 @@
+---
+title: my.vibrateLong
+description: Trigger a long device vibration.
+---
+
+Make the device vibrate for an extended duration, suitable for alerts or confirmations.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.vibrateLong({
+  success: () => {
+    console.log('Long vibration triggered');
+  }
+});
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.vibrate" icon="mobile" href="/jsapi/device/vibrate/my.vibrate">
+    General vibration
+  </Card>
+  <Card title="my.vibrateShort" icon="mobile" href="/jsapi/device/vibrate/my.vibrateShort">
+    Short vibration
+  </Card>
+</CardGroup>
