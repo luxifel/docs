@@ -18,7 +18,7 @@ today=$(date +"%Y-%m-%d %H:%M")
 printf '%s\n' "$new_version" > "$VERSION_FILE"
 
 # Update badge in index.mdx
-sed -i '' "s|<Badge>v[^<]*</Badge>|<Badge>v$new_version — Last updated: $today</Badge>|" "$INDEX_FILE"
+sed -i '' "s|<Badge>Documentation version [^<]*</Badge>|<Badge>Documentation version $new_version — Last updated: $today</Badge>|" "$INDEX_FILE"
 
 # Stage updated files
 git add "$VERSION_FILE" "$INDEX_FILE"
