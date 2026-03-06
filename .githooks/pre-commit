@@ -1,0 +1,26 @@
+#!/bin/sh
+
+VERSION_FILE="VERSION"
+INDEX_FILE="index.mdx"
+
+# Read and bump patch version
+current=$(cat "$VERSION_FILE" | tr -d '[:space:]')
+IFS='.' read -r major minor patch << EOF
+$current
+EOF
+patch=$((patch + 1))
+new_version="$major.$minor.$patch"
+
+# Today's date and time
+today=$(date +"%Y-%m-%d %H:%M")
+
+# Write new version
+printf '%s\n' "$new_version" > "$VERSION_FILE"
+
+# Update badge in index.mdx
+sed -i '' "s|<Badge>v[^<]*</Badge>|<Badge>v$new_version — Last updated: $today</Badge>|" "$INDEX_FILE"
+
+# Stage updated files
+git add "$VERSION_FILE" "$INDEX_FILE"
+
+echo "Doc version bumped to $new_version ($today)"
