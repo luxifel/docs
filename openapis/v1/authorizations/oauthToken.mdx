@@ -1,0 +1,74 @@
+---
+title: OAuth Token
+description: Obtain access tokens for server-to-server API calls using OAuth 2.0 Client Credentials.
+---
+
+`POST /oauth/token`
+
+Obtains access tokens for server-to-server API calls using the OAuth 2.0 Client Credentials grant type.
+
+## Required Headers
+
+<ParamField header="Authorization" type="string" required>
+  Basic authentication in the format: `Basic Base64(client_id:client_secret)`
+</ParamField>
+
+<ParamField header="Signature" type="string" required>
+  SHA256withRSA algorithm signature: `algorithm=RSA256, keyVersion=1, signature=****`
+</ParamField>
+
+<ParamField header="Client-Id" type="string" required>
+  Identifier provided by A+ (e.g., `2022091495540562874792`)
+</ParamField>
+
+<ParamField header="Request-Time" type="string" required>
+  RFC3339 formatted timestamp accurate to seconds
+</ParamField>
+
+<ParamField header="Content-Type" type="string">
+  `application/json; charset=UTF-8`
+</ParamField>
+
+## Request Parameters
+
+<ParamField body="grantType" type="string" required>
+  Fixed value: `client_credentials`
+</ParamField>
+
+<ParamField body="scope" type="string">
+  Permission scope. Use `openid` for Mini Program scenarios.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="accessToken" type="string">
+  Bearer token for subsequent API calls.
+</ResponseField>
+
+<ResponseField name="tokenType" type="string">
+  Always `Bearer`.
+</ResponseField>
+
+<ResponseField name="expiresIn" type="number">
+  Token validity period in seconds.
+</ResponseField>
+
+<ResponseField name="scope" type="string">
+  Granted permission scopes.
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Request successful |
+| `F` | `PARAM_ILLEGAL` | Missing or invalid required parameter |
+| `F` | `INVALID_AUTH_CLIENT` | Client authentication failed |
+| `F` | `UNSUPPORTED_GRANT_TYPE` | Unsupported `grantType` value |
+| `F` | `ACCESS_DENIED` | Missing or invalid authorization header |
+| `F` | `INVALID_SCOPE` | Invalid scope value |
+| `U` | `UNKNOWN_EXCEPTION` | Server error occurred |

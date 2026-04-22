@@ -1,0 +1,88 @@
+---
+title: Create QR Order
+description: Create a merchant-presented dynamic QR order for C Scan B payment.
+---
+
+`POST /v1/payments/createQrOrder`
+
+Creates a QR code order for the Merchant Presented Dynamic QR (C Scan B) payment scenario.
+
+## Request Parameters
+
+<ParamField body="bizType" type="string" required>
+  Business type of the QR code. For Merchant Presented Dynamic QR: `ORDER_CODE`
+
+  **Max length**: 16 characters
+</ParamField>
+
+<ParamField body="productCode" type="string" required>
+  Fixed value: `51051000101000100048` for C Scan B Dynamic.
+
+  **Max length**: 32 characters
+</ParamField>
+
+<ParamField body="codeType" type="string" required>
+  Protocol type. Only supports `CGCP`.
+
+  **Max length**: 16 characters
+</ParamField>
+
+<ParamField body="order" type="object" required>
+  Merchant order information.
+
+  <Expandable title="order fields">
+    | Field | Type | Required | Max | Description |
+    |-------|------|----------|-----|-------------|
+    | orderTitle | String | M | 256 | Order description |
+    | merchantTransId | String | M | 64 | Merchant transaction ID (idempotency key) |
+    | orderAmount | Amount | M | — | Amount with currency in smallest unit |
+    | orderMemo | String | O | 256 | Order notes |
+    | latitude | String | M | 32 | Google Maps latitude coordinate |
+    | longitude | String | M | 32 | Google Maps longitude coordinate |
+    | transactionAddress | String | M | 512 | `city\|\|street\|\|postCode\|\|countryCode\|\|country` |
+    | merchant.store.externalStoreId | String | M | 32 | External store identifier |
+  </Expandable>
+</ParamField>
+
+<ParamField body="paymentNotifyUrl" type="string">
+  Payment result notification address.
+
+  **Max length**: 1024 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  JSON-formatted extension data.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="merchantTransId" type="string" required>
+  Echo of the merchant-provided transaction identifier.
+</ResponseField>
+
+<ResponseField name="acquirementId" type="string">
+  Platform-generated unique payment order ID.
+</ResponseField>
+
+<ResponseField name="qrCode" type="string">
+  Generated QR code content.
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | QR order created successfully |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `REPEAT_REQ_INCONSISTENT` | Duplicate request with inconsistent data |
+| `F` | `ACCESS_DENIED` | Valid contract absent |
+| `F` | `INVALID_SIGNATURE` | Signature validation failed |
+| `F` | `MERCHANT_STATUS_ABNORMAL` | Merchant account issues |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
+| `U` | `REQUEST_TRAFFIC_EXCEED_LIMIT` | Rate limit exceeded |

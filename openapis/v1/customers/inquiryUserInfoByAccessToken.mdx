@@ -1,0 +1,71 @@
+---
+title: Inquiry User Info
+description: Query user information using an access token.
+---
+
+`POST /v1/customers/user/inquiryUserInfoByAccessToken`
+
+Queries user profile information using a valid access token.
+
+## Request Parameters
+
+<ParamField body="accessToken" type="string" required>
+  Token for accessing the user resource scope.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="authClientId" type="string">
+  Client identifier assigned by the wallet.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extended information for wallet and merchant use.
+
+  **Max length**: 4096 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="userInfo" type="object">
+  User profile information.
+
+  <Expandable title="userInfo fields">
+    | Field | Type | Description |
+    |-------|------|-------------|
+    | userId | String | Unique user identifier |
+    | loginIdInfos | Array | Login identity information list |
+    | status | String | Account status |
+    | nickName | String | User display name |
+    | userName | UserName | Full name structure (firstName, lastName) |
+    | avatar | String | Avatar image URL |
+    | gender | String | Gender |
+    | birthday | String | Date of birth |
+    | nationality | String | User nationality |
+    | contactInfos | Array | Contact information list |
+    | extendInfo | String | Extended user information |
+  </Expandable>
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Query successful |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `PROCESS_FAIL` | Business failure (non-retryable) |
+| `F` | `ACCESS_DENIED` | Access prohibited |
+| `F` | `INVALID_API` | API inactive or unavailable |
+| `F` | `INVALID_ACCESS_TOKEN` | Token is invalid |
+| `F` | `INVALID_AUTH_CLIENT` | Client ID invalid |
+| `F` | `EXPIRED_ACCESS_TOKEN` | Token has expired |
+| `F` | `EXPIRED_AGENT_TOKEN` | Mini program token expired |
+| `F` | `INVALID_AGENT_TOKEN` | Mini program token invalid |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
+| `U` | `REQUEST_TRAFFIC_EXCEED_LIMIT` | Rate limit exceeded |

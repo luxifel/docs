@@ -1,0 +1,79 @@
+---
+title: Apply Token
+description: Exchange authorization codes for access tokens or refresh expired tokens.
+---
+
+`POST /v1/authorizations/applyToken`
+
+Obtains access tokens. Supports two use cases:
+
+1. **Authorization Code Exchange**: Exchange an `authCode` for an `accessToken` following Mini Program user authentication
+2. **Token Refresh**: Use a `refreshToken` to obtain a new `accessToken` independently
+
+## Request Parameters
+
+<ParamField body="grantType" type="string" required>
+  The type of token grant being requested.
+
+  **Possible values**:
+  - `AUTHORIZATION_CODE` — Exchange an auth code for tokens
+  - `REFRESH_TOKEN` — Refresh an expired access token
+</ParamField>
+
+<ParamField body="authCode" type="string">
+  The authorization code received after user authorization.
+
+  **Required when**: `grantType` is `AUTHORIZATION_CODE`
+</ParamField>
+
+<ParamField body="refreshToken" type="string">
+  The refresh token from a previous token response.
+
+  **Required when**: `grantType` is `REFRESH_TOKEN`
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extended information for wallet and merchant configuration. Should include `customerBelongsTo` field mapping to the wallet site name in Mini Program scenarios.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="accessToken" type="string">
+  Token for accessing user resources within the authorized scope.
+</ResponseField>
+
+<ResponseField name="accessTokenExpiryTime" type="string">
+  Access token expiration time in ISO 8601 format.
+</ResponseField>
+
+<ResponseField name="refreshToken" type="string">
+  Token for obtaining new access tokens when the current one expires.
+</ResponseField>
+
+<ResponseField name="refreshTokenExpiryTime" type="string">
+  Refresh token expiration time. After this, the user must re-authorize.
+</ResponseField>
+
+<ResponseField name="customerId" type="string">
+  Resource owner identifier.
+</ResponseField>
+
+<ResponseField name="extendInfo" type="string">
+  Extended response information.
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Token issued successfully |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `INVALID_AUTH_CLIENT` | Client authentication failed |
+| `F` | `EXPIRED_CODE` | Authorization code no longer valid |
+| `F` | `USED_REFRESH_TOKEN` | Refresh token already consumed |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
+| `U` | `REQUEST_TRAFFIC_EXCEED_LIMIT` | Rate limit exceeded |

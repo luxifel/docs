@@ -1,0 +1,47 @@
+---
+title: Notify Payment
+description: Webhook endpoint to receive payment result notifications from the wallet.
+---
+
+`POST /v1/payments/notifyPayment`
+
+A notification endpoint implemented by the merchant. The wallet notifies the merchant of payment results.
+
+## Request Parameters
+
+<ParamField body="paymentId" type="string" required>
+  Wallet-generated unique payment ID.
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string" required>
+  Merchant-generated unique payment identifier.
+</ParamField>
+
+<ParamField body="paymentStatus" type="string" required>
+  Payment outcome. Values: `SUCCESS`, `FAIL`
+</ParamField>
+
+<ParamField body="paymentAmount" type="object" required>
+  Order amount for display on user consumption records and payment results page. See [Amount](/openapis/v1/data-dictionary#amount).
+</ParamField>
+
+<ParamField body="paymentTime" type="string">
+  Payment success time in ISO 8601 format (e.g., `2019-04-04T12:08:56.253+05:30`).
+</ParamField>
+
+<ParamField body="paymentCreateTime" type="string">
+  Payment creation time in ISO 8601 format.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Notification acknowledged |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

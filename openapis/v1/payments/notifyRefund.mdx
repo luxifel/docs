@@ -1,0 +1,57 @@
+---
+title: Notify Refund
+description: Webhook endpoint to receive refund result notifications from the wallet.
+---
+
+`POST /v1/payments/notifyRefund`
+
+A notification endpoint implemented by the merchant. The wallet notifies the merchant of refund results after completing fund processing.
+
+## Request Parameters
+
+<ParamField body="refundId" type="string">
+  Wallet-generated unique refund ID.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="refundRequestId" type="string">
+  Merchant-generated unique refund ID.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="refundAmount" type="object">
+  Refund amount with currency in smallest units. See [Amount](/openapis/v1/data-dictionary#amount).
+</ParamField>
+
+<ParamField body="refundReason" type="string">
+  Reason for the refund.
+
+  **Max length**: 256 characters
+</ParamField>
+
+<ParamField body="refundTime" type="string">
+  Timestamp when money is successfully deducted from the merchant, in ISO 8601 format.
+</ParamField>
+
+<ParamField body="refundStatus" type="string">
+  Refund status. Values: `SUCCESS`, `FAIL`, `PROCESSING`
+</ParamField>
+
+<ParamField body="contributionAccount" type="string">
+  Account type. Values: `MPA`, `MRBA`. Defaults to `MPA`.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Notification acknowledged |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

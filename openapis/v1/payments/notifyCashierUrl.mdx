@@ -1,0 +1,35 @@
+---
+title: Notify Cashier URL
+description: Receive the cashier redirect URL for use with the my.tradePay JSAPI.
+---
+
+`POST /v1/payments/notifyCashierUrl`
+
+A notification endpoint implemented by the merchant. The wallet sends the cashier redirect URL, which can then be passed to the `my.tradePay` JSAPI in the Mini Program.
+
+## Request Parameters
+
+<ParamField body="paymentId" type="string" required>
+  The payment ID of the original payment order.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="cashierRedirectUrl" type="string" required>
+  The cashier redirect URL to use in `my.tradePay`.
+
+  **Max length**: 1024 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Notification acknowledged |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

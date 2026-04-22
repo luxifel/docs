@@ -1,0 +1,78 @@
+---
+title: Refund Apply
+description: Apply for a refund on an original payment.
+---
+
+`POST /v1/payments/refundApply`
+
+Applies for a refund. After a successful response (`resultStatus: S`), use `inquiryRefund` to verify the actual refund state.
+
+## Request Parameters
+
+<ParamField body="refundRequestId" type="string" required>
+  Merchant-generated unique refund ID (idempotency key).
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="refundAmount" type="object" required>
+  Refund amount with currency in smallest units. See [Amount](/openapis/v1/data-dictionary#amount).
+</ParamField>
+
+<ParamField body="paymentId" type="string">
+  Wallet-generated ID of the original payment.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string">
+  Merchant-generated ID of the original payment request.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="captureId" type="string">
+  Wallet-generated capture request ID (for captured payments).
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="refundReason" type="string">
+  Reason for the refund.
+
+  **Max length**: 256 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  JSON-formatted extension data. May include `contributionAccount`, `refundNotificationUrl`, `latitude`, `longitude`, `transactionAddress`.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="refundId" type="string">
+  Wallet-generated unique refund order number. Present when `resultStatus` is `S`.
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Refund request accepted |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `PROCESS_FAIL` | Processing failed |
+| `F` | `MULTI_REFUND_NOT_ALLOWED` | Multiple refunds not permitted |
+| `F` | `REFUND_NOT_ALLOWED` | Refunds not allowed for this order |
+| `F` | `REPEAT_REQ_INCONSISTENT` | Inconsistent duplicate request |
+| `F` | `PARTNER_STATUS_ABNORMAL` | Partner status issue |
+| `F` | `ORDER_NOT_EXIST` | Order does not exist |
+| `F` | `ORDER_STATUS_INVALID` | Invalid order status |
+| `F` | `REFUND_WINDOW_EXCEED` | Refund window exceeded |
+| `F` | `REFUND_AMOUNT_EXCEED` | Total refund exceeds payment amount |
+| `F` | `CURRENCY_NOT_SUPPORT` | Currency not supported |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

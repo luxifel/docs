@@ -1,0 +1,124 @@
+---
+title: Pay
+description: Initiate a payment for Mini Program or agreement-based scenarios.
+---
+
+`POST /v1/payments/pay`
+
+Initiates a payment. Supports Mini Program cashier flows and agreement-based (recurring) payment scenarios.
+
+## Request Parameters
+
+<ParamField body="productCode" type="string" required>
+  Payment product code assigned by Rebell (e.g., `51051000000011`).
+
+  **Max length**: 32 characters
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string" required>
+  Merchant-generated unique identifier (idempotency key).
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="paymentAmount" type="object" required>
+  Payment amount. See [Amount](/openapis/v1/data-dictionary#amount).
+</ParamField>
+
+<ParamField body="paymentAuthCode" type="string">
+  Authorization code.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="paymentExpiryTime" type="string">
+  Payment expiry time in ISO 8601 format.
+</ParamField>
+
+<ParamField body="paymentNotifyUrl" type="string">
+  Merchant callback URL for payment result notifications.
+
+  **Max length**: 1024 characters
+</ParamField>
+
+<ParamField body="paymentRedirectUrl" type="string">
+  URL to redirect the user to after payment.
+
+  **Max length**: 1024 characters
+</ParamField>
+
+<ParamField body="cashierNotifyUrl" type="string">
+  Cashier notification URL.
+
+  **Max length**: 1024 characters
+</ParamField>
+
+<ParamField body="order" type="object">
+  Order details including merchant, buyer, and goods information. See [Order](/openapis/v1/data-dictionary#order).
+</ParamField>
+
+<ParamField body="agreedAmount" type="object">
+  For agreement-based transactions. See [Amount](/openapis/v1/data-dictionary#amount).
+</ParamField>
+
+<ParamField body="serviceExpireTime" type="string">
+  Service expiry date. Format: `yyyy-MM-dd`
+</ParamField>
+
+<ParamField body="nextPaymentDate" type="string">
+  Next scheduled payment date. Format: `yyyy-MM-dd`
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  JSON-formatted extension data. May include `channelSource`, `miniAppId`, `supportMultiConfirm`.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="paymentRequestId" type="string">
+  Echo of the merchant-provided request identifier.
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Wallet-generated unique payment ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="paymentTime" type="string">
+  Payment completion time in ISO 8601 format.
+</ResponseField>
+
+<ResponseField name="redirectActionForm" type="object">
+  Redirect instruction containing `method` and `redirectionUrl`.
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Payment successful |
+| `A` | `ACCEPT` | Accepted, further action required |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `PROCESS_FAIL` | Processing failed |
+| `F` | `ACCESS_DENIED` | Access denied |
+| `F` | `USER_NOT_EXIST` | User does not exist |
+| `F` | `CURRENCY_NOT_SUPPORT` | Currency not supported |
+| `F` | `PAYMENT_AMOUNT_EXCEED_LIMIT` | Payment amount exceeds limit |
+| `F` | `USER_AMOUNT_EXCEED_LIMIT` | User amount exceeds limit |
+| `F` | `REPEAT_REQ_INCONSISTENT` | Duplicate request with inconsistent data |
+| `F` | `AUTH_CODE_ALREADY_USED` | Auth code already used |
+| `F` | `PARTNER_STATUS_ABNORMAL` | Partner status abnormal |
+| `F` | `USER_STATUS_ABNORMAL` | User status abnormal |
+| `F` | `PARTNER_NOT_EXIST` | Partner does not exist |
+| `F` | `INVALID_ACCESS_TOKEN` | Access token is invalid |
+| `F` | `RISK_REJECT` | Transaction rejected by risk engine |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
+| `U` | `ORDER_AMOUNT_EXCEED_CONTRACT_LIMIT` | Order amount exceeds contract limit |
+| `U` | `CONTRACT_DEFAULT_PAY_METHOD_INVALID` | Default payment method invalid |

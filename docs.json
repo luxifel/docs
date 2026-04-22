@@ -522,6 +522,57 @@
             "group": "OpenAPIs for Merchants",
             "pages": [
               {
+                "group": "Version /v1",
+                "expanded": false,
+                "pages": [
+                  "openapis/v1/data-dictionary",
+                  {
+                    "group": "Authorizations",
+                    "pages": [
+                      "openapis/v1/authorizations/oauthToken",
+                      "openapis/v1/authorizations/prepare",
+                      "openapis/v1/authorizations/applyToken",
+                      "openapis/v1/authorizations/cancelToken",
+                      "openapis/v1/authorizations/contractStatusNotify"
+                    ]
+                  },
+                  {
+                    "group": "Payments",
+                    "pages": [
+                      "openapis/v1/payments/retailPay",
+                      "openapis/v1/payments/linkPayCreate",
+                      "openapis/v1/payments/createQrOrder",
+                      "openapis/v1/payments/pay",
+                      "openapis/v1/payments/cancel",
+                      "openapis/v1/payments/capture",
+                      "openapis/v1/payments/void",
+                      "openapis/v1/payments/inquiryPayment",
+                      "openapis/v1/payments/notifyPayment",
+                      "openapis/v1/payments/inquiryVoid",
+                      "openapis/v1/payments/inquiryCapture",
+                      "openapis/v1/payments/refundApply",
+                      "openapis/v1/payments/inquiryRefund",
+                      "openapis/v1/payments/notifyRefund",
+                      "openapis/v1/payments/notifyCashierUrl"
+                    ]
+                  },
+                  {
+                    "group": "Users",
+                    "pages": [
+                      "openapis/v1/customers/inquiryUserInfoByAccessToken"
+                    ]
+                  },
+                  {
+                    "group": "Messages",
+                    "pages": [
+                      "openapis/v1/messages/sendPush",
+                      "openapis/v1/messages/sendEmail",
+                      "openapis/v1/messages/sendSms"
+                    ]
+                  }
+                ]
+              },
+              {
                 "group": "Version /v2",
                 "expanded": true,
                 "pages": [

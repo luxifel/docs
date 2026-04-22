@@ -1,0 +1,61 @@
+---
+title: Inquiry Capture
+description: Query the result of a capture using captureId or captureRequestId.
+---
+
+`POST /v1/payments/inquiryCapture`
+
+Queries the result of a capture operation. At least one of `captureRequestId` or `captureId` must be provided.
+
+## Request Parameters
+
+<ParamField body="captureRequestId" type="string">
+  Merchant-generated capture ID.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="captureId" type="string">
+  Wallet-generated capture ID.
+
+  **Max length**: 64 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="captureId" type="string">
+  Wallet-generated capture ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="captureRequestId" type="string">
+  Merchant-generated capture ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="captureAmount" type="object">
+  The payment amount captured. Defaults to full capture if not specified.
+</ResponseField>
+
+<ResponseField name="captureTime" type="string">
+  Capture processing time in ISO 8601 format.
+</ResponseField>
+
+<ResponseField name="captureStatus" type="string">
+  Capture status. Values: `SUCCESS`, `FAIL`, `PROCESSING`
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Capture is successful |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `CAPTURE_NOT_EXIST` | Capture does not exist |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

@@ -1,0 +1,80 @@
+---
+title: Void
+description: Void the remaining amount of an authorized payment.
+---
+
+`POST /v1/payments/void`
+
+Voids the remaining amount of an original authorized payment.
+
+## Request Parameters
+
+<ParamField body="voidRequestId" type="string" required>
+  Merchant-generated unique ID for this void request.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="paymentId" type="string" required>
+  Payment ID of the original authorization to be voided.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="voidRemainingAmount" type="boolean">
+  Set to `true` to void all remaining payment amount after completion.
+</ParamField>
+
+<ParamField body="voidAmount" type="object">
+  Specific void payment amount. See [Amount](/openapis/v1/data-dictionary#amount).
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extension information.
+
+  **Max length**: 4096 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="voidRequestId" type="string">
+  Merchant's void request ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="voidId" type="string">
+  Wallet-generated unique void ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="extendInfo" type="string">
+  Extension information.
+
+  **Max length**: 4096 characters
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `A` | `ACCEPTED_SUCCESS` | Accepted successfully |
+| `S` | `SUCCESS` | Void successful |
+| `F` | `ORDER_NOT_EXISTS` | Order does not exist |
+| `F` | `ORDER_STATUS_INVALID` | Order status is invalid |
+| `F` | `ORDER_IS_FROZEN` | Order is frozen |
+| `F` | `ORDER_UNSUPPORTED_OPERATION` | Order does not support void |
+| `F` | `CURRENCY_NOT_SAME` | Currency mismatch |
+| `F` | `AMOUNT_EXCEEDS_LIMIT` | Payment amount exceeds limits |
+| `F` | `REPEAT_REQ_INCONSISTENT` | Duplicate request with inconsistent data |
+| `F` | `MUTEX_OPERATION_IN_PROCESSING` | Another operation in progress |
+| `F` | `MERCHANT_NOT_EXIST` | Merchant does not exist |
+| `F` | `USER_NOT_EXISTS` | User account does not exist |
+| `F` | `USER_STATUS_ABNORMAL` | User status abnormal |
+| `F` | `MERCHANT_STATUS_ABNORMAL` | Merchant status abnormal |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

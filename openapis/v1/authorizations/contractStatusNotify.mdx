@@ -1,0 +1,30 @@
+---
+title: Contract Status Notify
+description: Callback endpoint for receiving contract status update notifications from the Rebell A+ backend.
+---
+
+`POST /v1/authorizations/contractStatusNotify`
+
+A notification endpoint implemented by the merchant. The Rebell A+ backend sends contract cancellation notifications to the merchant backend when a contract status changes.
+
+## Request Parameters
+
+<ParamField body="accessToken" type="string" required>
+  The access token associated with the contract. No special characters (`@`, `#`, `?`).
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="contractStatus" type="string" required>
+  The updated contract status. Example value: `INVALID`
+</ParamField>
+
+<ParamField body="modifyTime" type="string">
+  Unix timestamp (10 digits) of the status change. Example: `1749634508`
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>

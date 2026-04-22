@@ -1,0 +1,162 @@
+---
+title: Data Dictionary (v1)
+description: Common data models and enumerations used across v1 OpenAPI endpoints.
+---
+
+## Models
+
+### Amount
+
+Represents a monetary value with currency specification.
+
+| Field | Type | Required | Max | Description |
+|-------|------|----------|-----|-------------|
+| currency | String | M | 3 | ISO-4217 three-character currency code |
+| value | String | M | 16 | Positive integer string representing the amount in the smallest currency unit |
+
+### Result
+
+Response status and messaging structure included in all responses.
+
+| Field | Type | Required | Max | Description |
+|-------|------|----------|-----|-------------|
+| resultStatus | String | O | — | `S` (Successful), `F` (Failed), `U` (Unknown), `A` (Accepted) |
+| resultCode | String | O | 64 | Code identifier |
+| resultMessage | String | O | 256 | Descriptive message |
+
+### Order
+
+Complete order information structure.
+
+| Field | Type | Required | Max | Description |
+|-------|------|----------|-----|-------------|
+| orderDescription | String | M | 256 | Description used to display user consumption records |
+| orderCreateTime | Datetime | O | 32 | ISO 8601 formatted timestamp |
+| merchant | Merchant | O | — | Associated merchant data |
+| buyer | Buyer | O | — | Purchaser information (optional for pre-create orders) |
+| env | Env | O | — | Device and environmental data |
+| extendInfo | String | O | 2048 | Special case information |
+
+### Merchant
+
+Business entity details.
+
+| Field | Type | Required | Max | Description |
+|-------|------|----------|-----|-------------|
+| merchantMCC | String | O | 32 | Merchant category code |
+| merchantName | String | O | 256 | Business name |
+| store | Store | O | — | Store-level information |
+
+### Store
+
+Individual retail location details.
+
+| Field | Type | Required | Max | Description |
+|-------|------|----------|-----|-------------|
+| externalStoreId | String | O | 64 | External identifier |
+| storeName | String | O | 256 | Location name |
+| storeMCC | String | O | 32 | Business category code |
+| storeTerminalId | String | O | 64 | Unique terminal identifier |
+| storeOperatorId | String | O | 64 | Terminal operator identifier |
+
+### Buyer
+
+Purchaser identification and contact information.
+
+| Field | Type | Required | Max | Description |
+|-------|------|----------|-----|-------------|
+| referenceBuyerId | String | O | 64 | Unique buyer identifier |
+| buyerName | UserName | O | — | Name structure |
+| buyerPhoneNo | String | O | 24 | Mobile number |
+
+### UserName
+
+Personal naming structure.
+
+| Field | Type | Required | Max | Description |
+|-------|------|----------|-----|-------------|
+| firstName | String | O | 32 | First name |
+| lastName | String | O | 32 | Last name |
+
+### Env
+
+Environmental context for requests, including device and client details.
+
+| Field | Type | Required | Max | Description |
+|-------|------|----------|-----|-------------|
+| terminalType | String | O | — | Request terminal type (see TerminalType enum) |
+| osType | String | O | — | Operating system type (see OSType enum) |
+| userAgent | String | O | 1024 | User agent string |
+| deviceTokenId | String | O | 128 | Device token identifier |
+| clientIp | String | O | 128 | Client device IP address |
+| cookieId | String | O | 128 | User cookie identifier |
+| storeTerminalId | String | O | 64 | Store terminal identifier |
+| storeTerminal | String | O | 32 | Store terminal request time |
+| extendInfo | String | O | 2048 | Extended information |
+
+### RedirectActionForm
+
+Navigation instruction element.
+
+| Field | Type | Required | Max | Description |
+|-------|------|----------|-----|-------------|
+| redirectUrl | String | M | 2048 | Target URL |
+
+### ContentTemplate
+
+Template with variable substitution capability.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| templateParameters | Map\<String,String\> | O | String-to-string mapping in JSON format |
+| language | String | O | RFC 1766 language code (e.g., `zh-CN`, `en-US`, `it-IT`) |
+
+### VoidDetail
+
+Payment cancellation transaction record.
+
+| Field | Type | Required | Max | Description |
+|-------|------|----------|-----|-------------|
+| voidId | String | O | 64 | Unique void request identifier |
+| voidAmount | Amount | O | — | Cancellation amount |
+| voidedTime | Datetime | O | — | ISO 8601 processing timestamp |
+| voidSource | String | O | — | Origin of cancellation (see VoidSource enum) |
+| voidStatus | String | O | — | Cancellation state (see VoidStatus enum) |
+
+---
+
+## Enumerations
+
+### OSType
+
+| Value | Description |
+|-------|-------------|
+| `IOS` | iOS platform |
+| `ANDROID` | Android platform |
+
+### TerminalType
+
+| Value | Description |
+|-------|-------------|
+| `MINI_APP` | Mini program |
+| `APP` | Mobile application |
+| `WEB` | Browser web |
+| `WAP` | Mobile WAP |
+| `SYSTEM` | System call |
+
+### VoidSource
+
+| Value | Description |
+|-------|-------------|
+| `MERCHANT` | Initiated by merchant |
+| `TIMEOUT` | Automatic timeout cancellation |
+| `LAST_CONFIRM` | Final confirmation cancellation |
+
+### VoidStatus
+
+| Value | Description |
+|-------|-------------|
+| `INIT` | Initial status |
+| `SUCCESS` | Void completed successfully |
+| `FAILED` | Void operation failed |
+| `PENDING` | Awaiting manual resolution |
