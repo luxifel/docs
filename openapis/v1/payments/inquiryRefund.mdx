@@ -1,0 +1,71 @@
+---
+title: Inquiry Refund
+description: Query the status of a refund by refundId or refundRequestId.
+---
+
+`POST /v1/payments/inquiryRefund`
+
+Queries the status of a refund. Use when the refund result cannot be obtained after extended delays. If both `refundId` and `refundRequestId` are provided, `refundId` takes priority.
+
+## Request Parameters
+
+<ParamField body="refundId" type="string">
+  Wallet-generated unique refund ID.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="refundRequestId" type="string">
+  Merchant-generated unique refund ID.
+
+  **Max length**: 64 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="refundId" type="string">
+  Wallet-generated refund ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="refundRequestId" type="string">
+  Merchant-generated refund ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="refundAmount" type="object">
+  Refund amount. See [Amount](/openapis/v1/data-dictionary#amount).
+</ResponseField>
+
+<ResponseField name="refundReason" type="string">
+  Reason for the refund.
+
+  **Max length**: 256 characters
+</ResponseField>
+
+<ResponseField name="refundTime" type="string">
+  Timestamp when funds were deducted from merchant, in ISO 8601 format.
+</ResponseField>
+
+<ResponseField name="refundStatus" type="string">
+  Refund status. Values: `PROCESSING`, `SUCCESS`, `FAIL`
+</ResponseField>
+
+<ResponseField name="contributionAccount" type="string">
+  Account type. Values: `MPA`, `MRBA`. Defaults to `MPA`.
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Query successful; check `refundStatus` for actual state |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `REFUND_NOT_EXIST` | Refund not yet accepted or does not exist |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

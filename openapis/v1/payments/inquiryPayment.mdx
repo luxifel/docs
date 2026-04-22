@@ -1,0 +1,70 @@
+---
+title: Inquiry Payment
+description: Query the status of a payment by paymentId or paymentRequestId.
+---
+
+`POST /v1/payments/inquiryPayment`
+
+Queries the status of a payment. If both `paymentId` and `paymentRequestId` are provided, `paymentId` takes priority.
+
+## Request Parameters
+
+<ParamField body="paymentId" type="string">
+  Wallet-generated unique payment ID.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string">
+  Merchant-generated payment request ID.
+
+  **Max length**: 64 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Wallet-generated payment ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="paymentRequestId" type="string">
+  Merchant-generated payment ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="paymentStatus" type="string">
+  Payment status. Values: `SUCCESS`, `FAIL`, `PROCESSING`, `AUTH_SUCCESS`
+</ResponseField>
+
+<ResponseField name="paymentTime" type="string">
+  Payment completion time in ISO 8601 format.
+</ResponseField>
+
+<ResponseField name="paymentAmount" type="object">
+  Payment amount. See [Amount](/openapis/v1/data-dictionary#amount).
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Query successful |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `ORDER_NOT_EXIST` | The order does not exist |
+| `F` | `NO_INTERFACE_DEF` | API is not defined |
+| `F` | `INVALID_API` | API is invalid |
+| `F` | `MSG_PARSE_ERROR` | Message parse error |
+| `F` | `FUNCTION_NOT_MATCH` | Function parameter does not match API |
+| `F` | `ACCESS_DENIED` | Access denied |
+| `F` | `INVALID_CLIENT` | Invalid client |
+| `F` | `INVALID_SIGNATURE` | Signature is invalid |
+| `F` | `INVALID_CLIENT_STATUS` | Invalid client status |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
+| `U` | `REQUEST_TRAFFIC_EXCEED_LIMIT` | Rate limit exceeded |

@@ -1,0 +1,86 @@
+---
+title: Link Pay Create
+description: Create an order and obtain a payment link for app cashier payment.
+---
+
+`POST /v1/payments/linkPayCreate`
+
+Creates an order for merchant app cashier payment and returns a payment link and platform-specific app links.
+
+## Request Parameters
+
+<ParamField body="productCode" type="string" required>
+  Fixed product identifier assigned per payment scenario (e.g., `51051000101000100054` or `51051000101000100086`).
+</ParamField>
+
+<ParamField body="order" type="object" required>
+  Order details.
+
+  <Expandable title="order fields">
+    | Field | Type | Required | Max | Description |
+    |-------|------|----------|-----|-------------|
+    | orderTitle | String | M | — | Order title |
+    | merchantTransId | String | M | 64 | Merchant transaction ID (idempotency key) |
+    | orderAmount | Amount | M | — | Order amount in EUR (smallest unit) |
+    | orderMemo | String | O | — | Order notes |
+    | latitude | String | M | — | Google Maps latitude |
+    | longitude | String | M | — | Google Maps longitude |
+    | transactionAddress | String | M | — | ISO 3166 alpha-2 country code format |
+    | merchant | Object | O | — | Merchant and store details |
+  </Expandable>
+</ParamField>
+
+<ParamField body="paymentNotifyUrl" type="string">
+  Merchant callback URL for payment result notifications.
+</ParamField>
+
+<ParamField body="paymentRedirectUrl" type="string">
+  URL to redirect the user to after successful payment.
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  JSON-formatted extended data.
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="redirectUrl" type="string">
+  Payment page URL.
+</ResponseField>
+
+<ResponseField name="merchantTransId" type="string">
+  Echo of the merchant-provided transaction identifier.
+</ResponseField>
+
+<ResponseField name="acquirementId" type="string">
+  Platform-generated unique order ID.
+</ResponseField>
+
+<ResponseField name="appLinks" type="object">
+  Platform-specific deep links.
+
+  <Expandable title="appLinks fields">
+    | Field | Description |
+    |-------|-------------|
+    | applicationId | App identifier |
+    | shortUrl | Short link URL |
+    | targetPath | Deep link path |
+  </Expandable>
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Order created successfully |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `REPEAT_REQ_INCONSISTENT` | Duplicate request with inconsistent data |
+| `F` | `ACCESS_DENIED` | Valid contract absent |
+| `F` | `INVALID_SIGNATURE` | Signature validation failed |
+| `F` | `MERCHANT_STATUS_ABNORMAL` | Merchant account issues |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
+| `U` | `REQUEST_TRAFFIC_EXCEED_LIMIT` | Rate limit exceeded |

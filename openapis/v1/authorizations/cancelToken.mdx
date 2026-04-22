@@ -1,0 +1,52 @@
+---
+title: Cancel Token
+description: Cancel an access token at the wallet.
+---
+
+`POST /v1/authorizations/cancelToken`
+
+Cancels an access token at the wallet, revoking the authorization.
+
+## Request Parameters
+
+<ParamField body="accessToken" type="string" required>
+  The access token to cancel. No special characters (`@`, `#`, `?`).
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extended information.
+
+  **Max length**: 4096 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="extendInfo" type="string">
+  Extended response information.
+
+  **Max length**: 4096 characters
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Authorization cancelled successfully |
+| `F` | `PROCESS_FAIL` | Processing failed |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `ACCESS_DENIED` | Access denied |
+| `F` | `INVALID_API` | Invalid API |
+| `F` | `INVALID_AUTH_CLIENT_STATUS` | Invalid auth client status |
+| `F` | `INVALID_ACCESS_TOKEN` | Access token is invalid |
+| `F` | `INVALID_AUTH_CLIENT` | Auth client invalid |
+| `F` | `EXPIRED_ACCESS_TOKEN` | Access token has expired |
+| `F` | `EXPIRED_AGENT_TOKEN` | Agent token has expired |
+| `F` | `INVALID_AGENT_TOKEN` | Agent token is invalid |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
+| `U` | `REQUEST_TRAFFIC_EXCEED_LIMIT` | Rate limit exceeded |

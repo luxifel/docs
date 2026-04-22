@@ -1,0 +1,97 @@
+---
+title: Retail Pay
+description: Initiate a retail payment by scanning a customer-presented QR or barcode.
+---
+
+`POST /v1/payments/retailPay`
+
+Initiates a retail payment where the merchant scans the customer's wallet QR code or barcode (Customer Presented Mode).
+
+## Request Parameters
+
+<ParamField body="productCode" type="string" required>
+  Fixed product code for B Scan C: `51051000101000100040`
+
+  **Max length**: 32 characters
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string" required>
+  Merchant-generated unique identifier (idempotency key). Must be unique per transaction.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="paymentAuthCode" type="string" required>
+  The QR code or barcode content scanned from the customer's wallet. Single-use only.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="paymentAmount" type="object" required>
+  Payment amount. See [Amount](/openapis/v1/data-dictionary#amount).
+</ParamField>
+
+<ParamField body="order" type="object" required>
+  Order details.
+
+  <Expandable title="order fields">
+    | Field | Type | Required | Max | Description |
+    |-------|------|----------|-----|-------------|
+    | orderDescription | String | M | 256 | Order description |
+    | orderMemo | String | O | 256 | Order notes |
+    | latitude | String | M | 32 | Google Maps latitude coordinate |
+    | longitude | String | M | 32 | Google Maps longitude coordinate |
+    | transactionAddress | String | M | 512 | `city\|\|street\|\|postCode\|\|countryShortName\|\|country` |
+    | merchant.store.externalStoreId | String | M | 32 | External store identifier |
+  </Expandable>
+</ParamField>
+
+<ParamField body="paymentNotifyUrl" type="string">
+  Merchant callback URL for payment result notifications.
+
+  **Max length**: 1024 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  JSON-formatted extension data.
+
+  **Max length**: 2048 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="paymentRequestId" type="string">
+  Echo of the merchant-provided request identifier.
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Wallet-generated unique payment identifier.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="paymentTime" type="string">
+  Payment completion time in ISO 8601 format.
+</ResponseField>
+
+<ResponseField name="paymentAmount" type="object">
+  Confirmed payment amount.
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Payment processed successfully |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `INVALID_CODE` | Auth code is invalid |
+| `F` | `AUTH_CODE_ALREADY_USED` | Auth code already used |
+| `F` | `PAYMENT_AMOUNT_EXCEED_LIMIT` | Payment amount exceeds limit |
+| `F` | `CURRENCY_NOT_SUPPORT` | Currency not supported |
+| `F` | `RISK_REJECT` | Transaction rejected by risk engine |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
+| `U` | `REQUEST_TRAFFIC_EXCEED_LIMIT` | Rate limit exceeded |

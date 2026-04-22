@@ -1,0 +1,70 @@
+---
+title: Cancel
+description: Cancel a payment by paymentId or paymentRequestId.
+---
+
+`POST /v1/payments/cancel`
+
+Cancels a payment. At least one of `paymentId` or `paymentRequestId` must be provided.
+
+## Request Parameters
+
+<ParamField body="paymentId" type="string">
+  Unique ID assigned by the wallet to identify the payment.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="paymentRequestId" type="string">
+  Unique ID assigned by the merchant to identify the payment request.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extension information.
+
+  **Max length**: 4096 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Wallet-assigned payment identifier.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="paymentRequestId" type="string">
+  Merchant-assigned request identifier.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="cancelTime" type="string">
+  Actual time when the payment cancellation process is completed, in ISO 8601 format.
+</ResponseField>
+
+<ResponseField name="extendInfo" type="string">
+  Extension information.
+
+  **Max length**: 4096 characters
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Cancellation successful |
+| `F` | `CANCEL_WINDOW_EXCEED` | Cancellation date is beyond the agreed contract period |
+| `F` | `ORDER_NOT_EXIST` | Order does not exist |
+| `F` | `KEY_NOT_FOUND` | Key not found |
+| `F` | `CLIENT_INVALID` | Invalid client |
+| `F` | `INVALID_SIGNATURE` | Signature invalid |
+| `F` | `METHOD_NOT_SUPPORTED` | HTTP method not supported |
+| `F` | `MERCHANT_BALANCE_NOT_ENOUGH` | Insufficient merchant balance |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

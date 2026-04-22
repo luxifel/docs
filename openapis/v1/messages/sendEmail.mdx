@@ -1,0 +1,77 @@
+---
+title: Send Email
+description: Send email notifications to users via access tokens.
+---
+
+`POST /v1/messages/sendEmail`
+
+Enables merchants to send email messages to users via their access tokens.
+
+## Request Parameters
+
+<ParamField body="accessToken" type="string" required>
+  Auth token identifying the target user.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="requestId" type="string" required>
+  Unique transaction ID for idempotency.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="templateCode" type="string" required>
+  Template identifier for the email.
+
+  **Max length**: 256 characters
+</ParamField>
+
+<ParamField body="templates" type="array" required>
+  Content templates. Maximum 5 items. Each item is a `ContentTemplate` object.
+
+  <Expandable title="ContentTemplate fields">
+    | Field | Type | Required | Description |
+    |-------|------|----------|-------------|
+    | templateParameters | Map\<String,String\> | O | Key-value pairs for variable substitution |
+    | language | String | O | Supported: `en-US`, `zh-CN`, `it-IT` |
+  </Expandable>
+</ParamField>
+
+<ParamField body="authClientId" type="string">
+  Unique auth client ID.
+
+  **Max length**: 128 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Additional metadata.
+
+  **Max length**: 4096 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="messageId" type="string">
+  Unique message identifier.
+</ResponseField>
+
+<ResponseField name="extendInfo" type="string">
+  Additional response metadata.
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Email sent successfully |
+| `F` | `INVALID_AUTH_CLIENT` | Invalid authentication client |
+| `F` | `USER_STATUS_ERROR` | Account locked or unregistered |
+| `F` | `VERIFY_REQUEST_ID_INVALID` | Malformed `requestId` |
+| `F` | `TEMPLATE_VARIABLE_NOT_COMPLETE` | Incomplete template variable replacement |
+| `F` | `GOTONE_UNIQ_ERROR` | Duplicate request detected |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

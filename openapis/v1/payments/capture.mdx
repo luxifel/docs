@@ -1,0 +1,93 @@
+---
+title: Capture
+description: Capture the amount of an authorized payment.
+---
+
+`POST /v1/payments/capture`
+
+Captures the amount of an original authorized payment. Omitting `captureAmount` defaults to a full capture.
+
+## Request Parameters
+
+<ParamField body="captureRequestId" type="string" required>
+  Merchant-generated unique ID for this capture.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="paymentId" type="string" required>
+  Payment ID of the original authorization to be captured.
+
+  **Max length**: 64 characters
+</ParamField>
+
+<ParamField body="captureAmount" type="object">
+  Amount to capture. Omit for full capture. See [Amount](/openapis/v1/data-dictionary#amount).
+</ParamField>
+
+<ParamField body="isLastCapture" type="boolean">
+  Indicates this is the final capture. Defaults to `true`.
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  Extension information.
+
+  **Max length**: 4096 characters
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="captureRequestId" type="string">
+  Merchant-generated capture ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="captureId" type="string">
+  Wallet-generated unique capture ID.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="paymentId" type="string">
+  Original payment identifier.
+
+  **Max length**: 64 characters
+</ResponseField>
+
+<ResponseField name="captureAmount" type="object">
+  Payment amount that was captured.
+</ResponseField>
+
+<ResponseField name="captureTime" type="string">
+  Capture processing time in ISO 8601 format.
+</ResponseField>
+
+<ResponseField name="extendInfo" type="string">
+  Extension information.
+
+  **Max length**: 4096 characters
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Capture successful |
+| `F` | `AUTH_CANCELLED` | Authorization was cancelled |
+| `F` | `AUTH_EXPIRED` | Authorization has expired |
+| `F` | `AUTH_NOT_FOUND` | Authorization not found |
+| `F` | `CAPTURE_AMOUNT_EXCEED_AUTH_LIMIT` | Capture amount exceeds authorization limit |
+| `F` | `CURRENCY_NOT_SUPPORT` | Currency not supported |
+| `F` | `USER_BALANCE_NOT_ENOUGH` | Insufficient user balance |
+| `F` | `USER_STATUS_ABNORMAL` | User status abnormal |
+| `F` | `REPEAT_REQ_INCONSISTENT` | Duplicate request with inconsistent data |
+| `F` | `RISK_REJECT` | Transaction rejected by risk engine |
+| `F` | `INVALID_TOKEN` | Token is invalid |
+| `F` | `SIGNATURE_INVALID` | Signature invalid |
+| `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
+| `U` | `CAPTURE_IN_PROCESS` | Capture is currently being processed |

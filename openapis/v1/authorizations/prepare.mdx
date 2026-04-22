@@ -1,0 +1,60 @@
+---
+title: Prepare
+description: Prepare contract information for agreement-based payment scenarios including subscriptions.
+---
+
+`POST /v1/authorizations/prepare`
+
+Prepares the contract information for agreement-based payment scenarios. Returns an `authUrl` to pass to `my.call("signContract")` in the Mini Program.
+
+## Request Parameters
+
+<ParamField body="referenceClientId" type="string" required>
+  Merchant identifier used to distinguish different businesses.
+
+  **Max length**: 16 characters
+</ParamField>
+
+<ParamField body="scopes" type="string" required>
+  Permission scope. Value: `AGREEMENT_PAY`
+
+  **Max length**: 16 characters
+</ParamField>
+
+<ParamField body="extendInfo" type="string">
+  JSON object containing contract details.
+
+  **Max length**: 4096 characters
+
+  <Expandable title="extendInfo fields">
+    | Field | Type | Required | Max | Description |
+    |-------|------|----------|-----|-------------|
+    | contractTitle | String | M | 64 | Title displayed on the authorization page |
+    | contractDesc | String | M | 2048 | Description shown to the user |
+    | agreedAmount | Amount | O | — | Transaction limit |
+    | startTime | String | O | — | First deduction date (`yyyy-MM-dd` format) |
+    | contractStatusNotifyUrl | String | O | — | Webhook URL for contract status updates |
+  </Expandable>
+</ParamField>
+
+## Response Parameters
+
+<ResponseField name="result" type="object" required>
+  Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="authUrl" type="string">
+  Authorization URL to pass to `my.call("signContract")` in the Mini Program.
+
+  **Max length**: 256 characters
+</ResponseField>
+
+## Result Codes
+
+| resultStatus | resultCode | Description |
+|-------------|-----------|-------------|
+| `S` | `SUCCESS` | Contract prepared successfully |
+| `F` | `PARAM_ILLEGAL` | Invalid parameters |
+| `F` | `INVALID_AUTH_CLIENT` | Invalid client ID |
+| `F` | `INVALID_SCOPE` | Invalid scope value |
+| `U` | `UNKNOWN_EXCEPTION` | API failure |
