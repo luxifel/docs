@@ -1,0 +1,44 @@
+---
+title: my.returnLoyaltyCardInfoToApp
+description: Return a selected loyalty card's information to the parent app.
+---
+
+Allow the user to select a loyalty card in the Mini Program and transmit that card's information back to the parent application.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| cardId | String | No | Identifier for the selected loyalty card |
+| merchantName | String | No | Name of the card's merchant |
+| cardColor | String | No | Gradient color as two hex values separated by `;` (e.g. `#033397;#011131`) |
+| cardLogo | String | No | Download URL for the card's logo image |
+| clearSelectedState | Boolean | Yes | `true` = no card selected or deleted · `false` = card actively selected |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Query success status |
+| resultCode | String | `0` success · `1000` invalid params · `1002` internal error |
+| resultMessage | String | Human-readable status message |
+
+## Code Example
+
+```javascript
+my.call('returnLoyaltyCardInfoToApp', {
+  cardId: 'CARD_001',
+  merchantName: 'Example Store',
+  cardColor: '#033397;#011131',
+  cardLogo: 'https://cdn.example.com/logo.png',
+  clearSelectedState: false,
+  success: (res) => {
+    my.alert({ content: 'success: ' + JSON.stringify(res) });
+  },
+  fail: (error) => {
+    my.alert({ content: 'error: ' + JSON.stringify(error) });
+  }
+});
+```

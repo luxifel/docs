@@ -1,0 +1,51 @@
+---
+title: my.searchPlaceByFuzzyCode
+description: Search for places on Google Maps by text query and country filter.
+---
+
+Query Google Maps with a text string and country code list to retrieve predicted place results.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| queryCode | String | Yes | Search text — supports full words, substrings, place names, addresses, and plus codes |
+| countryCode | Array\<String\> | Yes | List of up to 15 ccTLD two-character country codes to restrict results (e.g. `["IT", "DE"]`) |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Query success status |
+| resultCode | String | `0` success · `1000` invalid params · `1001` network error · `1002` internal error · `2000` Google service error |
+| resultMessage | String | Human-readable status message |
+| placesList | Array | List of matching `PlaceInfo` objects |
+
+### PlaceInfo Object
+
+| Field | Description |
+|-------|-------------|
+| fullText | Complete place description (primary + secondary text) |
+| primaryText | Main name (e.g. `"Eiffel Tower"`) |
+| secondaryText | Supporting details (e.g. location or address) |
+| distanceMeters | Straight-line distance from origin |
+| placeId | Google Maps place identifier |
+| placeTypes | Associated place type classifications |
+
+## Code Example
+
+```javascript
+my.call('searchPlaceByFuzzyCode', {
+  queryCode: 'Piazza Duomo',
+  countryCode: ['IT'],
+  success: (res) => {
+    const places = res.placesList;
+    // Display results to the user
+  },
+  fail: (error) => {
+    my.alert({ content: 'error: ' + JSON.stringify(error) });
+  }
+});
+```

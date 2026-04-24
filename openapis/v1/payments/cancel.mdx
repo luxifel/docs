@@ -5,7 +5,7 @@ description: Cancel a payment by paymentId or paymentRequestId.
 
 `POST /v1/payments/cancel`
 
-Cancels a payment. At least one of `paymentId` or `paymentRequestId` must be provided.
+Cancels a payment when results are delayed or the merchant decides not to accept the order. Upon success, the full amount is refunded. At least one of `paymentId` or `paymentRequestId` must be provided — `paymentId` takes priority if both are given.
 
 ## Request Parameters
 
@@ -19,12 +19,6 @@ Cancels a payment. At least one of `paymentId` or `paymentRequestId` must be pro
   Unique ID assigned by the merchant to identify the payment request.
 
   **Max length**: 64 characters
-</ParamField>
-
-<ParamField body="extendInfo" type="string">
-  Extension information.
-
-  **Max length**: 4096 characters
 </ParamField>
 
 ## Response Parameters
@@ -46,13 +40,7 @@ Cancels a payment. At least one of `paymentId` or `paymentRequestId` must be pro
 </ResponseField>
 
 <ResponseField name="cancelTime" type="string">
-  Actual time when the payment cancellation process is completed, in ISO 8601 format.
-</ResponseField>
-
-<ResponseField name="extendInfo" type="string">
-  Extension information.
-
-  **Max length**: 4096 characters
+  Actual time when the cancellation completed, in ISO 8601 format.
 </ResponseField>
 
 ## Result Codes
@@ -60,11 +48,19 @@ Cancels a payment. At least one of `paymentId` or `paymentRequestId` must be pro
 | resultStatus | resultCode | Description |
 |-------------|-----------|-------------|
 | `S` | `SUCCESS` | Cancellation successful |
-| `F` | `CANCEL_WINDOW_EXCEED` | Cancellation date is beyond the agreed contract period |
+| `F` | `PARAM_ILLEGAL` | Missing or invalid required parameter |
+| `F` | `PROCESS_FAIL` | General processing failure |
+| `F` | `ORDER_STATUS_INVALID` | Order status does not allow cancellation |
+| `F` | `ORDER_HAS_BEEN_CAPTURED` | Order has already been captured |
+| `F` | `ORDER_HAS_BEEN_REFUNDED` | Order has already been refunded |
+| `F` | `ORDER_HAS_BEEN_VOIDED` | Order has already been voided |
+| `F` | `CANCEL_NOT_ALLOWED` | Cancellation not permitted for this order |
+| `F` | `CANCEL_WINDOW_EXCEED` | Cancellation period has expired |
 | `F` | `ORDER_NOT_EXIST` | Order does not exist |
-| `F` | `KEY_NOT_FOUND` | Key not found |
-| `F` | `CLIENT_INVALID` | Invalid client |
+| `F` | `CLIENT_INVALID` | Invalid client credentials |
 | `F` | `INVALID_SIGNATURE` | Signature invalid |
 | `F` | `METHOD_NOT_SUPPORTED` | HTTP method not supported |
-| `F` | `MERCHANT_BALANCE_NOT_ENOUGH` | Insufficient merchant balance |
+| `F` | `MEDIA_TYPE_NOT_ACCEPTABLE` | Unsupported media type |
+| `F` | `PARTNER_STATUS_ABNORMAL` | Partner account status is abnormal |
+| `F` | `PARTNER_BALANCE_NOT_ENOUGH` | Insufficient partner balance |
 | `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

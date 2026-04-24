@@ -3,7 +3,7 @@ title: OAuth Token
 description: Obtain access tokens for server-to-server API calls using OAuth 2.0 Client Credentials.
 ---
 
-`POST /oauth/token`
+`POST /v1/authorizations/token`
 
 Obtains access tokens for server-to-server API calls using the OAuth 2.0 Client Credentials grant type.
 
@@ -14,7 +14,7 @@ Obtains access tokens for server-to-server API calls using the OAuth 2.0 Client 
 </ParamField>
 
 <ParamField header="Signature" type="string" required>
-  SHA256withRSA algorithm signature: `algorithm=RSA256, keyVersion=1, signature=****`
+  SHA256withRSA algorithm signature: `algorithm=SHA256withRSA, keyVersion=1, signature=****`
 </ParamField>
 
 <ParamField header="Client-Id" type="string" required>
@@ -43,6 +43,10 @@ Obtains access tokens for server-to-server API calls using the OAuth 2.0 Client 
 
 <ResponseField name="result" type="object" required>
   Standard result object with `resultCode`, `resultStatus`, `resultMessage`
+</ResponseField>
+
+<ResponseField name="responseTime" type="string">
+  13-digit millisecond timestamp of the response.
 </ResponseField>
 
 <ResponseField name="accessToken" type="string">

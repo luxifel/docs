@@ -1,0 +1,37 @@
+---
+title: my.transDetail
+description: Navigate to a transaction or coupon detail page.
+---
+
+Redirect the user to a transaction or coupon detail page. When both `transactionId` and `couponId` are provided, `transactionId` takes precedence.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| transactionId | String | No | Transaction identifier |
+| couponId | String | No | Coupon identifier |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Query success status |
+| resultCode | String | `0` success · `1000` invalid params · `1001` network error · `1002` internal error |
+| resultMessage | String | Human-readable status message |
+
+## Code Example
+
+```javascript
+my.call('transDetail', {
+  transactionId: 'TXN_001',
+  success: (res) => {
+    my.alert({ content: 'success: ' + JSON.stringify(res) });
+  },
+  fail: (error) => {
+    my.alert({ content: 'error: ' + JSON.stringify(error) });
+  }
+});
+```

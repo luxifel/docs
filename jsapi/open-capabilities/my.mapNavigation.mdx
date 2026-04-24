@@ -1,0 +1,38 @@
+---
+title: my.mapNavigation
+description: Launch navigation to a destination via Google Maps, Apple Maps, or Waze.
+---
+
+Open a navigation interface letting the user choose between Google Maps, Apple Maps, or Waze to route to the given coordinates.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| latitude | Double | Yes | Destination latitude |
+| longitude | Double | Yes | Destination longitude |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Query success status |
+| resultCode | String | `0` success · `1000` invalid params · `1001` network error |
+| resultMessage | String | Human-readable status message |
+
+## Code Example
+
+```javascript
+my.call('mapNavigation', {
+  latitude: 45.4642,
+  longitude: 9.1900,
+  success: (res) => {
+    my.alert({ content: 'success: ' + JSON.stringify(res) });
+  },
+  fail: (error) => {
+    my.alert({ content: 'error: ' + JSON.stringify(error) });
+  }
+});
+```

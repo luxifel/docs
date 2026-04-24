@@ -10,8 +10,9 @@ Open another Mini Program from the current one.
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | appId | String | Yes | Target Mini Program App ID |
-| path | String | No | Path to open in target Mini Program |
-| extraData | Object | No | Data to pass to target Mini Program |
+| path | String | No | Route to open in a DSL-based Mini Program (defaults to homepage) |
+| appendedUrlPart | String | No | Sub-path for H5+ Mini Programs — must be URL encoded |
+| extraData | Object | No | Data to pass to target Mini Program, accessible via `App.onLaunch()` or `App.onShow()` |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |

@@ -25,7 +25,7 @@ Creates an order for merchant app cashier payment and returns a payment link and
     | orderMemo | String | O | — | Order notes |
     | latitude | String | M | — | Google Maps latitude |
     | longitude | String | M | — | Google Maps longitude |
-    | transactionAddress | String | M | — | ISO 3166 alpha-2 country code format |
+    | transactionAddress | String | M | 512 | `city\|\|street\|\|postCode\|\|countryCode\|\|country` |
     | merchant | Object | O | — | Merchant and store details |
   </Expandable>
 </ParamField>
@@ -80,7 +80,14 @@ Creates an order for merchant app cashier payment and returns a payment link and
 | `F` | `PARAM_ILLEGAL` | Invalid parameters |
 | `F` | `REPEAT_REQ_INCONSISTENT` | Duplicate request with inconsistent data |
 | `F` | `ACCESS_DENIED` | Valid contract absent |
+| `F` | `NO_INTERFACE_DEF` | API not defined |
+| `F` | `INVALID_API` | API invalid |
+| `F` | `MSG_PARSE_ERROR` | Message parsing error |
+| `F` | `FUNCTION_NOT_MATCH` | Parameter mismatch |
+| `F` | `INVALID_CLIENT` | Invalid client |
 | `F` | `INVALID_SIGNATURE` | Signature validation failed |
+| `F` | `INVALID_CLIENT_STATUS` | Invalid client status |
+| `F` | `NOT_EXIST_VALID_CONTRACT` | Valid contract does not exist |
 | `F` | `MERCHANT_STATUS_ABNORMAL` | Merchant account issues |
 | `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
 | `U` | `REQUEST_TRAFFIC_EXCEED_LIMIT` | Rate limit exceeded |

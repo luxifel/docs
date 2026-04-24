@@ -1,0 +1,39 @@
+---
+title: my.searchLocationByPlaceId
+description: Get coordinates and address details from a Google Maps place ID.
+---
+
+Query Google Maps using a place ID to retrieve latitude/longitude coordinates and structured address information.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| placeId | String | Yes | Unique place identifier returned by a place search |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Query success status |
+| resultCode | String | `0` success · `1000` invalid params · `1001` network error · `1002` internal error · `2000` Google service error |
+| resultMessage | String | Human-readable status message |
+| location | Object | Coordinates with `latitude` and `longitude` (7 decimal precision) |
+| formattedAddress | String | Full structured address string |
+| addressComponents | Array | Address segments, each with `name`, `shortName`, and `types` |
+
+## Code Example
+
+```javascript
+my.call('searchLocationByPlaceId', {
+  placeId: 'ChIJN1t_tDeuEmsRUsoyG83frY4',
+  success: (res) => {
+    my.alert({ content: 'success: ' + JSON.stringify(res) });
+  },
+  fail: (error) => {
+    my.alert({ content: error.errorMessage || error.error });
+  }
+});
+```

@@ -3,7 +3,11 @@ title: my.getOpenUserInfo
 description: Get basic user information with user consent.
 ---
 
-Request access to the user's basic profile information.
+Request access to the user's basic profile information. This API must be triggered by a button tap — it cannot be called directly on page load.
+
+<Warning>
+This API requires the user to tap a `<button>` component with `open-type="getAuthorize"` and `scope="userInfo"`. Calling it outside of that interaction will fail. To obtain the `userId` specifically, use `my.getAuthCode` instead.
+</Warning>
 
 ## Parameters
 
@@ -15,25 +19,41 @@ Request access to the user's basic profile information.
 
 ## Success Callback
 
+All fields return an empty string if the value is unavailable.
+
 | Property | Type | Description |
 |----------|------|-------------|
-| response | String | JSON string with user info |
+| code | String | Result code |
+| msg | String | Result message |
+| avatar | String | Profile image URL (max 2048 bytes) |
+| nickName | String | Display name (max 128 bytes) |
+| gender | String | `m` for male, `f` for female |
+| countryCode | String | ISO 3166-1 alpha-2 country code (e.g. `IT`) |
+| province | String | User's province |
+| city | String | User's city |
+
+## Result Codes
+
+| Code | Meaning |
+|------|---------|
+| `10000` | Success |
+| `40006` | Insufficient permissions |
 
 ## Code Example
 
 ```javascript
-my.getOpenUserInfo({
-  success: (res) => {
-    const userInfo = JSON.parse(res.response).response;
-    console.log('Nickname:', userInfo.nickName);
-    console.log('Avatar:', userInfo.avatar);
-  },
-  fail: (err) => {
-    console.error('Failed to get user info:', err);
-  }
-});
-```
+// In your AXML template:
+// <button open-type="getAuthorize" scope="userInfo" onGetAuthorize="onGetAuthorize">Get User Info</button>
 
-<Info>
-User must grant permission for their profile information. Always handle the case where the user denies access.
-</Info>
+onGetAuthorize(res) {
+  my.getOpenUserInfo({
+    success: (res) => {
+      const userInfo = JSON.parse(res.response).response;
+      console.log('Nickname:', userInfo.nickName);
+      console.log('Avatar:', userInfo.avatar);
+    },
+    fail: (err) => {
+      console.error('Failed to get user info:', err);
+    }
+  });
+}

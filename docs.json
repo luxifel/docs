@@ -16,7 +16,8 @@
           {
             "group": "Getting started",
             "pages": [
-              "index"
+              "index",
+              "changelog"
             ]
           },
           {
@@ -484,12 +485,22 @@
           {
             "group": "Open Capabilities",
             "pages": [
+              "jsapi/open-capabilities/my.openScanPage",
+              "jsapi/open-capabilities/my.systemShare",
+              "jsapi/open-capabilities/my.mapNavigation",
+              "jsapi/open-capabilities/my.requestRiskBaseInfo",
+              "jsapi/open-capabilities/my.scanLoyaltyCard",
+              "jsapi/open-capabilities/my.returnLoyaltyCardInfoToApp",
+              "jsapi/open-capabilities/my.transDetail",
+              "jsapi/open-capabilities/my.searchLocationByPlaceId",
+              "jsapi/open-capabilities/my.searchPlaceByFuzzyCode",
+              "jsapi/open-capabilities/my.searchPlaceByLocation",
+              "jsapi/open-capabilities/my.navigateToMiniProgram",
+              "jsapi/open-capabilities/my.navigateBackMiniProgram",
               "jsapi/open-capabilities/my.getAuthCode",
               "jsapi/open-capabilities/my.getOpenUserInfo",
               "jsapi/open-capabilities/my.tradePay",
-              "jsapi/open-capabilities/my.signContract",
-              "jsapi/open-capabilities/my.navigateToMiniProgram",
-              "jsapi/open-capabilities/my.navigateBackMiniProgram"
+              "jsapi/open-capabilities/my.signContract"
             ]
           },
           {
@@ -521,104 +532,49 @@
           {
             "group": "OpenAPIs for Merchants",
             "pages": [
+              "openapis/v1/data-dictionary",
               {
-                "group": "Version /v1",
-                "expanded": false,
+                "group": "Authorizations",
                 "pages": [
-                  "openapis/v1/data-dictionary",
-                  {
-                    "group": "Authorizations",
-                    "pages": [
-                      "openapis/v1/authorizations/oauthToken",
-                      "openapis/v1/authorizations/prepare",
-                      "openapis/v1/authorizations/applyToken",
-                      "openapis/v1/authorizations/cancelToken",
-                      "openapis/v1/authorizations/contractStatusNotify"
-                    ]
-                  },
-                  {
-                    "group": "Payments",
-                    "pages": [
-                      "openapis/v1/payments/retailPay",
-                      "openapis/v1/payments/linkPayCreate",
-                      "openapis/v1/payments/createQrOrder",
-                      "openapis/v1/payments/pay",
-                      "openapis/v1/payments/cancel",
-                      "openapis/v1/payments/capture",
-                      "openapis/v1/payments/void",
-                      "openapis/v1/payments/inquiryPayment",
-                      "openapis/v1/payments/notifyPayment",
-                      "openapis/v1/payments/inquiryVoid",
-                      "openapis/v1/payments/inquiryCapture",
-                      "openapis/v1/payments/refundApply",
-                      "openapis/v1/payments/inquiryRefund",
-                      "openapis/v1/payments/notifyRefund",
-                      "openapis/v1/payments/notifyCashierUrl"
-                    ]
-                  },
-                  {
-                    "group": "Users",
-                    "pages": [
-                      "openapis/v1/customers/inquiryUserInfoByAccessToken"
-                    ]
-                  },
-                  {
-                    "group": "Messages",
-                    "pages": [
-                      "openapis/v1/messages/sendPush",
-                      "openapis/v1/messages/sendEmail",
-                      "openapis/v1/messages/sendSms"
-                    ]
-                  }
+                  "openapis/v1/authorizations/oauthToken",
+                  "openapis/v1/authorizations/prepare",
+                  "openapis/v1/authorizations/applyToken",
+                  "openapis/v1/authorizations/cancelToken",
+                  "openapis/v1/authorizations/contractStatusNotify"
                 ]
               },
               {
-                "group": "Version /v2",
-                "expanded": true,
+                "group": "Payments",
                 "pages": [
-                  "openapis/data-dictionary",
-                  {
-                    "group": "Authorizations",
-                    "pages": [
-                      "openapis/authorizations/prepare",
-                      "openapis/authorizations/applyToken",
-                      "openapis/authorizations/cancelToken",
-                      "openapis/authorizations/contractStatusNotify"
-                    ]
-                  },
-                  {
-                    "group": "Payments",
-                    "pages": [
-                      "openapis/payments/retailPay",
-                      "openapis/payments/linkPayCreate",
-                      "openapis/payments/createQrOrder",
-                      "openapis/payments/pay",
-                      "openapis/payments/inquiryPayment",
-                      "openapis/payments/notifyPayment",
-                      "openapis/payments/cancel",
-                      "openapis/payments/refundApply",
-                      "openapis/payments/inquiryRefund",
-                      "openapis/payments/notifyRefund",
-                      "openapis/payments/void",
-                      "openapis/payments/inquiryVoid",
-                      "openapis/payments/capture",
-                      "openapis/payments/inquiryCapture",
-                      "openapis/payments/notifyCashierUrl"
-                    ]
-                  },
-                  {
-                    "group": "Users",
-                    "pages": [
-                      "openapis/users/inquiryUserInfo"
-                    ]
-                  },
-                  {
-                    "group": "Messages",
-                    "pages": [
-                      "openapis/messages/sendPush",
-                      "openapis/messages/sendInbox"
-                    ]
-                  }
+                  "openapis/v1/payments/retailPay",
+                  "openapis/v1/payments/linkPayCreate",
+                  "openapis/v1/payments/createQrOrder",
+                  "openapis/v1/payments/cancel",
+                  "openapis/v1/payments/notifyRefund",
+                  "openapis/v1/payments/notifyCashierUrl",
+                  "openapis/v1/payments/inquiryVoid",
+                  "openapis/v1/payments/void",
+                  "openapis/v1/payments/inquiryCapture",
+                  "openapis/v1/payments/capture",
+                  "openapis/v1/payments/pay",
+                  "openapis/v1/payments/inquiryPayment",
+                  "openapis/v1/payments/notifyPayment",
+                  "openapis/v1/payments/refundApply",
+                  "openapis/v1/payments/inquiryRefund"
+                ]
+              },
+              {
+                "group": "Users",
+                "pages": [
+                  "openapis/v1/customers/inquiryUserInfo"
+                ]
+              },
+              {
+                "group": "Messages",
+                "pages": [
+                  "openapis/v1/messages/sendPush",
+                  "openapis/v1/messages/sendEmail",
+                  "openapis/v1/messages/sendSms"
                 ]
               }
             ]

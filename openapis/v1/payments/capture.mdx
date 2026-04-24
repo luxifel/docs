@@ -5,7 +5,7 @@ description: Capture the amount of an authorized payment.
 
 `POST /v1/payments/capture`
 
-Captures the amount of an original authorized payment. Omitting `captureAmount` defaults to a full capture.
+Captures the amount of an original authorized payment, transferring funds from the user account to the merchant account. Supports full capture or multiple partial captures.
 
 ## Request Parameters
 
@@ -26,7 +26,7 @@ Captures the amount of an original authorized payment. Omitting `captureAmount` 
 </ParamField>
 
 <ParamField body="isLastCapture" type="boolean">
-  Indicates this is the final capture. Defaults to `true`.
+  Indicates this is the final capture. Defaults to `false` — set to `true` to close the order after this capture.
 </ParamField>
 
 <ParamField body="extendInfo" type="string">
@@ -41,36 +41,14 @@ Captures the amount of an original authorized payment. Omitting `captureAmount` 
   Standard result object with `resultCode`, `resultStatus`, `resultMessage`
 </ResponseField>
 
-<ResponseField name="captureRequestId" type="string">
-  Merchant-generated capture ID.
-
-  **Max length**: 64 characters
-</ResponseField>
-
 <ResponseField name="captureId" type="string">
   Wallet-generated unique capture ID.
 
   **Max length**: 64 characters
 </ResponseField>
 
-<ResponseField name="paymentId" type="string">
-  Original payment identifier.
-
-  **Max length**: 64 characters
-</ResponseField>
-
-<ResponseField name="captureAmount" type="object">
-  Payment amount that was captured.
-</ResponseField>
-
 <ResponseField name="captureTime" type="string">
   Capture processing time in ISO 8601 format.
-</ResponseField>
-
-<ResponseField name="extendInfo" type="string">
-  Extension information.
-
-  **Max length**: 4096 characters
 </ResponseField>
 
 ## Result Codes
@@ -78,16 +56,11 @@ Captures the amount of an original authorized payment. Omitting `captureAmount` 
 | resultStatus | resultCode | Description |
 |-------------|-----------|-------------|
 | `S` | `SUCCESS` | Capture successful |
-| `F` | `AUTH_CANCELLED` | Authorization was cancelled |
-| `F` | `AUTH_EXPIRED` | Authorization has expired |
-| `F` | `AUTH_NOT_FOUND` | Authorization not found |
-| `F` | `CAPTURE_AMOUNT_EXCEED_AUTH_LIMIT` | Capture amount exceeds authorization limit |
-| `F` | `CURRENCY_NOT_SUPPORT` | Currency not supported |
-| `F` | `USER_BALANCE_NOT_ENOUGH` | Insufficient user balance |
-| `F` | `USER_STATUS_ABNORMAL` | User status abnormal |
+| `F` | `PARAM_ILLEGAL` | Missing or invalid required parameter |
+| `F` | `ORDER_UNSUPPORTED_OPERATION` | Order does not support capture |
 | `F` | `REPEAT_REQ_INCONSISTENT` | Duplicate request with inconsistent data |
+| `F` | `ORDER_STATUS_INVALID` | Order status does not allow capture |
 | `F` | `RISK_REJECT` | Transaction rejected by risk engine |
-| `F` | `INVALID_TOKEN` | Token is invalid |
-| `F` | `SIGNATURE_INVALID` | Signature invalid |
+| `F` | `CAPTURE_AMOUNT_EXCEED_LIMIT` | Capture amount exceeds the authorization limit |
+| `F` | `MULTIPLE_CAPTURE_NOT_SUPPORTED` | Multiple captures not supported for this order |
 | `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |
-| `U` | `CAPTURE_IN_PROCESS` | Capture is currently being processed |

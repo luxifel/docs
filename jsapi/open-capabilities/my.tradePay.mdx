@@ -31,9 +31,11 @@ Which parameter to use depends on the payment method your backend called. Use `t
 | Code | Meaning | Action |
 |------|---------|--------|
 | `9000` | Payment appears successful | Poll backend for confirmation |
+| `8000` | Transaction in progress | Poll backend for final status |
 | `6001` | User cancelled | Allow retry |
 | `6002` | Network error | Retry or poll status |
-| `4000` | Order paid or closed | Check backend status |
+| `6004` | Outcome uncertain — may have succeeded | Poll backend before retrying |
+| `4000` | Payment failed | Check backend status |
 
 ## Code Example
 

@@ -9,10 +9,34 @@ Request user authorization and get an authorization code for backend token excha
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| scopes | Array | Yes | Authorization scopes to request (e.g., `['auth_user']`) |
+| scopes | Array | No | Authorization scopes to request. Defaults to `['auth_base']` |
 | success | Function | No | Callback with auth code |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
+
+## Authorization Scopes
+
+| Scope | Data Accessible |
+|-------|----------------|
+| `auth_base` | User ID only (default, silent where permitted) |
+| `auth_user` | Full user profile |
+| `USER_NICKNAME` | Display name |
+| `USER_NAME` | First and last name |
+| `USER_LOGIN_ID` | Login identifier |
+| `USER_AVATAR` | Avatar image URL |
+| `USER_GENDER` | Gender |
+| `USER_BIRTHDAY` | Date of birth |
+| `USER_NATIONALITY` | Nationality |
+| `USER_PHONE_NUMBER` | Phone number |
+| `USER_SHIPPING_ADDRESS` | Shipping address |
+| `USER_RESIDENT_ADDRESS` | Resident address |
+| `NOTIFICATION_INBOX` | Inbox message permission |
+| `NOTIFICATION_PUSH` | Push notification permission |
+| `codice_fiscale` | Italian tax identification code |
+
+<Note>
+Silent authorization (`auth_base` without a prompt) is only available for first-party Mini Programs. All third-party Mini Programs require explicit user authorization.
+</Note>
 
 ## Success Callback
 
@@ -20,6 +44,15 @@ Request user authorization and get an authorization code for backend token excha
 |----------|------|-------------|
 | authCode | String | Short-lived authorization code |
 | authSuccessScopes | Array | Successfully authorized scopes |
+| authErrorScopes | Object | Scopes that were denied and the reason |
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 2 | Invalid parameters |
+| 10 | Network timeout |
+| 11 | User cancelled authorization |
 
 ## Code Example
 

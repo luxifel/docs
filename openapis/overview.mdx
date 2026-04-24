@@ -7,8 +7,8 @@ Mini programs provide a comprehensive set of OpenAPIs enabling developers to int
 
 ## API Version
 
-- **Current Version**: v2
-- **URL Format**: `https://{domainName}/api/open/v2/{endpoint}`
+- **Current Version**: v1
+- **URL Format**: `https://{domainName}/v1/{endpoint}`
 
 <Note>
 Different API versions represent distinct interfaces. Ensure you use the correct version for your integration.
@@ -22,14 +22,14 @@ All API requests follow this structure:
 
 | Component | Description |
 |-----------|-------------|
-| **URL** | `https://{domainName}/api/open/{restfulPath}` |
+| **URL** | `https://{domainName}/v1/{endpoint}` |
 | **Method** | POST (HTTPS) |
-| **Authentication** | RSA256 digital signature required |
+| **Authentication** | SHA256withRSA digital signature required |
 
 ### Required Headers
 
 <ParamField header="Signature" type="string" required>
-  Digital signature in format: `algorithm=RSA256, keyVersion=1, signature=****`
+  Digital signature in format: `algorithm=SHA256withRSA, keyVersion=1, signature=****`
 </ParamField>
 
 <ParamField header="Client-Id" type="string" required>
@@ -115,7 +115,7 @@ All responses include a standardized `result` object:
   </Card>
 
   <Card title="Key Management" icon="key">
-    Use 2048-bit RSA keys exclusively for the RSA256 algorithm
+    Use 2048-bit RSA keys exclusively for the SHA256withRSA algorithm
   </Card>
 
   <Card title="Message Encoding" icon="code">

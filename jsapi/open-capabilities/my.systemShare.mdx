@@ -1,0 +1,38 @@
+---
+title: my.systemShare
+description: Share text, images, or URLs to other applications.
+---
+
+Share content including text, images, and URLs to external applications using the system share sheet.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| text | String | No | Title text to share |
+| imageData | String | No | Image in base64 format — must include `data:image/png;base64,` or `data:image/jpeg;base64,` prefix |
+| url | String | No | URL to share |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | `true` if sharing succeeded, `false` if it failed |
+
+## Code Example
+
+```javascript
+my.call('systemShare', {
+  imageData: 'data:image/png;base64,[base64string]',
+  text: 'Check this out',
+  url: 'https://example.com/',
+  success: (res) => {
+    my.alert({ content: 'success: ' + JSON.stringify(res) });
+  },
+  fail: (error) => {
+    my.alert({ content: 'error: ' + JSON.stringify(error) });
+  }
+});
+```

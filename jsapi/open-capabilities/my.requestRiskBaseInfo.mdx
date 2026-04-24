@@ -1,0 +1,56 @@
+---
+title: my.requestRiskBaseInfo
+description: Retrieve device and environment risk control information.
+---
+
+Obtain basic risk control information from the device and environment. Used for security and fraud risk assessment.
+
+## Parameters
+
+No input parameters required.
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Query success status |
+| resultCode | String | `0` success · `1001` network error · `1002` internal error |
+| resultMessage | String | Human-readable status message |
+| sessionId | String | Session identifier |
+| tokenId | String | Device security identifier |
+| osType | String | Operating system type |
+| osVersion | String | Operating system version |
+| terminalType | String | Device category (e.g. `APP`, `H5`) |
+| clientIp | String | Device IP address |
+| envInfo | String | JSON string with extended environment metadata |
+
+### envInfo Fields
+
+| Field | Description |
+|-------|-------------|
+| tokenId | Device security identifier |
+| osType | OS type |
+| osVersion | OS version |
+| terminalType | Device category |
+| clientIp | Device IP |
+| clientKey | Client key |
+| cashierSdkVersion | Cashier SDK version |
+| locale | Device locale |
+| deliveryToken | Delivery token |
+| channel | Channel |
+| sourcePlatForm | Source platform |
+| networkType | Network type |
+| expandableInfo | Extensible metadata map |
+
+## Code Example
+
+```javascript
+my.call('requestRiskBaseInfo', {
+  success: (res) => {
+    my.alert({ content: 'success: ' + JSON.stringify(res) });
+  },
+  fail: (error) => {
+    my.alert({ content: error.errorMessage || error.error });
+  }
+});
+```

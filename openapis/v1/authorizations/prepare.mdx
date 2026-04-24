@@ -31,9 +31,12 @@ Prepares the contract information for agreement-based payment scenarios. Returns
     |-------|------|----------|-----|-------------|
     | contractTitle | String | M | 64 | Title displayed on the authorization page |
     | contractDesc | String | M | 2048 | Description shown to the user |
-    | agreedAmount | Amount | O | — | Transaction limit |
+    | agreedAmount | Amount | O | — | Single transaction amount limit |
     | startTime | String | O | — | First deduction date (`yyyy-MM-dd` format) |
     | contractStatusNotifyUrl | String | O | — | Webhook URL for contract status updates |
+    | paymentFrequency | String | O | — | Deduction frequency: `DAILY`, `WEEKLY`, `MONTHLY`, `QUARTERLY`, or `YEARLY` |
+    | amountType | String | O | — | Amount type: `VARIABLE` or `FIXED` |
+    | maxAmount | Amount | O | — | Maximum amount per transaction |
   </Expandable>
 </ParamField>
 
@@ -56,5 +59,8 @@ Prepares the contract information for agreement-based payment scenarios. Returns
 | `S` | `SUCCESS` | Contract prepared successfully |
 | `F` | `PARAM_ILLEGAL` | Invalid parameters |
 | `F` | `INVALID_AUTH_CLIENT` | Invalid client ID |
+| `F` | `INVALID_AUTH_CLIENT_STATUS` | Auth client status issue |
 | `F` | `INVALID_SCOPE` | Invalid scope value |
+| `F` | `AUTH_CLIENT_UNSUPPORT_SCOPE` | Client does not support requested scope |
+| `F` | `REDIRECT_URL_NOT_MATCH` | Redirect URL is not permitted |
 | `U` | `UNKNOWN_EXCEPTION` | API failure |
