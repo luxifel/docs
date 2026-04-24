@@ -40,7 +40,7 @@ Build a string combining the HTTP method, URI, client identifier, timestamp, and
 | Component | Description | Example |
 |-----------|-------------|---------|
 | HTTP_METHOD | The HTTP method | `POST` |
-| HTTP_URI | The API endpoint path | `/api/open/v2/payments/pay` |
+| HTTP_URI | The API endpoint path | `/v1/payments/pay` |
 | Client-Id | Your assigned client ID | `TEST_5X00000000000000` |
 | Request-Time | ISO 8601 timestamp | `2024-01-10T12:12:12+01:00` |
 | HTTP_BODY | JSON request body | `{"paymentRequestId":"..."}` |
@@ -48,7 +48,7 @@ Build a string combining the HTTP method, URI, client identifier, timestamp, and
 **Example content to sign**:
 
 ```
-POST /api/open/v2/payments/pay
+POST /v1/payments/pay
 TEST_5X00000000000000.2024-01-10T12:12:12+01:00.{"paymentRequestId":"REQ_001","paymentAmount":{"currency":"EUR","value":"1000"}}
 ```
 
@@ -69,7 +69,7 @@ function generateSignature(contentToSign, privateKey) {
 
 // Build content to sign
 const method = 'POST';
-const uri = '/api/open/v2/payments/pay';
+const uri = '/v1/payments/pay';
 const clientId = 'YOUR_CLIENT_ID';
 const requestTime = new Date().toISOString();
 const body = JSON.stringify(requestBody);
@@ -94,7 +94,7 @@ def generate_signature(content_to_sign: str, private_key) -> str:
 
 # Build content to sign
 method = 'POST'
-uri = '/api/open/v2/payments/pay'
+uri = '/v1/payments/pay'
 client_id = 'YOUR_CLIENT_ID'
 request_time = datetime.utcnow().isoformat() + 'Z'
 body = json.dumps(request_body, separators=(',', ':'))
@@ -109,12 +109,12 @@ signature = generate_signature(content_to_sign, private_key)
 Format and add the signature header to your request:
 
 ```
-Signature: algorithm=RSA256, keyVersion=1, signature=<generated_signature>
+Signature: algorithm=SHA256withRSA, keyVersion=1, signature=<generated_signature>
 ```
 
 | Field | Description |
 |-------|-------------|
-| `algorithm` | Always `RSA256` |
+| `algorithm` | Always `SHA256withRSA` |
 | `keyVersion` | Your key version (provided during onboarding) |
 | `signature` | Base64-encoded signature from Step 3 |
 
@@ -122,11 +122,11 @@ Signature: algorithm=RSA256, keyVersion=1, signature=<generated_signature>
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.rebellapp.com/api/open/v2/payments/pay \
+curl -X POST https://api.rebellapp.com/v1/payments/pay \
   -H 'Content-Type: application/json' \
   -H 'Client-Id: TEST_5X00000000000000' \
   -H 'Request-Time: 2024-01-10T12:12:12+01:00' \
-  -H 'Signature: algorithm=RSA256, keyVersion=1, signature=BASE64_SIGNATURE_HERE' \
+  -H 'Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE_HERE' \
   -d '{
     "paymentRequestId": "REQ_001",
     "paymentAmount": {
@@ -162,7 +162,7 @@ async function callAPI(endpoint, body) {
       'Content-Type': 'application/json',
       'Client-Id': clientId,
       'Request-Time': requestTime,
-      'Signature': `algorithm=RSA256, keyVersion=${keyVersion}, signature=${signature}`
+      'Signature': `algorithm=SHA256withRSA, keyVersion=${keyVersion}, signature=${signature}`
     },
     body: bodyString
   });
@@ -208,7 +208,7 @@ def call_api(endpoint: str, body: dict) -> dict:
             'Content-Type': 'application/json',
             'Client-Id': client_id,
             'Request-Time': request_time,
-            'Signature': f'algorithm=RSA256, keyVersion={key_version}, signature={signature_b64}'
+            'Signature': f'algorithm=SHA256withRSA, keyVersion={key_version}, signature={signature_b64}'
         },
         data=body_string
     )
@@ -246,7 +246,7 @@ function verifySignature(method, uri, clientId, responseTime, body, signature, p
 // Usage
 const isValid = verifySignature(
   'POST',
-  '/api/open/v2/payments/pay',
+  '/v1/payments/pay',
   clientId,
   response.headers['response-time'],
   JSON.stringify(response.body),

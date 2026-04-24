@@ -1,0 +1,38 @@
+---
+title: my.scanLoyaltyCard
+description: Scan a loyalty card QR code or barcode.
+---
+
+Invoke the device camera to scan a loyalty card QR code or barcode and return the decoded value and code type.
+
+## Parameters
+
+No input parameters required.
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | `true` if the scan succeeded |
+| resultCode | String | `0` success · `1002` internal error · `1003` user cancelled |
+| resultMessage | String | Human-readable status message |
+| codeValue | String | Decoded content from the scanned code |
+| codeType | String | Code format (see supported types below) |
+| clickEnterManuallyButton | Boolean | Whether the user chose manual entry |
+
+## Supported Code Types
+
+`CODE_128` · `CODE_39` · `CODE_93` · `CODABAR` · `DATA_MATRIX` · `EAN_13` · `EAN_8` · `ITF` · `QR_CODE` · `UPC_A` · `UPC_E` · `PDF417` · `AZTEC`
+
+## Code Example
+
+```javascript
+my.call('scanLoyaltyCard', {
+  success: (res) => {
+    my.alert({ content: 'success: ' + JSON.stringify(res) });
+  },
+  fail: (error) => {
+    my.alert({ content: 'error: ' + JSON.stringify(error) });
+  }
+});
+```

@@ -1,0 +1,32 @@
+---
+title: my.openScanPage
+description: Open the Rebell QR code scanning page.
+---
+
+Open the Rebell QR code scanning page from within a Mini Program.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | `true` if the scan succeeded, `false` if it failed |
+
+## Code Example
+
+```javascript
+my.call('openScanPage', {
+  success: (res) => {
+    my.alert({ content: 'success: ' + JSON.stringify(res) });
+  },
+  fail: (error) => {
+    my.alert({ content: 'error: ' + JSON.stringify(error) });
+  }
+});
+```

@@ -1,0 +1,45 @@
+---
+title: my.searchPlaceByLocation
+description: Reverse geocode coordinates to a structured address via Google Maps.
+---
+
+Query Google Maps with latitude and longitude to retrieve structured address information for that location.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| latitude | Double | Yes | Latitude of the location |
+| longitude | Double | Yes | Longitude of the location |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Query success status |
+| resultCode | String | `0` success · `1000` invalid params · `1001` network error · `1002` internal error |
+| resultMessage | String | Human-readable status message |
+| country | String | Country name |
+| province | String | Province or state |
+| city | String | City |
+| street | String | Street |
+| formattedAddress | String | Full address per Google Maps reverse geocoding standards |
+| countryShortName | String | ISO country code |
+| postCode | String | Postal code |
+
+## Code Example
+
+```javascript
+my.call('searchPlaceByLocation', {
+  latitude: 45.4642,
+  longitude: 9.1900,
+  success: (res) => {
+    my.alert({ content: 'success: ' + JSON.stringify(res) });
+  },
+  fail: (error) => {
+    my.alert({ content: 'error: ' + JSON.stringify(error) });
+  }
+});
+```

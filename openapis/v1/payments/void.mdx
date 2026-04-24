@@ -5,12 +5,12 @@ description: Void the remaining amount of an authorized payment.
 
 `POST /v1/payments/void`
 
-Voids the remaining amount of an original authorized payment.
+Voids a paid order before the payment is captured or the order confirmed, returning funds to the payer. Supports partial or full void operations.
 
 ## Request Parameters
 
 <ParamField body="voidRequestId" type="string" required>
-  Merchant-generated unique ID for this void request.
+  Merchant-generated unique ID for this void request. Used for idempotence control.
 
   **Max length**: 64 characters
 </ParamField>
@@ -21,12 +21,8 @@ Voids the remaining amount of an original authorized payment.
   **Max length**: 64 characters
 </ParamField>
 
-<ParamField body="voidRemainingAmount" type="boolean">
-  Set to `true` to void all remaining payment amount after completion.
-</ParamField>
-
 <ParamField body="voidAmount" type="object">
-  Specific void payment amount. See [Amount](/openapis/v1/data-dictionary#amount).
+  Specific void payment amount. Defaults to full void if omitted. See [Amount](/openapis/v1/data-dictionary#amount).
 </ParamField>
 
 <ParamField body="extendInfo" type="string">
@@ -53,28 +49,14 @@ Voids the remaining amount of an original authorized payment.
   **Max length**: 64 characters
 </ResponseField>
 
-<ResponseField name="extendInfo" type="string">
-  Extension information.
-
-  **Max length**: 4096 characters
-</ResponseField>
-
 ## Result Codes
 
 | resultStatus | resultCode | Description |
 |-------------|-----------|-------------|
-| `A` | `ACCEPTED_SUCCESS` | Accepted successfully |
 | `S` | `SUCCESS` | Void successful |
-| `F` | `ORDER_NOT_EXISTS` | Order does not exist |
-| `F` | `ORDER_STATUS_INVALID` | Order status is invalid |
-| `F` | `ORDER_IS_FROZEN` | Order is frozen |
+| `F` | `PARAM_ILLEGAL` | Missing or invalid required parameter |
 | `F` | `ORDER_UNSUPPORTED_OPERATION` | Order does not support void |
-| `F` | `CURRENCY_NOT_SAME` | Currency mismatch |
-| `F` | `AMOUNT_EXCEEDS_LIMIT` | Payment amount exceeds limits |
-| `F` | `REPEAT_REQ_INCONSISTENT` | Duplicate request with inconsistent data |
-| `F` | `MUTEX_OPERATION_IN_PROCESSING` | Another operation in progress |
-| `F` | `MERCHANT_NOT_EXIST` | Merchant does not exist |
-| `F` | `USER_NOT_EXISTS` | User account does not exist |
-| `F` | `USER_STATUS_ABNORMAL` | User status abnormal |
-| `F` | `MERCHANT_STATUS_ABNORMAL` | Merchant status abnormal |
+| `F` | `VOID_AMOUNT_EXCEED` | Void amount exceeds the original payment amount |
+| `F` | `MUTEX_OPERATION_IN_PROCESSING` | Another void, confirm, or capture is in progress |
+| `F` | `PARTNER_BALANCE_NOT_ENOUGH` | Insufficient partner balance |
 | `U` | `UNKNOWN_EXCEPTION` | Unknown error occurred |

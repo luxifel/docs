@@ -1,0 +1,32 @@
+#!/bin/sh
+
+CHANGELOG_FILE="changelog.mdx"
+VERSION_FILE="VERSION"
+
+# Read version already bumped by pre-commit hook
+new_version=$(cat "$VERSION_FILE" | tr -d '[:space:]')
+
+# Read first non-empty, non-comment line of the commit message
+commit_msg=$(grep -v '^#' "$1" | grep -v '^[[:space:]]*$' | head -1)
+
+# Today's date
+today=$(date +"%Y-%m-%d")
+
+TMPFILE=$(mktemp)
+
+# Insert new <Update> block after <!-- ENTRIES --> marker
+awk -v ver="$new_version" -v msg="$commit_msg" -v dt="$today" '
+/\{\/\* ENTRIES \*\/\}/ {
+    print
+    print ""
+    print "<Update label=\"v" ver "\" description=\"" dt "\">"
+    print "  " msg
+    print "</Update>"
+    next
+}
+{ print }
+' "$CHANGELOG_FILE" > "$TMPFILE" && mv "$TMPFILE" "$CHANGELOG_FILE"
+
+git add "$CHANGELOG_FILE"
+
+echo "Changelog entry added for v$new_version"
