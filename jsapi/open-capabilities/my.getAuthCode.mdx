@@ -9,7 +9,7 @@ Request user authorization and get an authorization code for backend token excha
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| scopes | Array | No | Authorization scopes to request. Defaults to `['auth_base']` |
+| scopes | Array | No | Authorization scopes to request. Defaults to `['auth_base']`. Must be an array — passing a plain string will cause a parse error or unexpected failure on some SDK versions. |
 | success | Function | No | Callback with auth code |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -46,11 +46,20 @@ Silent authorization (`auth_base` without a prompt) is only available for first-
 | authSuccessScopes | Array | Successfully authorized scopes |
 | authErrorScopes | Object | Scopes that were denied and the reason |
 
+## Fail Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| error | Number | Error code |
+| errorMessage | String | Human-readable error description |
+| authErrorScopes | Object | Scopes that were denied and the reason. Only present when specific scopes are rejected (error code 2). Not present for error code 3. |
+
 ## Error Codes
 
 | Code | Description |
 |------|-------------|
-| 2 | Invalid parameters |
+| 2 | Invalid parameters — check the `scopes` value and format |
+| 3 | Authorization service error — the SuperApp host's OAuthService could not complete the request. Common causes: no logged-in user session in the SuperApp, or the test user does not exist in the environment being targeted (e.g. using a sandbox user against a production endpoint, or vice versa). When this error occurs, `authErrorScopes` is not populated. |
 | 10 | Network timeout |
 | 11 | User cancelled authorization |
 
@@ -65,7 +74,11 @@ my.getAuthCode({
     this.sendToBackend(res.authCode);
   },
   fail: (err) => {
-    console.error('Authorization failed:', err);
+    console.error('Authorization failed — code:', err.error, err.errorMessage);
+    // authErrorScopes is only present for error code 2 (scope rejection), not code 3
+    if (err.authErrorScopes) {
+      console.error('Denied scopes:', err.authErrorScopes);
+    }
   }
 });
 ```
