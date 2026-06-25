@@ -55,6 +55,10 @@ Initiates a payment. Supports Mini Program cashier flows and agreement-based (re
 
 <ParamField body="order" type="object">
   Order details including merchant, buyer, and goods information. See [Order](/openapis/v1/data-dictionary#order).
+
+  For Mini Program and in-app payment flows, `order.env` is required and must include:
+  - `terminalType`: `APP`
+  - `osType`: `IOS` or `ANDROID`
 </ParamField>
 
 <ParamField body="agreedAmount" type="object">
@@ -70,9 +74,15 @@ Initiates a payment. Supports Mini Program cashier flows and agreement-based (re
 </ParamField>
 
 <ParamField body="extendInfo" type="string">
-  JSON-formatted extension data. May include `channelSource`, `miniAppId`, `supportMultiConfirm`.
+  JSON-formatted extension data.
 
   **Max length**: 2048 characters
+
+  | Sub-field | Required | Description |
+  |-----------|----------|-------------|
+  | `channelSource` | Required for Mini Program flows | Payment channel origin. Use `MERCHANT_MP` for Mini Program, `MERCHANT_APP` for native app, `MOBILE_H5` for mobile H5. |
+  | `supportMultiConfirm` | Required for auth-capture (`productCode` ending `...000012`) | Set to `true` to enable multi-confirmation auth-capture flow. |
+  | `miniAppId` | Optional | Mini Program app identifier. |
 </ParamField>
 
 ## Response Parameters

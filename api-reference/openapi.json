@@ -60,7 +60,7 @@
                 "example": {
                   "value": {
                     "bizType": "ORDER_CODE",
-                    "productCode": "5105010010000100040",
+                    "productCode": "51051000101000100048",
                     "codeType": "CGCP",
                     "paymentRequestId": "20220914595540652867492",
                     "paymentAmount": {
@@ -113,17 +113,17 @@
           {
             "lang": "cURL",
             "label": "cURL",
-            "source": "curl -X POST https://api.rebellapp.com/v1/payments/createQROrder \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Client-Id: YOUR_CLIENT_ID\" \\\n  -H \"Request-Time: 2024-01-10T12:00:00Z\" \\\n  -H \"Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE\" \\\n  -d '{\n    \"bizType\": \"ORDER_CODE\",\n    \"productCode\": \"5105010010000100040\",\n    \"codeType\": \"CGCP\",\n    \"paymentRequestId\": \"REQ_abc_123\",\n    \"paymentAmount\": {\n      \"currency\": \"EUR\",\n      \"value\": 1000\n    },\n    \"order\": {\n      \"orderDescription\": \"Latte x2\"\n    },\n    \"paymentNotifyUrl\": \"https://merchant.example.com/webhook\"\n  }'"
+            "source": "curl -X POST https://api.rebellapp.com/v1/payments/createQROrder \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Client-Id: YOUR_CLIENT_ID\" \\\n  -H \"Request-Time: 2024-01-10T12:00:00Z\" \\\n  -H \"Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE\" \\\n  -d '{\n    \"bizType\": \"ORDER_CODE\",\n    \"productCode\": \"51051000101000100048\",\n    \"codeType\": \"CGCP\",\n    \"paymentRequestId\": \"REQ_abc_123\",\n    \"paymentAmount\": {\n      \"currency\": \"EUR\",\n      \"value\": 1000\n    },\n    \"order\": {\n      \"orderDescription\": \"Latte x2\"\n    },\n    \"paymentNotifyUrl\": \"https://merchant.example.com/webhook\"\n  }'"
           },
           {
             "lang": "JavaScript",
             "label": "Node.js",
-            "source": "const response = await fetch('https://api.rebellapp.com/v1/payments/createQROrder', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Client-Id': 'YOUR_CLIENT_ID',\n    'Request-Time': new Date().toISOString(),\n    'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n  },\n  body: JSON.stringify({\n    bizType: 'ORDER_CODE',\n    productCode: '5105010010000100040',\n    codeType: 'CGCP',\n    paymentRequestId: 'REQ_abc_123',\n    paymentAmount: { currency: 'EUR', value: 1000 },\n    order: { orderDescription: 'Latte x2' },\n    paymentNotifyUrl: 'https://merchant.example.com/webhook'\n  })\n});\n\nconst data = await response.json();\nconsole.log(data.qrCode); // Display QR code to customer"
+            "source": "const response = await fetch('https://api.rebellapp.com/v1/payments/createQROrder', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Client-Id': 'YOUR_CLIENT_ID',\n    'Request-Time': new Date().toISOString(),\n    'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n  },\n  body: JSON.stringify({\n    bizType: 'ORDER_CODE',\n    productCode: '51051000101000100048',\n    codeType: 'CGCP',\n    paymentRequestId: 'REQ_abc_123',\n    paymentAmount: { currency: 'EUR', value: 1000 },\n    order: { orderDescription: 'Latte x2' },\n    paymentNotifyUrl: 'https://merchant.example.com/webhook'\n  })\n});\n\nconst data = await response.json();\nconsole.log(data.qrCode); // Display QR code to customer"
           },
           {
             "lang": "Python",
             "label": "Python",
-            "source": "import requests\n\nresponse = requests.post(\n    'https://api.rebellapp.com/v1/payments/createQROrder',\n    headers={\n        'Content-Type': 'application/json',\n        'Client-Id': 'YOUR_CLIENT_ID',\n        'Request-Time': '2024-01-10T12:00:00Z',\n        'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n    },\n    json={\n        'bizType': 'ORDER_CODE',\n        'productCode': '5105010010000100040',\n        'codeType': 'CGCP',\n        'paymentRequestId': 'REQ_abc_123',\n        'paymentAmount': {'currency': 'EUR', 'value': 1000},\n        'order': {'orderDescription': 'Latte x2'},\n        'paymentNotifyUrl': 'https://merchant.example.com/webhook'\n    }\n)\n\ndata = response.json()\nprint(data['qrCode'])  # Display QR code to customer"
+            "source": "import requests\n\nresponse = requests.post(\n    'https://api.rebellapp.com/v1/payments/createQROrder',\n    headers={\n        'Content-Type': 'application/json',\n        'Client-Id': 'YOUR_CLIENT_ID',\n        'Request-Time': '2024-01-10T12:00:00Z',\n        'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n    },\n    json={\n        'bizType': 'ORDER_CODE',\n        'productCode': '51051000101000100048',\n        'codeType': 'CGCP',\n        'paymentRequestId': 'REQ_abc_123',\n        'paymentAmount': {'currency': 'EUR', 'value': 1000},\n        'order': {'orderDescription': 'Latte x2'},\n        'paymentNotifyUrl': 'https://merchant.example.com/webhook'\n    }\n)\n\ndata = response.json()\nprint(data['qrCode'])  # Display QR code to customer"
           }
         ]
       }
@@ -225,7 +225,7 @@
               "examples": {
                 "example": {
                   "value": {
-                    "productCode": "5105010010000100040",
+                    "productCode": "51051000101000100040",
                     "paymentRequestId": "REQ_abc_456",
                     "paymentAuthCode": "289123456789012345",
                     "paymentAmount": {
@@ -269,17 +269,17 @@
           {
             "lang": "cURL",
             "label": "cURL",
-            "source": "curl -X POST https://api.rebellapp.com/v1/payments/retailPay \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Client-Id: YOUR_CLIENT_ID\" \\\n  -H \"Request-Time: 2024-01-10T12:00:00Z\" \\\n  -H \"Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE\" \\\n  -d '{\n    \"productCode\": \"5105010010000100040\",\n    \"paymentRequestId\": \"REQ_abc_456\",\n    \"paymentAuthCode\": \"289123456789012345\",\n    \"paymentAmount\": {\n      \"currency\": \"EUR\",\n      \"value\": 2500\n    },\n    \"order\": {\n      \"orderDescription\": \"In-store purchase\"\n    },\n    \"paymentNotifyUrl\": \"https://merchant.example.com/webhook\"\n  }'"
+            "source": "curl -X POST https://api.rebellapp.com/v1/payments/retailPay \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Client-Id: YOUR_CLIENT_ID\" \\\n  -H \"Request-Time: 2024-01-10T12:00:00Z\" \\\n  -H \"Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE\" \\\n  -d '{\n    \"productCode\": \"51051000101000100040\",\n    \"paymentRequestId\": \"REQ_abc_456\",\n    \"paymentAuthCode\": \"289123456789012345\",\n    \"paymentAmount\": {\n      \"currency\": \"EUR\",\n      \"value\": 2500\n    },\n    \"order\": {\n      \"orderDescription\": \"In-store purchase\"\n    },\n    \"paymentNotifyUrl\": \"https://merchant.example.com/webhook\"\n  }'"
           },
           {
             "lang": "JavaScript",
             "label": "Node.js",
-            "source": "const response = await fetch('https://api.rebellapp.com/v1/payments/retailPay', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Client-Id': 'YOUR_CLIENT_ID',\n    'Request-Time': new Date().toISOString(),\n    'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n  },\n  body: JSON.stringify({\n    productCode: '5105010010000100040',\n    paymentRequestId: 'REQ_abc_456',\n    paymentAuthCode: '289123456789012345', // Scanned from customer's wallet\n    paymentAmount: { currency: 'EUR', value: 2500 },\n    order: { orderDescription: 'In-store purchase' },\n    paymentNotifyUrl: 'https://merchant.example.com/webhook'\n  })\n});\n\nconst data = await response.json();\nif (data.result.resultStatus === 'S') {\n  console.log('Payment successful:', data.paymentId);\n}"
+            "source": "const response = await fetch('https://api.rebellapp.com/v1/payments/retailPay', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Client-Id': 'YOUR_CLIENT_ID',\n    'Request-Time': new Date().toISOString(),\n    'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n  },\n  body: JSON.stringify({\n    productCode: '51051000101000100040',\n    paymentRequestId: 'REQ_abc_456',\n    paymentAuthCode: '289123456789012345', // Scanned from customer's wallet\n    paymentAmount: { currency: 'EUR', value: 2500 },\n    order: { orderDescription: 'In-store purchase' },\n    paymentNotifyUrl: 'https://merchant.example.com/webhook'\n  })\n});\n\nconst data = await response.json();\nif (data.result.resultStatus === 'S') {\n  console.log('Payment successful:', data.paymentId);\n}"
           },
           {
             "lang": "Python",
             "label": "Python",
-            "source": "import requests\n\nresponse = requests.post(\n    'https://api.rebellapp.com/v1/payments/retailPay',\n    headers={\n        'Content-Type': 'application/json',\n        'Client-Id': 'YOUR_CLIENT_ID',\n        'Request-Time': '2024-01-10T12:00:00Z',\n        'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n    },\n    json={\n        'productCode': '5105010010000100040',\n        'paymentRequestId': 'REQ_abc_456',\n        'paymentAuthCode': '289123456789012345',  # Scanned from customer's wallet\n        'paymentAmount': {'currency': 'EUR', 'value': 2500},\n        'order': {'orderDescription': 'In-store purchase'},\n        'paymentNotifyUrl': 'https://merchant.example.com/webhook'\n    }\n)\n\ndata = response.json()\nif data['result']['resultStatus'] == 'S':\n    print('Payment successful:', data['paymentId'])"
+            "source": "import requests\n\nresponse = requests.post(\n    'https://api.rebellapp.com/v1/payments/retailPay',\n    headers={\n        'Content-Type': 'application/json',\n        'Client-Id': 'YOUR_CLIENT_ID',\n        'Request-Time': '2024-01-10T12:00:00Z',\n        'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n    },\n    json={\n        'productCode': '51051000101000100040',\n        'paymentRequestId': 'REQ_abc_456',\n        'paymentAuthCode': '289123456789012345',  # Scanned from customer's wallet\n        'paymentAmount': {'currency': 'EUR', 'value': 2500},\n        'order': {'orderDescription': 'In-store purchase'},\n        'paymentNotifyUrl': 'https://merchant.example.com/webhook'\n    }\n)\n\ndata = response.json()\nif data['result']['resultStatus'] == 'S':\n    print('Payment successful:', data['paymentId'])"
           }
         ]
       }
@@ -309,7 +309,7 @@
               "examples": {
                 "example": {
                   "value": {
-                    "productCode": "5105010010000100040",
+                    "productCode": "51051000101000100054",
                     "paymentRequestId": "checkout-20240321-987",
                     "paymentAmount": {
                       "currency": "EUR",
@@ -358,17 +358,17 @@
           {
             "lang": "cURL",
             "label": "cURL",
-            "source": "curl -X POST https://api.rebellapp.com/v1/payments/linkPayCreate \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Client-Id: YOUR_CLIENT_ID\" \\\n  -H \"Request-Time: 2024-01-10T12:00:00Z\" \\\n  -H \"Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE\" \\\n  -d '{\n    \"productCode\": \"5105010010000100040\",\n    \"paymentRequestId\": \"checkout-20240321-987\",\n    \"paymentAmount\": {\n      \"currency\": \"EUR\",\n      \"value\": 499\n    },\n    \"order\": {\n      \"orderDescription\": \"Monthly subscription - Premium plan\"\n    },\n    \"settlementStrategy\": {\n      \"settlementCurrency\": \"EUR\"\n    }\n  }'"
+            "source": "curl -X POST https://api.rebellapp.com/v1/payments/linkPayCreate \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Client-Id: YOUR_CLIENT_ID\" \\\n  -H \"Request-Time: 2024-01-10T12:00:00Z\" \\\n  -H \"Signature: algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE\" \\\n  -d '{\n    \"productCode\": \"51051000101000100054\",\n    \"paymentRequestId\": \"checkout-20240321-987\",\n    \"paymentAmount\": {\n      \"currency\": \"EUR\",\n      \"value\": 499\n    },\n    \"order\": {\n      \"orderDescription\": \"Monthly subscription - Premium plan\"\n    },\n    \"settlementStrategy\": {\n      \"settlementCurrency\": \"EUR\"\n    }\n  }'"
           },
           {
             "lang": "JavaScript",
             "label": "Node.js",
-            "source": "const response = await fetch('https://api.rebellapp.com/v1/payments/linkPayCreate', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Client-Id': 'YOUR_CLIENT_ID',\n    'Request-Time': new Date().toISOString(),\n    'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n  },\n  body: JSON.stringify({\n    productCode: '5105010010000100040',\n    paymentRequestId: `checkout-${orderId}-${Date.now()}`,\n    paymentAmount: { currency: 'EUR', value: 499 },\n    order: { orderDescription: 'Monthly subscription - Premium plan' },\n    settlementStrategy: { settlementCurrency: 'EUR' }\n  })\n});\n\nconst data = await response.json();\n// Redirect user to Rebell app\nwindow.location.href = data.appLinks.ios.shortUrl; // or android"
+            "source": "const response = await fetch('https://api.rebellapp.com/v1/payments/linkPayCreate', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Client-Id': 'YOUR_CLIENT_ID',\n    'Request-Time': new Date().toISOString(),\n    'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n  },\n  body: JSON.stringify({\n    productCode: '51051000101000100054',\n    paymentRequestId: `checkout-${orderId}-${Date.now()}`,\n    paymentAmount: { currency: 'EUR', value: 499 },\n    order: { orderDescription: 'Monthly subscription - Premium plan' },\n    settlementStrategy: { settlementCurrency: 'EUR' }\n  })\n});\n\nconst data = await response.json();\n// Redirect user to Rebell app\nwindow.location.href = data.appLinks.ios.shortUrl; // or android"
           },
           {
             "lang": "Python",
             "label": "Python",
-            "source": "import requests\n\nresponse = requests.post(\n    'https://api.rebellapp.com/v1/payments/linkPayCreate',\n    headers={\n        'Content-Type': 'application/json',\n        'Client-Id': 'YOUR_CLIENT_ID',\n        'Request-Time': '2024-01-10T12:00:00Z',\n        'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n    },\n    json={\n        'productCode': '5105010010000100040',\n        'paymentRequestId': f'checkout-{order_id}-{int(time.time())}',\n        'paymentAmount': {'currency': 'EUR', 'value': 499},\n        'order': {'orderDescription': 'Monthly subscription - Premium plan'},\n        'settlementStrategy': {'settlementCurrency': 'EUR'}\n    }\n)\n\ndata = response.json()\n# Return redirect URLs to frontend\nredirect_url = data['redirectUrl']\napp_links = data['appLinks']"
+            "source": "import requests\n\nresponse = requests.post(\n    'https://api.rebellapp.com/v1/payments/linkPayCreate',\n    headers={\n        'Content-Type': 'application/json',\n        'Client-Id': 'YOUR_CLIENT_ID',\n        'Request-Time': '2024-01-10T12:00:00Z',\n        'Signature': 'algorithm=SHA256withRSA, keyVersion=1, signature=BASE64_SIGNATURE'\n    },\n    json={\n        'productCode': '51051000101000100054',\n        'paymentRequestId': f'checkout-{order_id}-{int(time.time())}',\n        'paymentAmount': {'currency': 'EUR', 'value': 499},\n        'order': {'orderDescription': 'Monthly subscription - Premium plan'},\n        'settlementStrategy': {'settlementCurrency': 'EUR'}\n    }\n)\n\ndata = response.json()\n# Return redirect URLs to frontend\nredirect_url = data['redirectUrl']\napp_links = data['appLinks']"
           }
         ]
       }
@@ -564,9 +564,9 @@
         "required": [
           "bizType",
           "productCode",
-          "codeType",
           "paymentRequestId",
-          "paymentAmount"
+          "paymentAmount",
+          "order"
         ]
       },
       "CreateQROrderResponse": {
@@ -591,18 +591,17 @@
       },
       "InquiryRequest": {
         "type": "object",
+        "description": "Provide either paymentId or paymentRequestId (at least one required).",
         "properties": {
           "paymentId": {
-            "type": "string"
+            "type": "string",
+            "description": "Wallet-generated payment ID."
           },
           "paymentRequestId": {
-            "type": "string"
+            "type": "string",
+            "description": "Merchant-provided idempotency key from the original payment request."
           }
-        },
-        "required": [
-          "paymentId",
-          "paymentRequestId"
-        ]
+        }
       },
       "InquiryResponse": {
         "type": "object",
@@ -669,7 +668,7 @@
           "paymentRequestId",
           "paymentAuthCode",
           "paymentAmount",
-          "paymentNotifyUrl"
+          "order"
         ]
       },
       "RetailPayResponse": {
@@ -781,6 +780,16 @@
           "order": {
             "$ref": "#/components/schemas/Order"
           },
+          "paymentNotifyUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Payment result notification URL."
+          },
+          "paymentRedirectUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Redirect URL after payment completion."
+          },
           "settlementStrategy": {
             "$ref": "#/components/schemas/SettlementStrategy"
           }
@@ -788,7 +797,8 @@
         "required": [
           "productCode",
           "paymentRequestId",
-          "paymentAmount"
+          "paymentAmount",
+          "order"
         ]
       },
       "AppLinkPlatform": {
