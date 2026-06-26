@@ -848,13 +848,18 @@
           "appLinks": {
             "$ref": "#/components/schemas/AppLinks"
           },
-          "paymentId": {
+          "acquirementId": {
             "type": "string",
-            "description": "Payment identifier to be used for inquiry or reconciliation"
+            "description": "Unique platform payment order ID, used for inquiry or reconciliation"
+          },
+          "merchantTransId": {
+            "type": "string",
+            "description": "Echo of the merchant-provided transaction ID from the request"
           }
         },
         "required": [
-          "result"
+          "result",
+          "merchantTransId"
         ]
       }
     }
