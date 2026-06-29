@@ -106,7 +106,37 @@ Initiates a payment. Supports Mini Program cashier flows and agreement-based (re
 </ResponseField>
 
 <ResponseField name="redirectActionForm" type="object">
-  Redirect instruction containing `method` and `redirectionUrl`.
+  Redirect instruction returned when the payment requires an H5 cashier step (e.g. direct pay and auth-capture flows with `MOBILE_H5` channel source).
+
+  | Sub-field | Type | Description |
+  |-----------|------|-------------|
+  | `method` | string | HTTP method for the redirect (usually `GET`) |
+  | `redirectUrl` | string | H5 cashier page URL. Include a `sign` query parameter signed by Rebell. |
+
+  <Warning>
+    **Double-encode the `sign` parameter before rendering `redirectUrl` as a QR code.**
+
+    The H5 cashier page decodes the URL once before parsing query parameters. Base64 characters in `sign` that are percent-encoded as `%2B` (`+`), `%2F` (`/`), or `%3D` (`=`) become `+`, `/`, `=` after that decode — but `+` is then parsed as a space, causing a `PUB_VERIFY_SIGN_ERROR`.
+
+    Fix: replace those characters with their double-percent equivalents so they survive the H5 decode intact:
+
+    ```js
+    function doubleEncodeSign(url) {
+      return url.replace(/([?&]sign=)([^&#]*)/, (_, prefix, signVal) =>
+        prefix + signVal
+          .replace(/%2B/gi, '%252B')
+          .replace(/%2F/gi, '%252F')
+          .replace(/%3D/gi, '%253D')
+          .replace(/\+/g, '%252B')
+      );
+    }
+
+    const safeUrl = doubleEncodeSign(redirectActionForm.redirectUrl);
+    await QRCode.toCanvas(canvas, safeUrl, { width: 300 });
+    ```
+
+    This is only needed when embedding the URL in a QR code. For direct browser redirects (`window.location.href = redirectUrl`), use the URL as-is.
+  </Warning>
 </ResponseField>
 
 ## Result Codes
