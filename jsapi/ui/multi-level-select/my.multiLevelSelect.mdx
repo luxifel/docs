@@ -10,7 +10,9 @@ Use this API to show a cascading picker for hierarchical data selection.
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | title | String | No | Selector title |
-| list | Array | Yes | Hierarchical data array |
+| list | JsonArray | Yes | Selection data list |
+| name | String | Yes | Entry name (property of each object in `list`) |
+| subList | JsonArray | No | Sub-entry list (property of each object in `list`) |
 | success | Function | No | Callback with selection |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -19,8 +21,8 @@ Use this API to show a cascading picker for hierarchical data selection.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| success | Boolean | Whether selection was successful |
-| result | Array | Selected items array |
+| success | Boolean | Whether selection was successful (returns `false` for cancellation) |
+| result | JsonArray | Selected items array, e.g. `[{"name":"City"},{"name":"District A"},{"name":"Street A"}]` |
 
 ## Code Example
 

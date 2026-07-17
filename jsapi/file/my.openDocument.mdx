@@ -3,17 +3,25 @@ title: my.openDocument
 description: Open and preview a document file.
 ---
 
-Open a document for viewing (PDF, Word, etc.).
+Preview a PDF file within the Mini Program, without leaving the Mini Program.
 
 ## Parameters
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| filePath | String | Yes | Document file path |
-| fileType | String | No | File type hint |
+| filePath | String | Yes | File path, obtained via `my.downloadFile` |
+| fileType | String | Yes | File type. Only `pdf` is currently supported |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
+
+## Error Codes
+
+| Code | Description | Solution |
+|------|-------------|----------|
+| 4011 | File path is invalid or no permission to access incoming path | Check the incoming file path |
+| 4012 | Preview files do not exist | Make sure files that correspond to file path exist |
+| 4013 | File format is not supported | Currently preview of PDF files is supported |
 
 ## Code Example
 

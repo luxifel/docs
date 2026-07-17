@@ -1,0 +1,54 @@
+---
+title: my.onBLEConnectionStateChanged
+description: Listen for BLE connection state changes.
+---
+
+Use this API to listen for changes in a BLE device's connection state, including unexpected disconnections.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | Yes | Callback when the connection state changes |
+
+## Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| deviceId | String | The Bluetooth device ID |
+| connected | Boolean | The current connection state |
+
+## Code Example
+
+```javascript
+Page({
+  onLoad() {
+    my.onBLEConnectionStateChanged(this.handleConnectionStateChange);
+  },
+
+  handleConnectionStateChange(res) {
+    if (!res.connected) {
+      console.log('Device disconnected:', res.deviceId);
+    }
+  },
+
+  onUnload() {
+    my.offBLEConnectionStateChanged(this.handleConnectionStateChange);
+  }
+});
+```
+
+<Warning>
+Call `my.offBLEConnectionStateChanged` to remove any existing listener before calling `my.onBLEConnectionStateChanged`, to avoid registering duplicate listeners that each fire on the same event. IDE simulation is not supported for this API — test on a real device.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.offBLEConnectionStateChanged" icon="xmark" href="/jsapi/device/bluetooth/my.offBLEConnectionStateChanged">
+    Stop listening
+  </Card>
+  <Card title="my.connectBLEDevice" icon="link" href="/jsapi/device/bluetooth/my.connectBLEDevice">
+    Connect to a BLE device
+  </Card>
+</CardGroup>

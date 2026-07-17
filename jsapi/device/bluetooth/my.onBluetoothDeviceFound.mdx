@@ -9,32 +9,37 @@ Use this API to listen for newly discovered Bluetooth devices during discovery. 
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| callback | Function | Yes | Callback when devices are found |
+| success | Function | No | Callback when devices are found |
+| fail | Function | No | Callback on failure |
 
-## Callback Parameters
+## Success Callback Parameters
 
 | Property | Type | Description |
 |----------|------|-------------|
-| devices | Array | Array of newly found devices |
+| devices | Array | List of all newly discovered devices |
 
 ## Device Object Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| deviceId | String | Device identifier |
-| name | String | Device name (may be empty) |
-| RSSI | Number | Signal strength (dBm) |
-| advertisData | ArrayBuffer | Advertisement data |
+| deviceId | String | Device ID |
+| name | String | Name of the Bluetooth device (some devices may not have a name) |
+| deviceName | String | Name of the Bluetooth device |
+| localName | String | Name of the local device |
+| RSSI | Number | Received Signal Strength Indicator |
+| advertisData | Hex String | Advertisement data of the device |
 
 ## Code Example
 
 ### Basic Usage
 
 ```javascript
-my.onBluetoothDeviceFound((res) => {
-  res.devices.forEach(device => {
-    console.log('Found:', device.name, device.deviceId);
-  });
+my.onBluetoothDeviceFound({
+  success: (res) => {
+    res.devices.forEach(device => {
+      console.log('Found:', device.name, device.deviceId);
+    });
+  }
 });
 ```
 
@@ -56,17 +61,19 @@ Page({
   },
 
   setupDeviceListener() {
-    my.onBluetoothDeviceFound((res) => {
-      const { devices } = this.data;
+    my.onBluetoothDeviceFound({
+      success: (res) => {
+        const { devices } = this.data;
 
-      res.devices.forEach(newDevice => {
-        const exists = devices.find(d => d.deviceId === newDevice.deviceId);
-        if (!exists && newDevice.name) {
-          devices.push(newDevice);
-        }
-      });
+        res.devices.forEach(newDevice => {
+          const exists = devices.find(d => d.deviceId === newDevice.deviceId);
+          if (!exists && newDevice.name) {
+            devices.push(newDevice);
+          }
+        });
 
-      this.setData({ devices });
+        this.setData({ devices });
+      }
     });
   },
 
@@ -86,13 +93,15 @@ Page({
 ```javascript
 Page({
   findDevice(targetName) {
-    my.onBluetoothDeviceFound((res) => {
-      const target = res.devices.find(d => d.name === targetName);
+    my.onBluetoothDeviceFound({
+      success: (res) => {
+        const target = res.devices.find(d => d.name === targetName);
 
-      if (target) {
-        my.stopBluetoothDevicesDiscovery();
-        my.offBluetoothDeviceFound();
-        this.connectToDevice(target);
+        if (target) {
+          my.stopBluetoothDevicesDiscovery();
+          my.offBluetoothDeviceFound();
+          this.connectToDevice(target);
+        }
       }
     });
 

@@ -1,0 +1,32 @@
+---
+title: my.getBatteryInfoSync
+description: Get the device battery status synchronously.
+---
+
+Synchronous version of `my.getBatteryInfo`. Returns the current battery level and charging status directly, with no parameters and no callbacks.
+
+## Return Value
+
+| Property | Type | Description |
+|----------|------|-------------|
+| level | Int | The battery level of the current device |
+| isCharging | Boolean | Whether the device is currently charging |
+
+## Code Example
+
+```javascript
+const res = my.getBatteryInfoSync();
+console.log('Battery level:', res.level);
+console.log('Is charging:', res.isCharging);
+```
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.getBatteryInfo" icon="battery-full" href="/jsapi/device/battery/my.getBatteryInfo">
+    Get battery info asynchronously
+  </Card>
+  <Card title="my.getSystemInfo" icon="mobile" href="/jsapi/device/system/my.getSystemInfo">
+    Get system information
+  </Card>
+</CardGroup>

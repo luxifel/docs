@@ -9,7 +9,8 @@ Send a message through an active WebSocket connection.
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| data | String/ArrayBuffer | Yes | Data to send |
+| data | String | Yes | The data to be sent, in text string or base64 encoded string. |
+| isBuffer | Boolean | No | If true, the data field represents base64 encoded binary strings. If empty, the data field represents normal strings. |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |

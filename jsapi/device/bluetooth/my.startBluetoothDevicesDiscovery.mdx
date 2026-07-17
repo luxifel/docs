@@ -11,7 +11,7 @@ Use this API to start discovering nearby Bluetooth devices. Use `my.onBluetoothD
 |----------|------|----------|-------------|
 | services | Array | No | Filter by service UUIDs |
 | allowDuplicatesKey | Boolean | No | Allow duplicate device reports (default: false) |
-| interval | Number | No | Report interval in milliseconds |
+| interval | Number | No | Reporting frequency. Default: 0, meaning a device is reported as soon as it's found; otherwise devices are reported at this interval |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |

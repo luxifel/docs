@@ -11,16 +11,10 @@ Register a callback for WebSocket errors.
 |----------|------|----------|-------------|
 | callback | Function | Yes | Handler for errors |
 
-## Callback Parameters
-
-| Property | Type | Description |
-|----------|------|-------------|
-| errorMessage | String | Error description |
-
 ## Code Example
 
 ```javascript
-my.onSocketError((err) => {
-  console.error('Socket error:', err.errorMessage);
+my.onSocketError((res) => {
+  console.error('WebSocket connection failed. Please check!', res);
 });
 ```

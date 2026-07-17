@@ -3,22 +3,14 @@ title: my.showSharePanel
 description: Display the share panel for content sharing.
 ---
 
-Show a native share panel with sharing options.
+Use this API to trigger the native share panel within a mini program. This API takes no parameters.
 
-## Parameters
-
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| success | Function | No | Callback on success |
-| fail | Function | No | Callback on failure |
-| complete | Function | No | Callback that always executes |
+<Note>
+When this API triggers sharing, the request parameter `from` in `page.onShareAppMessage` receives the value `code`.
+</Note>
 
 ## Code Example
 
 ```javascript
-my.showSharePanel({
-  success: () => {
-    console.log('Share panel shown');
-  }
-});
+my.showSharePanel();
 ```

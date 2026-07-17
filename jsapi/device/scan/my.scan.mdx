@@ -9,7 +9,8 @@ Scan QR codes or barcodes using the device camera.
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| type | String | No | Scan type: `qr`, `bar` |
+| type | String | No | Type for scanning (`qr` by default): `qr` - two-dimensional QR scanning frame; `bar` - linear barcode scanning frame |
+| hideAlbum | Boolean | No | Hide album entry or not. If `false`, there will be an entry for the user to select a picture from the album as the scanned picture; otherwise the user scans directly with the camera. Defaults to `false`. |
 | success | Function | No | Callback with scan result |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -18,7 +19,16 @@ Scan QR codes or barcodes using the device camera.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| code | String | Scanned content |
+| code | String | Data returned from scanning |
+| qrCode | String | QR code data returned from scanning |
+| barCode | String | Bar code data returned from scanning |
+
+## Error Codes
+
+| Error | Description |
+|-------|-------------|
+| 10 | User cancellation |
+| 11 | Operation failure |
 
 ## Code Example
 

@@ -17,7 +17,8 @@ Use this API to get the current screen orientation of the device.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| orientation | String | Current orientation: `portrait`, `landscape`, `portraitUpsideDown`, `landscapeLeft`, `landscapeRight` |
+| success | Boolean | Specifies whether the call is successful. When the value is `true`, the call is successful. |
+| orientation | String | Indicates the orientation of the screen, `portrait` or `landscape`. |
 
 ## Code Example
 
@@ -70,9 +71,6 @@ Page({
 |-------|-------------|
 | `portrait` | Device held upright |
 | `landscape` | Device held sideways |
-| `portraitUpsideDown` | Device held upside down |
-| `landscapeLeft` | Device rotated left |
-| `landscapeRight` | Device rotated right |
 
 ## Related APIs
 

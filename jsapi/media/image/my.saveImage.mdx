@@ -9,7 +9,8 @@ Use this API to save an image file to the user's photo album.
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| url | String | Yes | Image URL or local path |
+| url | String | Yes | URL of the image to be saved |
+| showActionSheet | Boolean | No | Whether to show the menu when saving image; `false` by default |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -27,6 +28,15 @@ my.saveImage({
   }
 });
 ```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 2 | Invalid parameter, no url parameter transferred |
+| 15 | Album right not enabled (iOS only) |
+| 16 | Insufficient album storage on cellphone (iOS only) |
+| 17 | Other errors during picture saving |
 
 ## Related APIs
 

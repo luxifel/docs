@@ -19,8 +19,10 @@ Open a map interface for the user to select a location.
 |----------|------|-------------|
 | name | String | Location name |
 | address | String | Full address |
-| latitude | Number | Latitude |
-| longitude | Number | Longitude |
+| latitude | Number | The latitude, expressed as a floating-point number ranging from -90 to +90. A negative number means south latitude |
+| longitude | Number | The longitude, expressed as a floating-point number ranging from -180 to +180. A negative number means west longitude |
+| provinceName | String | The province |
+| cityName | String | The city |
 
 ## Code Example
 
@@ -30,6 +32,7 @@ my.chooseLocation({
     console.log('Selected:', res.name);
     console.log('Address:', res.address);
     console.log('Coordinates:', res.latitude, res.longitude);
+    console.log('Province/City:', res.provinceName, res.cityName);
   }
 });
 ```

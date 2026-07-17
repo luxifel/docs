@@ -9,9 +9,16 @@ Use this API to initialize the Bluetooth adapter. This must be called before usi
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
+| autoClose | Boolean | No | Whether to automatically disconnect Bluetooth when leaving the current page. Default: `true`. Android only. |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
+
+## Success Callback
+
+| Property | Type | Description |
+|----------|------|-------------|
+| isSupportBLE | Boolean | Whether BLE is supported |
 
 ## Code Example
 
@@ -19,7 +26,11 @@ Use this API to initialize the Bluetooth adapter. This must be called before usi
 
 ```javascript
 my.openBluetoothAdapter({
-  success() {
+  success(res) {
+    if (!res.isSupportBLE) {
+      console.log('Bluetooth is unavailable temporarily');
+      return;
+    }
     console.log('Bluetooth adapter initialized');
   },
   fail(err) {
@@ -61,10 +72,12 @@ Page({
 
 ## Error Codes
 
-| Code | Description |
-|------|-------------|
-| 10001 | Bluetooth is not enabled on the device |
-| 10000 | Bluetooth adapter not initialized |
+| Code | Description | Solution |
+|------|-------------|----------|
+| 12 | Bluetooth is not turned on. | Try again to turn on Bluetooth. |
+| 13 | Connection to the system service is temporarily lost. | Try again to reconnect. |
+| 14 | Not authorized to use Bluetooth. | Authorize app to use Bluetooth. |
+| 15 | Unknown error. | - |
 
 <Warning>
 Always call `my.closeBluetoothAdapter` when you're done using Bluetooth to release system resources.

@@ -16,6 +16,20 @@ Reads the current value of a characteristic on a connected BLE device. The resul
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
 
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| characteristic | Object | Information of the device characteristic |
+
+### Characteristic Object
+
+| Property | Type | Description |
+|----------|------|-------------|
+| characteristicId | String | Characteristic UUID |
+| serviceId | String | Service UUID |
+| value | Hex String | The Bluetooth characteristic value |
+
 ## Code Example
 
 ```javascript
@@ -29,8 +43,8 @@ my.readBLECharacteristicValue({
   deviceId: 'XX:XX:XX:XX:XX:XX',
   serviceId: '0000FFF0-0000-1000-8000-00805F9B34FB',
   characteristicId: '0000FFF1-0000-1000-8000-00805F9B34FB',
-  success: () => {
-    console.log('Read request sent');
+  success: (res) => {
+    console.log('Read request sent, characteristic:', res.characteristic);
   },
   fail: (err) => {
     console.error('Read failed:', err);
@@ -39,7 +53,7 @@ my.readBLECharacteristicValue({
 ```
 
 <Info>
-The characteristic value is not returned directly in the success callback. Listen for `my.onBLECharacteristicValueChange` to receive the result.
+Although the success callback includes a `characteristic` object, the authoritative value should be obtained by listening for `my.onBLECharacteristicValueChange`.
 </Info>
 
 ## Related APIs

@@ -3,7 +3,7 @@ title: my.openSetting
 description: Open the Mini Program settings page.
 ---
 
-Use this API to open the Mini Program settings page where users can manage permissions they have previously granted or denied.
+Use this API to open the Mini Program settings page and return permission setting results. Only the permissions that have been requested by the Mini Program from the user are displayed on the settings page.
 
 ## Parameters
 
@@ -17,16 +17,16 @@ Use this API to open the Mini Program settings page where users can manage permi
 
 | Property | Type | Description |
 |----------|------|-------------|
-| authSetting | Object | Current authorization settings |
+| authSetting | Object | Results of user authorization. Keys are the values of scopes and values are boolean types, which shows whether the user gives the permission or not. |
 
 ## authSetting Object
 
 | Property | Type | Description |
 |----------|------|-------------|
-| location | Boolean | Location permission |
-| camera | Boolean | Camera permission |
-| album | Boolean | Photo album permission |
-| userInfo | Boolean | User info permission |
+| location | Boolean | Whether location permission (my.getLocation) is granted |
+| camera | Boolean | Whether camera permission (my.scan) is granted |
+| album | Boolean | Whether photo album permission (my.chooseImage, my.saveImage) is granted |
+| userInfo | Boolean | Whether user info permission (my.getOpenUserInfo) is granted |
 
 ## Code Example
 

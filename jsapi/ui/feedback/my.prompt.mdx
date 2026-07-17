@@ -10,12 +10,14 @@ Use this API to show a modal dialog that allows users to enter text input.
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | title | String | No | Dialog title |
-| message | String | No | Dialog message |
+| message | String | Yes | Dialog message (default: "Enter contents here") |
 | placeholder | String | No | Input placeholder text |
-| align | String | No | Text alignment: `left`, `center`, `right` |
-| okButtonText | String | No | OK button text |
-| cancelButtonText | String | No | Cancel button text |
+| align | String | No | Text alignment: `left`, `center`, `right` (default: `center` on both iOS and Android) |
+| okButtonText | String | No | OK button text (default: "OK") |
+| cancelButtonText | String | No | Cancel button text (default: "Cancel") |
 | success | Function | No | Callback with result |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
 
 ## Success Callback
 

@@ -19,11 +19,22 @@ Returns a MapContext object with control methods.
 
 | Method | Description |
 |--------|-------------|
-| getCenterLocation() | Get map center coordinates |
-| moveToLocation() | Move to current location |
-| includePoints() | Adjust view to include points |
-| getRegion() | Get visible region |
-| getScale() | Get current zoom level |
+| getCenterLocation() | Get the center location of the current map |
+| moveToLocation() | Display the pinned location at the center of the map and restore the default zoom level |
+| includePoints() | Adjust the visible map area to display specified coordinates |
+| getRegion() | Get the coordinates (latitude and longitude) of the northeast and southwest corners of the current map |
+| getScale() | Get the zoom level of the current map |
+| getSkew() | Get the skew angle of the current map |
+| changeMarkers() | Add, delete, or update the specified location marker |
+| translateMarker() | Move the marker on the map |
+| showRoute() | Show the default walking route planned. Only one route is displayed |
+| clearRoute() | Clear the walking route on the map |
+| calculateDistance() | Calculate path length and target coordinates at specified distances |
+| gestureEnable() | Enable or disable all gestures |
+| showsCompass() | Set the visibility of the compass |
+| updateComponents() | Update the map API incrementally |
+| screenToMap() | Convert screen coordinates to map latitude/longitude |
+| mapToScreen() | Convert map coordinates to screen coordinates |
 
 ## Code Example
 

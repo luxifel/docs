@@ -9,8 +9,8 @@ Use this API to authenticate the user using biometric methods such as fingerprin
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| type | String | Yes | Biometric type: `fingerPrint` or `facial` |
-| title | String | No | Custom title for the authentication dialog |
+| promptText | String | Yes | The text displayed on the biometric prompt. Use short, clear text to state the authentication purpose to avoid truncation. |
+| fallbackType | Number | No | The alternative authentication method when biometric authentication fails: `0` - No fallback (default). `1` - Fallback to device credentials. |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -19,35 +19,42 @@ Use this API to authenticate the user using biometric methods such as fingerprin
 
 | Property | Type | Description |
 |----------|------|-------------|
-| success | Boolean | Whether authentication was successful |
+| success | Boolean | Whether the biometric authentication succeeded. Returned by the `success` or `complete` callback. |
+| error | Number | The error code. Returned by the `fail` callback, or by the `complete` callback when `success` is `false`. See Error Codes below. |
+| errorMessage | String | The error message corresponding to the error code. |
 
 ## Code Example
 
-### Basic Fingerprint Authentication
+### Basic Authentication
 
 ```javascript
 my.startLocalBioAuth({
-  type: 'fingerPrint',
+  promptText: 'Authenticate to unlock',
   success(res) {
     if (res.success) {
-      console.log('Fingerprint verified');
+      console.log('Biometric verified');
     }
   },
-  fail(err) {
-    console.error('Authentication failed:', err);
+  fail(res) {
+    console.error('Authentication failed:', res.error);
   }
 });
 ```
 
-### Face Recognition
+### Fallback to Device Credentials
 
 ```javascript
 my.startLocalBioAuth({
-  type: 'facial',
-  title: 'Verify your identity',
+  promptText: 'Verify your identity',
+  fallbackType: 1,
   success(res) {
     if (res.success) {
-      console.log('Face verified');
+      console.log('Authenticated');
+    }
+  },
+  fail(res) {
+    if (res.error === 11) {
+      // The user cancelled the authentication
     }
   }
 });
@@ -60,8 +67,8 @@ Page({
   async confirmPayment() {
     // First verify user identity
     my.startLocalBioAuth({
-      type: 'fingerPrint',
-      title: 'Confirm payment',
+      promptText: 'Confirm payment',
+      fallbackType: 1,
       success: (res) => {
         if (res.success) {
           this.processPayment();
@@ -72,8 +79,8 @@ Page({
           });
         }
       },
-      fail: (err) => {
-        // Biometric not available, fall back to PIN
+      fail: (res) => {
+        // Biometric not available or cancelled, fall back to PIN
         this.showPinEntry();
       }
     });
@@ -97,9 +104,9 @@ Page({
     // Check if biometric is available
     my.checkLocalBioAuthSupported({
       success: (res) => {
-        if (res.available) {
+        if (res.success) {
           my.startLocalBioAuth({
-            type: res.type, // Use available type
+            promptText: 'Verify your identity',
             success: (verifyRes) => {
               if (verifyRes.success) {
                 this.onAuthSuccess();
@@ -128,10 +135,10 @@ Page({
 
 | Code | Description |
 |------|-------------|
-| 10001 | Biometric not supported on device |
-| 10002 | Biometric not enrolled |
-| 10003 | User cancelled authentication |
-| 10004 | Authentication failed |
+| 11 | The authentication process was canceled by the user. |
+| 12 | Either the device lacks biometric support or the super app cannot access the biometric feature. |
+| 13 | Biometric credentials are not enabled on the user's device. |
+| 99 | An undefined error has occurred. Please contact technical support for assistance. |
 
 <Warning>
 Biometric authentication may not be available on all devices. Always provide a fallback authentication method.

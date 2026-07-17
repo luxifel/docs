@@ -9,26 +9,30 @@ Use this API to listen for changes in the value of a BLE device characteristic. 
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| callback | Function | Yes | Callback when a characteristic value changes |
+| success | Function | No | Callback when a characteristic value changes |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
 
-## Callback Parameters
+## Success Callback Parameters
 
 | Property | Type | Description |
 |----------|------|-------------|
 | deviceId | String | Device identifier |
 | serviceId | String | Service UUID |
 | characteristicId | String | Characteristic UUID |
-| value | ArrayBuffer | The new characteristic value |
+| value | Hex String | The new hexadecimal characteristic value |
 
 ## Code Example
 
 ### Basic Usage
 
 ```javascript
-my.onBLECharacteristicValueChange((res) => {
-  console.log('Device:', res.deviceId);
-  console.log('Characteristic:', res.characteristicId);
-  console.log('Value:', res.value);
+my.onBLECharacteristicValueChange({
+  success: (res) => {
+    console.log('Device:', res.deviceId);
+    console.log('Characteristic:', res.characteristicId);
+    console.log('Value:', res.value);
+  }
 });
 ```
 
@@ -37,15 +41,14 @@ my.onBLECharacteristicValueChange((res) => {
 ```javascript
 Page({
   onLoad() {
-    my.onBLECharacteristicValueChange(this.handleValueChange);
+    my.onBLECharacteristicValueChange({
+      success: this.handleValueChange
+    });
   },
 
   handleValueChange(res) {
-    // Convert ArrayBuffer to usable data
-    const dataView = new DataView(res.value);
-    const intValue = dataView.getUint8(0);
-    console.log('Received value:', intValue);
-    this.setData({ latestValue: intValue });
+    console.log('Received hex value:', res.value);
+    this.setData({ latestValue: res.value });
   },
 
   readValue() {
@@ -57,7 +60,7 @@ Page({
   },
 
   onUnload() {
-    my.offBLECharacteristicValueChange(this.handleValueChange);
+    my.offBLECharacteristicValueChange();
   }
 });
 ```
@@ -66,16 +69,17 @@ Page({
 
 ```javascript
 // When characteristic has notify enabled, updates arrive automatically
-my.onBLECharacteristicValueChange((res) => {
-  if (res.characteristicId === '0000FFF1-0000-1000-8000-00805F9B34FB') {
-    const buffer = new Uint8Array(res.value);
-    console.log('Sensor data:', Array.from(buffer));
+my.onBLECharacteristicValueChange({
+  success: (res) => {
+    if (res.characteristicId === '0000FFF1-0000-1000-8000-00805F9B34FB') {
+      console.log('Sensor data (hex):', res.value);
+    }
   }
 });
 ```
 
 <Info>
-The value is delivered as an `ArrayBuffer`. Use `DataView` or `Uint8Array` to interpret the bytes according to the characteristic's GATT profile.
+The value is delivered as a hexadecimal string. Parse it according to the characteristic's GATT profile.
 </Info>
 
 ## Related APIs

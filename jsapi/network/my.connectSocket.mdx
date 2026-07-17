@@ -10,10 +10,28 @@ Create a WebSocket connection to a server.
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | url | String | Yes | WebSocket URL (wss:// required in production) |
+| data | Object | No | Request parameters |
 | header | Object | No | Request headers |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
+
+## Error Codes
+
+| Error Code | Description | Solution |
+|------------|-------------|----------|
+| 1 | An unknown error | — |
+| 2 | A network connection already exists | A Mini Program can only keep one WebSocket connection at a time. If a WebSocket connection already exists when a new one is created, the existing one will be automatically disabled |
+| 3 | The URL parameter is null | Replace the URL link |
+| 4 | An unrecognized URL format | Replace the URL link |
+| 5 | The URL must start with WS or WSS | Replace the URL link |
+| 6 | Connection timed out | Try again later |
+| 7 | The HTTPS certificate returned by the server is invalid | Ensure the server domain's certificate is valid |
+| 8 | The protocol header returned by the server is invalid | Newly created Mini Programs must use HTTPS and WSS by default; HTTP and WS are not supported |
+| 9 | The Sec-WebSocket-Protocol request header is not specified for the WebSocket request | Specify the Sec-WebSocket-Protocol request header |
+| 10 | The network is not available and the message cannot be sent | Call `my.sendSocketMessage` only after the connection succeeds; use `my.onSocketOpen` to check the connection state |
+| 11 | Failed to send message | Try again later |
+| 12 | Unable to request more memory to read network data | Check available memory |
 
 ## Code Example
 

@@ -9,6 +9,7 @@ Use this API to start the compass sensor. After calling this, you can use `my.on
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
+| interval | String | No | Execution frequency of the callback functions that monitor compass data updates (the listeners registered with `my.onCompassChange`). Valid values: `game` (~20ms), `ui` (~60ms), `normal` (~200ms). Default: `normal` |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |

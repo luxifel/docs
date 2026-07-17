@@ -15,7 +15,8 @@ Register a callback for incoming WebSocket messages.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| data | String/ArrayBuffer | Received message data |
+| data | String/ArrayBuffer | Messages returned by the server, in text string or base64 encoded string |
+| isBuffer | Boolean | If the value of this field is `true`, the `data` field represents the received base64 encoded binary strings. If the value of this field is empty, the `data` field represents normal strings |
 
 ## Code Example
 

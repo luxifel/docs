@@ -9,8 +9,8 @@ Use this API to select images from the device album or capture using the camera.
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| count | Number | No | Maximum number of images (default: 1) |
-| sourceType | Array | No | Sources: `['album']`, `['camera']`, or both |
+| sizeType | Array | No | Original image, compressed image, both by default |
+| sourceType | Array | No | Camera or album, `['camera', 'album']` by default |
 | success | Function | No | Callback with image paths |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -25,13 +25,18 @@ Use this API to select images from the device album or capture using the camera.
 
 ```javascript
 my.chooseImage({
-  count: 3,
   sourceType: ['album', 'camera'],
   success: (res) => {
     console.log('Selected images:', res.apFilePaths);
   }
 });
 ```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 11 | User cancels operation |
 
 ## Related APIs
 

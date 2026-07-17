@@ -9,7 +9,7 @@ Use this API to get the list of Bluetooth devices that are currently connected.
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| services | Array | No | Filter by service UUIDs |
+| deviceId | String | Yes | Device ID of the Bluetooth device |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -39,13 +39,13 @@ my.getConnectedBluetoothDevices({
 });
 ```
 
-### Filter by Service
+### Check Specific Device
 
 ```javascript
 my.getConnectedBluetoothDevices({
-  services: ['FEE7'],
+  deviceId: 'XX:XX:XX:XX:XX:XX',
   success(res) {
-    console.log('Connected devices with service FEE7:', res.devices);
+    console.log('Connected devices:', res.devices);
   }
 });
 ```

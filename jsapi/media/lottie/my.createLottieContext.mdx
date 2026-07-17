@@ -22,7 +22,12 @@ Returns a LottieContext object with playback control methods.
 | play() | Start animation |
 | pause() | Pause animation |
 | stop() | Stop animation |
-| setSpeed(speed) | Set playback speed |
+| setSpeed({value}) | Set playback speed; a positive number is fast-forward speed, a negative number is rewind speed |
+| goToAndStop({value}) | Move the animation to the target progress (0.0-1.0) and stop it there |
+| goToAndPlay({value}) | Move the animation to the target progress (0.0-1.0) and play from that progress |
+| playFromMinToMaxProgress({min,max}) | Play the animation from the minimum to the maximum progress interval (0.0-1.0) |
+| playFromMinToMaxFrame({min,max}) | Play the animation from the minimum to the maximum frame interval |
+| downgradeToPlaceholder() | Downgrade the animation to the default placeholder image |
 
 ## Code Example
 

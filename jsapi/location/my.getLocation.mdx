@@ -9,8 +9,8 @@ Get the user's current location coordinates.
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| type | String | No | Coordinate type: `gcj02` (default) or `wgs84` |
-| cacheTimeout | Number | No | Cache timeout in seconds |
+| type | Number | No | `0`: default, get the longitude and latitude |
+| cacheTimeout | Number | No | Longitude and latitude location cache expiry time in seconds. Default is 30s |
 | success | Function | No | Callback with location |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -19,16 +19,23 @@ Get the user's current location coordinates.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| latitude | Number | Latitude |
-| longitude | Number | Longitude |
-| accuracy | Number | Accuracy in meters |
-| speed | Number | Speed in m/s |
+| longitude | String | Longitude |
+| latitude | String | Latitude |
+| accuracy | String | Accuracy, in m |
+
+## Error Codes
+
+| Error | Description | Solution |
+|-------|-------------|----------|
+| 11 | Make sure the location related right has been enabled | Prompt the user to enable location permission |
+| 12 | Network abnormity, try again later | Prompt the user to check the current network |
+| 13 | Location failure, try again later | — |
+| 14 | Service location timeout | Prompt the user to try again |
 
 ## Code Example
 
 ```javascript
 my.getLocation({
-  type: 'gcj02',
   success: (res) => {
     console.log('Lat:', res.latitude);
     console.log('Lng:', res.longitude);

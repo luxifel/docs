@@ -17,8 +17,10 @@ Get information about the current network connection.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| networkType | String | Network type: `WIFI`, `2G`, `3G`, `4G`, `5G`, `UNKNOWN`, `NONE` |
+| networkType | String | Network type: `UNKNOWN`, `NOTREACHABLE`, `WWAN`, `WIFI`, `2G`, `3G`, `4G`, `5G` |
 | networkAvailable | Boolean | Whether network is available |
+| signalStrength | Number | Signal strength in dbm. Only used when `networkType` is `WIFI`. Android only |
+| hasSystemProxy | Boolean | Whether the network proxy is being used |
 
 ## Code Example
 

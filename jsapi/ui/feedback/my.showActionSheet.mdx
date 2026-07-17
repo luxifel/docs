@@ -11,10 +11,20 @@ Use this API to show an action sheet menu that slides up from the bottom.
 |----------|------|----------|-------------|
 | title | String | No | Action sheet title |
 | items | Array | Yes | Array of option strings |
-| cancelButtonText | String | No | Cancel button text |
+| cancelButtonText | String | No | Cancel button text. Invalid on Android, where the cancel button is not displayed |
+| destructiveBtnIndex | Number | No | Index (starting from 0) of the button to mark as destructive, e.g. for delete/clear actions. Its default color is red |
+| badges | Array | No | Array of badge objects used to show red marks on menu items |
 | success | Function | No | Callback with selected index |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
+
+## Badges Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| index | Number | Index of the option to add a red mark to, starting from 0 |
+| type | String | Red mark type. Valid values: `none`, `point`, `num`, `text` |
+| text | String | Custom red mark text. Optional for `none`/`point`; for `num`, not displayed if the value has decimals or is not between 0-100 |
 
 ## Success Callback
 

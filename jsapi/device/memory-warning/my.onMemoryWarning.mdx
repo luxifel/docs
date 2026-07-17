@@ -15,15 +15,16 @@ Use this API to listen for system memory warning events. When the system is runn
 
 | Property | Type | Description |
 |----------|------|-------------|
-| level | Number | Memory warning level (higher means more critical) |
+| level | Number | Memory alarm level, only available on Android |
 
 ## Memory Warning Levels
 
-| Level | Description |
-|-------|-------------|
-| 10 | Low memory warning (iOS only) |
-| 15 | Critical memory warning (iOS only) |
-| 5 | Low memory warning (Android) |
+iOS devices do not have alarm levels. On Android, two alarm levels exist:
+
+| Level | Constant | Description |
+|-------|----------|-------------|
+| 10 | `TRIM_MEMORY_RUNNING_LOW` | Low memory warning (Android only) |
+| 15 | `TRIM_MEMORY_RUNNING_CRITICAL` | Critical memory warning (Android only) |
 
 ## Code Example
 

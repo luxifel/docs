@@ -9,12 +9,14 @@ Upload a file to a remote server.
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| url | String | Yes | Upload endpoint URL |
-| filePath | String | Yes | Local file path |
-| fileName | String | Yes | File name |
-| fileType | String | Yes | File type: `image`, `video`, `audio` |
-| formData | Object | No | Additional form data |
-| header | Object | No | Request headers |
+| url | String | Yes | Address of the developer server |
+| filePath | String | Yes | Local locator of the file resource to be uploaded |
+| fileName | String | Yes | Filename, also the corresponding key. The developer uses this key at the server side to get the file binary contents |
+| fileType | String | Yes | File type of the uploaded file. Note: this parameter is only used for backward compatibility with older super app versions; if not previously set, you can set the value to `image` for any file type |
+| header | Object | No | HTTP request header. By default, `Content-Type` is set to `multipart/form-data` — do not change this value, otherwise your request might fail |
+| formData | Object | No | Other additional form data in the HTTP request |
+| timeout | Object | No | Timeout period of the request in milliseconds. Default value is `60000` |
+| hideLoading | Boolean | No | Whether to hide a loading icon during the uploading process. Defaults to `false` |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -23,8 +25,17 @@ Upload a file to a remote server.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| data | String | Server response |
-| statusCode | Number | HTTP status code |
+| data | String | Data returned from the server |
+| statusCode | String | HTTP status code |
+| header | Object | Header returned from the server |
+
+## Error Codes
+
+| Error | Description |
+|-------|-------------|
+| 11 | File nonexistent |
+| 12 | File uploading failed |
+| 13 | No right |
 
 ## Code Example
 

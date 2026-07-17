@@ -417,7 +417,8 @@
               {
                 "group": "Battery",
                 "pages": [
-                  "jsapi/device/battery/my.getBatteryInfo"
+                  "jsapi/device/battery/my.getBatteryInfo",
+                  "jsapi/device/battery/my.getBatteryInfoSync"
                 ]
               },
               {
@@ -439,8 +440,12 @@
                   "jsapi/device/bluetooth/my.getBLEDeviceServices",
                   "jsapi/device/bluetooth/my.getBLEDeviceCharacteristics",
                   "jsapi/device/bluetooth/my.readBLECharacteristicValue",
+                  "jsapi/device/bluetooth/my.writeBLECharacteristicValue",
                   "jsapi/device/bluetooth/my.onBLECharacteristicValueChange",
-                  "jsapi/device/bluetooth/my.offBLECharacteristicValueChange"
+                  "jsapi/device/bluetooth/my.offBLECharacteristicValueChange",
+                  "jsapi/device/bluetooth/my.notifyBLECharacteristicValueChange",
+                  "jsapi/device/bluetooth/my.onBLEConnectionStateChanged",
+                  "jsapi/device/bluetooth/my.offBLEConnectionStateChanged"
                 ]
               },
               {

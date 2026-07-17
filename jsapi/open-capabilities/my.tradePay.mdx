@@ -7,18 +7,12 @@ Invoke the Rebell payment UI to complete a payment flow.
 
 ## Parameters
 
-Use **one** of the three mutually exclusive payment reference parameters, plus the optional callbacks:
-
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| tradeNO | String | One of three | Payment ID returned by the backend from a Payment API call |
-| paymentUrl | String | One of three | Full cashier URL returned by the backend |
-| orderStr | String | One of three | Signed order string returned by the backend |
+| paymentUrl | String | Yes | Full cashier URL returned by the backend |
 | success | Function | No | Callback with payment result |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
-
-Which parameter to use depends on the payment method your backend called. Use `tradeNO` for standard payment flows (Retail Pay, QR Order Pay), and `paymentUrl` when your backend returns a cashier URL (Link Pay).
 
 ## Success Callback
 
@@ -41,7 +35,7 @@ Which parameter to use depends on the payment method your backend called. Use `t
 
 ```javascript
 my.tradePay({
-  tradeNO: paymentIdFromBackend,
+  paymentUrl: paymentUrlFromBackend,
   success: (res) => {
     if (res.resultCode === '9000') {
       // Show pending, poll backend for confirmation

@@ -3,19 +3,20 @@ title: my.onCompassChange
 description: Listen for compass heading changes.
 ---
 
-Use this API to listen for compass heading changes. The callback provides the device's current heading direction.
+Use this API to register listeners that monitor compass data updates.
 
 ## Parameters
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| callback | Function | Yes | Callback function when compass heading changes |
+| listener | Function | Yes | A callback that monitors compass data updates. When executed, it receives a `res` object containing updated compass data. |
 
 ## Callback Parameters
 
 | Property | Type | Description |
 |----------|------|-------------|
-| direction | Number | Heading in degrees (0-360), where 0 is North |
+| direction | Number | The clockwise angle (in degrees) between the device's orientation and true north. Valid range: [0, 360) |
+| timestamp | Number | Timestamp when the compass data is recorded |
 
 ## Code Example
 

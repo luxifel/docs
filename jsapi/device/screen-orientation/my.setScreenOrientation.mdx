@@ -9,10 +9,16 @@ Use this API to lock the screen to a specific orientation. This is useful for vi
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| orientation | String | Yes | Target orientation: `auto`, `portrait`, `landscape` |
+| orientation | String | Yes | Indicates the orientation of the screen, `portrait` or `landscape`. |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
+
+## Success Callback Parameters
+
+| Property | Type | Description |
+|----------|------|-------------|
+| success | Boolean | Specifies whether the call is successful. When the value is `true`, the call is successful. |
 
 ## Code Example
 
@@ -50,8 +56,8 @@ Page({
   },
 
   onUnload() {
-    // Ensure orientation is reset
-    my.setScreenOrientation({ orientation: 'auto' });
+    // Restore portrait when leaving the page
+    my.setScreenOrientation({ orientation: 'portrait' });
   }
 });
 ```
@@ -68,9 +74,9 @@ Page({
   },
 
   onUnload() {
-    // Allow auto rotation when leaving
+    // Restore portrait when leaving
     my.setScreenOrientation({
-      orientation: 'auto'
+      orientation: 'portrait'
     });
   }
 });
@@ -80,12 +86,11 @@ Page({
 
 | Value | Description |
 |-------|-------------|
-| `auto` | Allow automatic rotation based on device orientation |
 | `portrait` | Lock to portrait (vertical) mode |
 | `landscape` | Lock to landscape (horizontal) mode |
 
 <Warning>
-Always reset orientation to `auto` when leaving a page that locked the orientation, otherwise users may be stuck in an unexpected orientation.
+Always reset orientation to `portrait` when leaving a page that locked the orientation, otherwise users may be stuck in an unexpected orientation.
 </Warning>
 
 ## Related APIs

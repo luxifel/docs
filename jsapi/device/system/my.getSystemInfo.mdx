@@ -17,26 +17,39 @@ Get detailed information about the device, system, and Mini Program environment.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| brand | String | Device brand |
-| model | String | Device model |
-| system | String | OS version |
-| platform | String | Platform (iOS/Android) |
-| version | String | Mini Program version |
-| screenWidth | Number | Screen width in px |
-| screenHeight | Number | Screen height in px |
+| model | String | Cellphone model |
+| pixelRatio | Number | Device pixel ratio |
 | windowWidth | Number | Window width in px |
 | windowHeight | Number | Window height in px |
+| language | String | The language set by the user in the app. If the app does not support the language setting, returns the system language |
+| version | String | App version number |
+| storage | String | Device disk capacity |
+| currentBattery | String | Current battery percentage |
+| system | String | System version |
+| platform | String | System name: Android or iOS |
+| titleBarHeight | Number | Title bar height in px |
 | statusBarHeight | Number | Status bar height in px |
-| language | String | System language |
+| screenWidth | Number | Screen width in px |
+| screenHeight | Number | Screen height in px |
+| brand | String | Cellphone brand |
+| fontSizeSetting | Number | User setting font size |
+| app | String | The current client on which the Mini Program is running |
 
 ## Code Example
 
 ```javascript
-my.getSystemInfo({
-  success: (res) => {
-    console.log('Device:', res.brand, res.model);
-    console.log('System:', res.system);
-    console.log('Screen:', res.screenWidth, 'x', res.screenHeight);
-  }
-});
+Page({
+  data: {
+    systemInfo: {}
+  },
+  getSystemInfoPage() {
+    my.getSystemInfo({
+      success: (res) => {
+        this.setData({
+          systemInfo: res
+        })
+      }
+    })
+  },
+})
 ```

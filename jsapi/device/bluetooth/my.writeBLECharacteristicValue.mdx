@@ -1,0 +1,72 @@
+---
+title: my.writeBLECharacteristicValue
+description: Write a value to a BLE device characteristic.
+---
+
+Use this API to write data to a characteristic on a connected BLE device. The target characteristic must support writing.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| deviceId | String | Yes | Device identifier |
+| serviceId | String | Yes | Service UUID |
+| characteristicId | String | Yes | Characteristic UUID |
+| value | Hex String | Yes | Hexadecimal string value to write, limited to 20 bytes |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.writeBLECharacteristicValue({
+  deviceId: 'XX:XX:XX:XX:XX:XX',
+  serviceId: '0000FFF0-0000-1000-8000-00805F9B34FB',
+  characteristicId: '0000FFF1-0000-1000-8000-00805F9B34FB',
+  value: 'fffe',
+  success: (res) => {
+    console.log('Write succeeded:', res);
+  },
+  fail: (err) => {
+    console.error('Write failed:', err);
+  }
+});
+```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 10000 | The Bluetooth adapter is not initialized |
+| 10001 | The Bluetooth adapter is not available |
+| 10002 | Device not found |
+| 10003 | Connection failed |
+| 10004 | Service not found |
+| 10005 | Characteristic not found |
+| 10006 | Connection lost |
+| 10007 | Characteristic not supported |
+| 10008 | System error |
+| 10009 | BLE is not supported for Android systems with versions lower than 4.3 |
+| 10011 | Invalid device ID |
+| 10012 | Invalid service ID |
+| 10013 | Invalid characteristic ID |
+| 10014 | Invalid data |
+| 10015 | Timeout |
+| 10016 | Parameters not enough |
+| 10017 | Failed to write characteristic |
+
+<Warning>
+IDE simulation is not supported for this API. Test on a real device.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.readBLECharacteristicValue" icon="arrow-down" href="/jsapi/device/bluetooth/my.readBLECharacteristicValue">
+    Read a characteristic value
+  </Card>
+  <Card title="my.onBLECharacteristicValueChange" icon="bell" href="/jsapi/device/bluetooth/my.onBLECharacteristicValueChange">
+    Listen for value changes
+  </Card>
+</CardGroup>

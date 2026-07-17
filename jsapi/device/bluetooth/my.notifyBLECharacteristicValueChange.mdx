@@ -1,0 +1,48 @@
+---
+title: my.notifyBLECharacteristicValueChange
+description: Enable notifications for a BLE device characteristic.
+---
+
+Use this API to enable notifications for changes to a BLE device characteristic. The target characteristic must support `notify` or `indicate`. This must be called before `my.onBLECharacteristicValueChange` will receive updates pushed by the device, and is more efficient than repeatedly calling `my.readBLECharacteristicValue`.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| deviceId | String | Yes | Device identifier |
+| serviceId | String | Yes | Service UUID |
+| characteristicId | String | Yes | Characteristic UUID |
+| descriptorId | String | No | Descriptor UUID for notification (Android-specific; defaults to `00002902-0000-1000-8000-00805F9b34fb`) |
+| state | Boolean | No | Enables or disables `notify`/`indicate` |
+| success | Function | No | Callback on success |
+| fail | Function | No | Callback on failure |
+| complete | Function | No | Callback that always executes |
+
+## Code Example
+
+```javascript
+my.notifyBLECharacteristicValueChange({
+  deviceId: 'XX:XX:XX:XX:XX:XX',
+  serviceId: '0000FFF0-0000-1000-8000-00805F9B34FB',
+  characteristicId: '0000FFF1-0000-1000-8000-00805F9B34FB',
+  state: true,
+  success: (res) => {
+    console.log('Notifications enabled:', res);
+  }
+});
+```
+
+<Info>
+Subscribing to notifications is recommended over polling with `my.readBLECharacteristicValue`. IDE simulation is not supported for this API — test on a real device.
+</Info>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onBLECharacteristicValueChange" icon="bell" href="/jsapi/device/bluetooth/my.onBLECharacteristicValueChange">
+    Listen for value changes
+  </Card>
+  <Card title="my.writeBLECharacteristicValue" icon="arrow-up" href="/jsapi/device/bluetooth/my.writeBLECharacteristicValue">
+    Write a characteristic value
+  </Card>
+</CardGroup>

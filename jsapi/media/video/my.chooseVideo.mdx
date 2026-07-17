@@ -9,9 +9,10 @@ Use this API to select a video from the device album or record a new video.
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| sourceType | Array | No | Sources: `['album']`, `['camera']`, or both |
-| maxDuration | Number | No | Maximum recording duration in seconds |
-| camera | String | No | Default camera: `front` or `back` |
+| sourceType | Array | No | Sources: `['album']`, `['camera']`, or both; default `['album', 'camera']` |
+| compressed | Boolean | No | Whether to compress the selected video file; always compressed on iOS; default `true` |
+| maxDuration | Number | No | Maximum recording duration in seconds (default: 60) |
+| camera | String | No | Default camera: `front` or `back`; default `back` |
 | success | Function | No | Callback with video data |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -20,9 +21,11 @@ Use this API to select a video from the device album or record a new video.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| apFilePath | String | Local path to video |
+| tempFilePath | String | Temporary file path of the selected video |
 | duration | Number | Video duration in seconds |
 | size | Number | File size in bytes |
+| height | Number | Video height |
+| width | Number | Video width |
 
 ## Code Example
 
@@ -31,7 +34,19 @@ my.chooseVideo({
   sourceType: ['album', 'camera'],
   maxDuration: 60,
   success: (res) => {
-    console.log('Video:', res.apFilePath);
+    console.log('Video:', res.tempFilePath);
   }
 });
 ```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 2 | Invalid parameters |
+| 3 | An unknown error occurs |
+| 11 | The operation was canceled by the user |
+| 12 | An error occurs in data processing |
+| 13 | The file size exceeds the limit |
+| 14 | No access to camera |
+| 15 | No access to album |

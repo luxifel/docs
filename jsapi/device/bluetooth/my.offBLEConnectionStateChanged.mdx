@@ -1,0 +1,53 @@
+---
+title: my.offBLEConnectionStateChanged
+description: Stop listening for BLE connection state changes.
+---
+
+Use this API to remove a listener registered with `my.onBLEConnectionStateChanged`. If no callback is provided, all listeners are removed.
+
+## Parameters
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| callback | Function | No | The specific callback to remove. If omitted, all listeners are removed. |
+
+## Code Example
+
+### Remove All Listeners
+
+```javascript
+my.offBLEConnectionStateChanged();
+```
+
+### Remove Specific Listener
+
+```javascript
+Page({
+  onLoad() {
+    my.onBLEConnectionStateChanged(this.handleConnectionStateChange);
+  },
+
+  handleConnectionStateChange(res) {
+    console.log('Connection state:', res.connected);
+  },
+
+  onUnload() {
+    my.offBLEConnectionStateChanged(this.handleConnectionStateChange);
+  }
+});
+```
+
+<Warning>
+IDE simulation is not supported for this API. Test on a real device.
+</Warning>
+
+## Related APIs
+
+<CardGroup cols={2}>
+  <Card title="my.onBLEConnectionStateChanged" icon="bell" href="/jsapi/device/bluetooth/my.onBLEConnectionStateChanged">
+    Listen for connection state changes
+  </Card>
+  <Card title="my.disconnectBLEDevice" icon="link-slash" href="/jsapi/device/bluetooth/my.disconnectBLEDevice">
+    Disconnect from a BLE device
+  </Card>
+</CardGroup>

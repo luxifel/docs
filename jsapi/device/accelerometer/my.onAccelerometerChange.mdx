@@ -3,21 +3,22 @@ title: my.onAccelerometerChange
 description: Listen for accelerometer data changes.
 ---
 
-Use this API to listen for accelerometer data changes. The callback provides x, y, and z axis acceleration values.
+Use this API to listen to the data change event of the accelerometer. The triggering of acceleration data change events relies on the call to `my.startAccelerometer`.
 
 ## Parameters
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| callback | Function | Yes | Callback function when accelerometer data changes |
+| listener | Function | Yes | The callback function to listen to the data change event of the accelerometer |
 
 ## Callback Parameters
 
 | Property | Type | Description |
 |----------|------|-------------|
-| x | Number | Acceleration along X axis |
-| y | Number | Acceleration along Y axis |
-| z | Number | Acceleration along Z axis |
+| x | Number | Acceleration value in x-axis. Unit: m/s² |
+| y | Number | Acceleration value in y-axis. Unit: m/s² |
+| z | Number | Acceleration value in z-axis. Unit: m/s² |
+| timestamp | Number | Timestamp. Unit: ns |
 
 ## Code Example
 

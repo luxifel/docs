@@ -10,7 +10,7 @@ Use this API to reduce the file size of an image.
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | apFilePaths | Array | Yes | Array of image paths to compress |
-| compressLevel | Number | No | Compression level (0-4, default: 4) |
+| compressLevel | Number | No | Image quality after compression: `0` (low), `1` (medium), `2` (high), `4` (depends on network — Wi-Fi is high, otherwise medium); default: `4` |
 | success | Function | No | Callback with compressed paths |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -32,3 +32,10 @@ my.compressImage({
   }
 });
 ```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 2 | Compress failed: failed to compress all images |
+| - | Invalid parameter: failed to compress one of the images |

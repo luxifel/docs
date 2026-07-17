@@ -24,7 +24,9 @@ my.offBluetoothDeviceFound();
 ```javascript
 Page({
   onLoad() {
-    my.onBluetoothDeviceFound(this.handleDeviceFound);
+    my.onBluetoothDeviceFound({
+      success: this.handleDeviceFound
+    });
   },
 
   handleDeviceFound(res) {

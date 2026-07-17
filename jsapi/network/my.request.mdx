@@ -3,18 +3,19 @@ title: my.request
 description: Make an HTTP network request.
 ---
 
-Make HTTP/HTTPS requests to remote servers.
+Make HTTP/HTTPS requests to remote servers. This method returns a request task object that exposes an `abort()` method to cancel the request.
 
 ## Parameters
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| url | String | Yes | Request URL (HTTPS required in production) |
-| method | String | No | HTTP method: `GET`, `POST`, `PUT`, `DELETE` (default: `GET`) |
+| url | String | Yes | Target server url |
+| method | String | No | HTTP method: `GET` or `POST` (default: `GET`) |
 | data | Object | No | Request data |
-| headers | Object | No | Request headers |
+| headers | Object | No | Request headers (default: `{'content-type': 'application/json'}`) |
 | timeout | Number | No | Timeout in ms (default: 30000) |
-| dataType | String | No | Response type: `json`, `text`, `base64` |
+| dataType | String | No | Response type: `json`, `text`, `base64` (default: `json`) |
+| enableCookie | Boolean | No | Whether to use the cookie header: `true` to use it, `false` to ignore it (non-expired cookies are used automatically) |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
@@ -23,9 +24,21 @@ Make HTTP/HTTPS requests to remote servers.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| data | Object/String | Response data |
+| data | String | Response data. Format depends on the `dataType` value |
 | status | Number | HTTP status code |
 | headers | Object | Response headers |
+
+## Error Codes
+
+| Error Code | Error Message | Further Action |
+|------------|---------------|-----------------|
+| 2 | URL parameter cannot be empty | Check the HTTPS format and URL parameters |
+| 4 | Not authorized to call the interface | Configure the server domain whitelist under Mini Program > Configuration > Server Domain Whitelist |
+| 12 | Network error | Check internet connection and server stability |
+| 13 | Timeout | Check network and server response; adjust timeout if needed |
+| 14 | Decoding failed. JSON parse data error. | Verify `dataType` matches the response format; check for a UTF-8 BOM |
+| 19 | HTTP error | HTTP status >= 400. Check the IDE debugger Network tab |
+| 20 | Cancel the network request | Operation cancelled |
 
 ## Code Example
 
@@ -45,6 +58,10 @@ my.request({
     console.error('Error:', err);
   }
 });
+
+// Cancel an in-flight request
+const task = my.request({ url: 'https://api.example.com/data' });
+task.abort();
 ```
 
 ## Related APIs

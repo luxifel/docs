@@ -23,11 +23,13 @@ Use this API to get all Bluetooth devices discovered during the current session,
 
 | Property | Type | Description |
 |----------|------|-------------|
-| deviceId | String | Device identifier |
-| name | String | Device name (may be empty) |
-| RSSI | Number | Signal strength |
-| advertisData | ArrayBuffer | Advertisement data |
-| advertisServiceUUIDs | Array | Advertised service UUIDs |
+| deviceId | String | Device ID |
+| name | String | Name of the Bluetooth device (some devices may not have a name) |
+| deviceName | String | Name of the Bluetooth device |
+| localName | String | Name of the local device |
+| RSSI | Number | Received Signal Strength Indicator |
+| advertisData | Hex String | Advertisement data of the device |
+| manufacturerData | Hex String | Manufacturer data of the device |
 
 ## Code Example
 

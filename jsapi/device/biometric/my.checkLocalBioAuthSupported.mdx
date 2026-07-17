@@ -17,8 +17,17 @@ Use this API to check if biometric authentication (fingerprint or face recogniti
 
 | Property | Type | Description |
 |----------|------|-------------|
-| available | Boolean | Whether biometric is available |
-| type | String | Available type: `fingerPrint`, `facial`, or `none` |
+| success | Boolean | Whether biometric authentication is available on the user's device. Returned by the `success` or `complete` callback. |
+| error | Number | The error code. Returned by the `fail` callback, or by the `complete` callback when `success` is `false`. See Error Codes below. |
+| errorMessage | String | The error message corresponding to the error code. |
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 12 | Either the device lacks biometric support or the super app cannot access the biometric feature. |
+| 13 | Biometric credentials are not enabled on the user's device. |
+| 99 | An undefined error has occurred. Please contact technical support for assistance. |
 
 ## Code Example
 
@@ -27,8 +36,10 @@ Use this API to check if biometric authentication (fingerprint or face recogniti
 ```javascript
 my.checkLocalBioAuthSupported({
   success(res) {
-    console.log('Biometric available:', res.available);
-    console.log('Type:', res.type);
+    console.log('Biometric available:', res.success);
+  },
+  fail(res) {
+    console.error('Error code:', res.error);
   }
 });
 ```
@@ -38,16 +49,14 @@ my.checkLocalBioAuthSupported({
 ```javascript
 Page({
   data: {
-    biometricAvailable: false,
-    biometricType: 'none'
+    biometricAvailable: false
   },
 
   onLoad() {
     my.checkLocalBioAuthSupported({
       success: (res) => {
         this.setData({
-          biometricAvailable: res.available,
-          biometricType: res.type
+          biometricAvailable: res.success
         });
       }
     });
@@ -62,23 +71,21 @@ Page({
   authenticate() {
     my.checkLocalBioAuthSupported({
       success: (res) => {
-        if (res.available) {
-          this.useBiometric(res.type);
+        if (res.success) {
+          this.useBiometric();
         } else {
           this.usePasswordAuth();
         }
+      },
+      fail: () => {
+        this.usePasswordAuth();
       }
     });
   },
 
-  useBiometric(type) {
-    const title = type === 'facial'
-      ? 'Look at your device'
-      : 'Touch the fingerprint sensor';
-
+  useBiometric() {
     my.startLocalBioAuth({
-      type: type,
-      title: title,
+      promptText: 'Verify your identity',
       success: (res) => {
         if (res.success) {
           this.onAuthSuccess();
@@ -101,7 +108,7 @@ Page({
 });
 ```
 
-### Display Biometric Options
+### Handling Errors
 
 ```javascript
 Page({
@@ -110,18 +117,15 @@ Page({
   },
 
   onLoad() {
-    const methods = [{ name: 'Password', type: 'password' }];
-
     my.checkLocalBioAuthSupported({
       success: (res) => {
-        if (res.available) {
-          if (res.type === 'fingerPrint') {
-            methods.unshift({ name: 'Fingerprint', type: 'fingerPrint' });
-          } else if (res.type === 'facial') {
-            methods.unshift({ name: 'Face ID', type: 'facial' });
-          }
-        }
-        this.setData({ authMethods: methods });
+        this.setData({
+          authMethods: res.success ? ['Biometric', 'Password'] : ['Password']
+        });
+      },
+      fail: (res) => {
+        console.log('Error code:', res.error, res.errorMessage);
+        this.setData({ authMethods: ['Password'] });
       }
     });
   }

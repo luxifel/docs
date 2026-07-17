@@ -3,12 +3,13 @@ title: my.vibrateShort
 description: Trigger a short device vibration.
 ---
 
-Make the device vibrate briefly for lightweight haptic feedback.
+Use this API to trigger a relatively short period of vibration (40 ms) on the device.
 
 ## Parameters
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
+| type | String | No | Level of device vibration intensity. If the current device does not support setting the vibration level, the default intensity (`light`) is used, and no error is triggered. Valid values: `heavy`, `medium`, `light` (default) |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |

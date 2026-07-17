@@ -10,10 +10,11 @@ Use this API to establish a connection to a Bluetooth Low Energy (BLE) device.
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | deviceId | String | Yes | Device identifier from discovery |
-| timeout | Number | No | Connection timeout in milliseconds |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
+
+If the specified Bluetooth device is already connected, a repeated connection request returns success directly.
 
 ## Code Example
 
@@ -31,23 +32,6 @@ my.connectBLEDevice({
 });
 ```
 
-### Connect with Timeout
-
-```javascript
-my.connectBLEDevice({
-  deviceId: 'XX:XX:XX:XX:XX:XX',
-  timeout: 5000, // 5 second timeout
-  success() {
-    console.log('Connected');
-  },
-  fail(err) {
-    if (err.error === 10012) {
-      my.showToast({ content: 'Connection timeout', type: 'fail' });
-    }
-  }
-});
-```
-
 ### Complete Connection Flow
 
 ```javascript
@@ -61,7 +45,6 @@ Page({
 
     my.connectBLEDevice({
       deviceId: device.deviceId,
-      timeout: 10000,
       success: () => {
         my.hideLoading();
         this.setData({ connectedDevice: device });
@@ -93,10 +76,12 @@ Page({
 
 | Code | Description |
 |------|-------------|
-| 10000 | Bluetooth adapter not initialized |
-| 10001 | Bluetooth not enabled |
-| 10012 | Connection timeout |
-| 10013 | Device not found |
+| 10000 | The Bluetooth adapter is not initialized |
+| 10001 | The Bluetooth adapter is not available |
+| 10002 | Device not found |
+| 10003 | Connection failed |
+| 10006 | Connection lost |
+| 10015 | Timeout |
 
 <Warning>
 Ensure the device is in range and advertising before attempting to connect. Use discovery to verify the device is available.

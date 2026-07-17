@@ -3,7 +3,7 @@ title: my.getSetting
 description: Obtain the user's current Mini App permission settings.
 ---
 
-Returns the user's current authorization settings for the Mini App — which permissions have been granted and which have been denied.
+Use this API to obtain the user's current settings. Only the permissions that have been requested by the Mini Program from the user are returned.
 
 ## Parameters
 
@@ -17,7 +17,17 @@ Returns the user's current authorization settings for the Mini App — which per
 
 | Property | Type | Description |
 |----------|------|-------------|
-| authSetting | Object | Map of permission scope keys to their granted status (`true`/`false`) |
+| authSetting | Object | Results of user authorization. Keys are the values of scopes and values are boolean types, which shows whether the user gives the permission or not. |
+
+## Scopes
+
+| Scope | API | Description |
+|-------|-----|-------------|
+| location | my.getLocation | Specifies whether to authorize access to geographic location. |
+| album | my.chooseImage, my.saveImage | Specifies whether to authorize saving images to the album. |
+| camera | my.scan | Specifies whether to authorize access to the camera. |
+| phoneNumber | my.getPhoneNumber | Specifies whether to authorize access to the phone number. |
+| userInfo | my.getOpenUserInfo | Specifies whether to authorize access to user information. |
 
 ## Code Example
 
@@ -25,8 +35,8 @@ Returns the user's current authorization settings for the Mini App — which per
 my.getSetting({
   success: (res) => {
     console.log('Auth settings:', res.authSetting);
-    // Example: { 'scope.userLocation': true, 'scope.camera': false }
-    if (res.authSetting['scope.userLocation']) {
+    // Example: { location: true, camera: false, album: true, userInfo: true, phoneNumber: true }
+    if (res.authSetting['location']) {
       // Location permission already granted
     }
   },

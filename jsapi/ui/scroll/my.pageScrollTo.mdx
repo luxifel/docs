@@ -3,15 +3,15 @@ title: my.pageScrollTo
 description: Scroll the page to a specified position.
 ---
 
-Use this API to scroll the page to a specific position.
+Use this API to scroll the page to a specific position. The `scrollTop` parameter has a higher priority than `selector`.
 
 ## Parameters
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| scrollTop | Number | No | Target scroll position in pixels |
-| duration | Number | No | Scroll animation duration in ms (default: 300) |
-| selector | String | No | CSS selector to scroll to |
+| scrollTop | Number | No | Scroll to target position in px. Must be greater than 0 when jumping to top. |
+| duration | Number | No | Duration of scroll animation, in ms (default: 0) |
+| selector | String | No | Selector. Framework executes `document.querySelector(selector)`. |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |

@@ -9,8 +9,7 @@ Open file picker to select a file from device storage.
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| count | Number | No | Maximum files to select |
-| success | Function | No | Callback with file paths |
+| success | Function | No | Callback with file path |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
 
@@ -18,15 +17,25 @@ Open file picker to select a file from device storage.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| apFilePaths | Array | Selected file paths |
+| apFilePath | String | The temporary local file path |
+
+## Error Codes
+
+| Error Code | Error Message | Remark |
+|------------|---------------|--------|
+| 4 | The JSAPI call is denied | The mini program has no right to call the JSAPI |
+| 12 | Errors occur when copying the file | |
+| 15 | The user cancels the file selection | |
+| 16 | The user denies the permission to read the storage | Android only |
+| 17 | No permission to read the storage | Android only |
+| 18 | Choosing large file is not supported | |
 
 ## Code Example
 
 ```javascript
 my.chooseFileFromDisk({
-  count: 1,
   success: (res) => {
-    console.log('Selected:', res.apFilePaths);
+    console.log('Selected:', res.apFilePath);
   }
 });
 ```

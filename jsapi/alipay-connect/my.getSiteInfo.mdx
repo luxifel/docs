@@ -3,7 +3,7 @@ title: my.getSiteInfo
 description: Get site-specific information for Alipay Connect.
 ---
 
-Retrieve site information for cross-platform compatibility.
+Use this API to obtain the site information assigned by Alipay+, which is used in Alipay+ business, such as the site name. Requires Appx 1.24.6 or higher.
 
 ## Parameters
 
@@ -17,8 +17,7 @@ Retrieve site information for cross-platform compatibility.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| siteCode | String | Site identifier code |
-| siteName | String | Site name |
+| siteName | String | The site name assigned by Alipay+ which can be used in Alipay+ business. Supported values: `EASYPAISA`, `DANA`, `GCASH`, `TRUEMONEY`, `TNG`, `BKASH`, `KAKAOPAY`, `ALIPAY_CN`, `ALIPAY_HK` |
 
 ## Code Example
 
@@ -26,7 +25,6 @@ Retrieve site information for cross-platform compatibility.
 my.getSiteInfo({
   success: (res) => {
     console.log('Site:', res.siteName);
-    console.log('Code:', res.siteCode);
   }
 });
 ```

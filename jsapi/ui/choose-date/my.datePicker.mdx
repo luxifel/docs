@@ -13,15 +13,21 @@ Use this API to show a date/time picker for user selection.
 | currentDate | String | No | Initial selected date |
 | startDate | String | No | Minimum selectable date |
 | endDate | String | No | Maximum selectable date |
-| success | Function | No | Callback with selected date |
-| fail | Function | No | Callback on failure |
-| complete | Function | No | Callback that always executes |
+| success | Function | Yes | Callback with selected date |
+| fail | Function | Yes | Callback on failure |
+| complete | Function | Yes | Callback that always executes |
 
 ## Success Callback
 
 | Property | Type | Description |
 |----------|------|-------------|
 | date | String | Selected date in specified format |
+
+## Error Codes
+
+| Error Code | Description | Solution |
+|------------|-------------|----------|
+| 11 | The user cancelled the operation. | The user cancelled the operation and no action is required. |
 
 ## Code Example
 

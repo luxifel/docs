@@ -9,30 +9,47 @@ Use this API to add a new contact to the user's phone contact list. The user wil
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| firstName | String | Yes | Contact's first name |
-| lastName | String | No | Contact's last name |
-| nickName | String | No | Contact's nickname |
-| mobilePhoneNumber | String | No | Mobile phone number |
+| photoFilePath | String | No | Local file path of avatar |
+| nickName | String | No | Nickname |
+| lastName | String | No | Surname |
+| middleName | String | No | Middle name |
+| firstName | String | No | First name |
+| remark | String | No | Remarks |
+| mobilePhoneNumber | String | No | Cell number |
+| addressCountry | String | No | Country in contact address |
+| addressState | String | No | Province in contact address |
+| addressCity | String | No | City in contact address |
+| addressStreet | String | No | Street in contact address |
+| addressPostalCode | String | No | Postcode in contact address |
+| organization | String | No | Company |
+| title | String | No | Title |
+| workFaxNumber | String | No | Work fax |
 | workPhoneNumber | String | No | Work phone number |
-| homePhoneNumber | String | No | Home phone number |
-| email | String | No | Email address |
-| workEmail | String | No | Work email address |
-| organization | String | No | Company/organization name |
-| title | String | No | Job title |
-| workAddressStreet | String | No | Work street address |
-| workAddressCity | String | No | Work city |
-| workAddressState | String | No | Work state/province |
-| workAddressPostalCode | String | No | Work postal code |
-| workAddressCountry | String | No | Work country |
-| homeAddressStreet | String | No | Home street address |
-| homeAddressCity | String | No | Home city |
-| homeAddressState | String | No | Home state/province |
-| homeAddressPostalCode | String | No | Home postal code |
-| homeAddressCountry | String | No | Home country |
-| remark | String | No | Notes/remarks |
+| hostNumber | String | No | Company phone number |
+| email | String | No | Email |
+| url | String | No | Website |
+| workAddressCountry | String | No | Country in work address |
+| workAddressState | String | No | Province in work address |
+| workAddressCity | String | No | City in work address |
+| workAddressStreet | String | No | Street in work address |
+| workAddressPostalCode | String | No | Postcode in work address |
+| homeFaxNumber | String | No | Home fax |
+| homePhoneNumber | String | No | Home phone |
+| homeAddressCountry | String | No | Country in home address |
+| homeAddressState | String | No | Province in home address |
+| homeAddressCity | String | No | City in home address |
+| homeAddressStreet | String | No | Street in home address |
+| homeAddressPostalCode | String | No | Postcode in home address |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
+
+## Error Codes
+
+| Error | Message | Description |
+|-------|---------|-------------|
+| 11 | fail cancel | The user cancels the operation. |
+| 3 | fail ${detail} | Call failure, detail includes the detailed information. |
 
 ## Code Example
 
@@ -58,7 +75,6 @@ my.addPhoneContact({
   mobilePhoneNumber: '+1234567890',
   workPhoneNumber: '+1987654321',
   email: 'jane.smith@example.com',
-  workEmail: 'jsmith@company.com',
   organization: 'Acme Corporation',
   title: 'Sales Manager',
   workAddressStreet: '123 Business Ave',

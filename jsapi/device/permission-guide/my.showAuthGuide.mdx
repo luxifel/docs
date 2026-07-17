@@ -18,11 +18,11 @@ Use this API to display a guide helping users understand and grant specific perm
 
 | Value | Description |
 |-------|-------------|
-| `LOCATION` | Location permission |
-| `CAMERA` | Camera permission |
-| `PHOTO` | Photo album permission |
-| `CONTACTS` | Contacts permission |
 | `MICROPHONE` | Microphone permission |
+| `ADDRESSBOOK` | Address book permission |
+| `CAMERA` | Camera permission |
+| `PHOTO` | Photo permission |
+| `LBS` | Location (LBS) permission |
 
 ## Code Example
 
@@ -30,7 +30,7 @@ Use this API to display a guide helping users understand and grant specific perm
 
 ```javascript
 my.showAuthGuide({
-  authType: 'LOCATION',
+  authType: 'LBS',
   success() {
     console.log('Auth guide shown');
   }
@@ -49,7 +49,7 @@ Page({
       fail: (err) => {
         // Show authorization guide
         my.showAuthGuide({
-          authType: 'LOCATION',
+          authType: 'LBS',
           success: () => {
             // Guide was shown, user may have granted permission
             // Try again after a delay
@@ -105,10 +105,10 @@ Page({
 
 ```javascript
 const permissionGuides = {
-  location: () => my.showAuthGuide({ authType: 'LOCATION' }),
+  location: () => my.showAuthGuide({ authType: 'LBS' }),
   camera: () => my.showAuthGuide({ authType: 'CAMERA' }),
   photo: () => my.showAuthGuide({ authType: 'PHOTO' }),
-  contacts: () => my.showAuthGuide({ authType: 'CONTACTS' })
+  contacts: () => my.showAuthGuide({ authType: 'ADDRESSBOOK' })
 };
 
 function showGuideFor(type) {

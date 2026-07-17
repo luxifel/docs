@@ -10,7 +10,7 @@ Use this API to show a loading indicator during asynchronous operations.
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | content | String | No | Loading text message |
-| delay | Number | No | Delay before showing (ms) |
+| delay | Number | No | Delay before showing, in ms (0 by default). If `my.hideLoading` is called before this delay elapses, the loading indicator is not displayed |
 | success | Function | No | Callback on success |
 | fail | Function | No | Callback on failure |
 | complete | Function | No | Callback that always executes |
